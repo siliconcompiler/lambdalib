@@ -1,7 +1,5 @@
-// See https://skywater-pdk.readthedocs.io
 module la_iovss
-  #(
-    parameter TYPE = "DEFAULT" // cell type
+  #(parameter TYPE = "DEFAULT" // cell type
     )
    (
     inout 	vdd, // core supply
