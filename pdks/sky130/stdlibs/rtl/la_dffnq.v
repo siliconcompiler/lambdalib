@@ -1,5 +1,5 @@
 
-module la_latnq(d, clk, q);
+module la_dffnq(d, clk, q);
   wire _0_;
   input clk;
   input d;
@@ -8,9 +8,9 @@ module la_latnq(d, clk, q);
     .A(clk),
     .Y(_0_)
   );
-  \$_DLATCH_P_  _2_ (
+  sky130_fd_sc_hd__dfxtp_2 _2_ (
+    .CLK(_0_),
     .D(d),
-    .E(_0_),
     .Q(q)
   );
 endmodule

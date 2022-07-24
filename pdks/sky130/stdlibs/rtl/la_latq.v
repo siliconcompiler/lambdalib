@@ -1,16 +1,11 @@
 
-module la_latq
-  #(parameter TYPE = "DEFAULT")
-   (
-    input  d,
-    input  clk,
-    output q
-    );
-
-   sky130_fd_sc_hd__dlxtp_1
-     lat1 (.D(d),
-	   .GATE(clk),
-           .Q(q)
-           );
-
+module la_latq(d, clk, q);
+  input clk;
+  input d;
+  output q;
+  \$_DLATCH_P_  _0_ (
+    .D(d),
+    .E(clk),
+    .Q(q)
+  );
 endmodule
