@@ -1,19 +1,19 @@
 /*****************************************************************************
- * Function: IO section
+ * Function: IO padring section
  * Copyright: Lambda Project Authors. ALl rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
  ****************************************************************************/
 
 module la_iosection
-  #(parameter N         =  8,        // total signal pads (in section)
-    parameter NVDDIO    =  8,        // total IO supply pads
-    parameter NVDD      =  8,        // total core supply pads
-    parameter NVSS      =  8,        // total core ground pads
-    parameter NDCAP     =  0,        // total decap cells
-    parameter CFGW      =  16,       // width of core config bus
+  #(parameter N         =  8,        // total bidir pads (in section)
+    parameter NANALOG   =  0,        // total analog pads
+    parameter NVDDIO    =  1,        // total IO supply pads
+    parameter NVDD      =  1,        // total core supply pads
+    parameter NGND      =  1,        // total core ground pads
+    parameter NDECAP    =  0,        // total decap cells
+    parameter CFGW      =  8,        // width of core config bus
     parameter RINGW     =  8,        // width of io ring
-    parameter ANALOG    =  1 ,       // 1 = section is analog
     parameter SIDE      = "NO",      // "NO", "SO", "EA", "WE"
     parameter IOTYPE    = "DEFAULT", // io cell type
     parameter POCTYPE   = "DEFAULT", // poc cell type
@@ -46,50 +46,54 @@ module la_iosection
    genvar 	       i;
 
    //##########################################
-   //# IO BUFFERS
+   //# BIDIR BUFFERS
    //##########################################
 
    for(i=0;i<N;i=i+1)
-     if(ANALOG)
-       begin
-	  la_ioanalog #(.SIDE(SIDE),
-			.TYPE(IOTYPE),
-			.RINGW(RINGW))
-	  ipin (.pad    (pad[i]),
-		.vdd    (vdd),
-		.vss    (vss),
-		.vddio  (vddio),
-		.vssio  (vssio),
-		.a      (a[i]),
-		.z      (z[i]),
-		.ioring (ioring[RINGW-1:0]));
-       end
-     else
-       begin
-	  la_iobidir #(.SIDE(SIDE),
-		       .TYPE(IOTYPE),
-		       .CFGW(CFGW),
-		       .RINGW(RINGW))
-	  ipin (// Outputs
-		.z		(z),
+     begin
+	la_iobidir #(.SIDE(SIDE),
+		     .TYPE(IOTYPE),
+		     .CFGW(CFGW),
+		     .RINGW(RINGW))
+	ibidir (// Outputs
+		.z	(z[i]),
 		// Inouts
-		.pad		(pad[i]),
-		.vdd		(vdd),
-		.vss		(vss),
-		.vddio	(vddio),
+		.pad	(pad[i]),
+		.vdd	(vdd),
+		.vss	(vss),
+		.vddio  (vddio),
 		.vssio	(vssio),
 		.ioring	(ioring[RINGW-1:0]),
 		// Inputs
-		.a		(a[i]),
-		.ie		(ie[i]),
-		.oe		(oe[i]),
-		.pe		(pe[i]),
-		.ps		(ps[i]),
-		.sr		(sr[i]),
-		.st		(st[i]),
-		.ds		(ds[i*3+:3]),
-		.cfg		(cfg[i*CFGW+:CFGW]));
-       end // else: !if(EN_ANALOG)
+		.a	(a[i]),
+		.ie	(ie[i]),
+		.oe	(oe[i]),
+		.pe	(pe[i]),
+		.ps	(ps[i]),
+		.sr	(sr[i]),
+		.st	(st[i]),
+		.ds	(ds[i*3+:3]),
+		.cfg	(cfg[i*CFGW+:CFGW]));
+     end
+
+   //##########################################
+   //# ANALOG
+   //##########################################
+
+   for(i=0;i<NANALOG;i=i+1)
+     begin
+	la_ioanalog #(.SIDE(SIDE),
+		      .TYPE(IOTYPE),
+		      .RINGW(RINGW))
+	ipin (.pad    (pad[i]),
+	      .vdd    (vdd),
+	      .vss    (vss),
+	      .vddio  (vddio),
+	      .vssio  (vssio),
+	      .a      (a[i]),
+	      .z      (z[i]),
+	      .ioring (ioring[RINGW-1:0]));
+     end
 
    //##########################################
    //# VDDIO/VSSIO
@@ -138,7 +142,7 @@ module la_iosection
    //# VSS
    //##########################################
 
-   for(i=0;i<NVSS;i=i+1)
+   for(i=0;i<NGND;i=i+1)
      begin
 	la_iovss #(.SIDE(SIDE),
 		   .TYPE(VSSTYPE),
@@ -150,14 +154,14 @@ module la_iosection
 	      .ioring  (ioring[RINGW-1:0]));
      end
 
-   //######################
+   //#########################################
    //# POWER ON CONTROL
-   //######################
+   //#########################################
 
    la_iopoc #(.SIDE(SIDE),
 	      .TYPE(POCTYPE),
 	      .RINGW(RINGW))
-   ivss (.vdd     (vdd),
+   ipoc (.vdd     (vdd),
 	 .vss     (vss),
 	 .vddio   (vddio),
 	 .vssio   (vssio),
