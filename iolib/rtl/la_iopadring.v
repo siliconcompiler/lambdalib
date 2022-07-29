@@ -11,7 +11,7 @@
  *
  ****************************************************************************/
 
-module la_padring
+module la_iopadring
   #(parameter TYPE       = "SOFT",// asic cell type selector
     // north
     parameter NO_SECTIONS =  1,    // total domains

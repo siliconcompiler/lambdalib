@@ -13,10 +13,7 @@ module la_iocut
     parameter SIDE  = "NO",      // "NO", "SO", "EA", "WE"
     parameter RINGW =  8         // width of io ring
     )
-  #(
-    parameter TYPE = "DEFAULT" // cell type
-    )
-  (
+   (
     // ground never cut
     inout 	      vss,
     // left side (viewed from center)
