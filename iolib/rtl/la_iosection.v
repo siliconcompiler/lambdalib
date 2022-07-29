@@ -12,17 +12,18 @@
  ****************************************************************************/
 
 module la_iosection
-  #(parameter N         =  8,        // total pads (in section)
-    parameter NANALOG   =  0,        // Number of analog pads (of total)
-    parameter NVDDIO    =  1,        // total IO supply pads
-    parameter NVDD      =  1,        // total core supply pads
-    parameter NGND      =  1,        // total core ground pads
-    parameter NDECAP    =  0,        // total decap cells
-    parameter CFGW      =  8,        // width of core config bus
-    parameter RINGW     =  8,        // width of io ring
+  #(parameter N         = 8,        // total pads (in section)
+    parameter NANALOG   = 0,        // Number of analog pads
+    parameter NXTAL     = 1,        // Number of xtal pads
+    parameter NVDDIO    = 1,        // total IO supply pads
+    parameter NVDD      = 1,        // total core supply pads
+    parameter NGND      = 1,        // total core ground pads
+    parameter CFGW      = 8,        // width of core config bus
+    parameter RINGW     = 8,        // width of io ring
+    parameter ENCLAMP   = 1,         // 1=place clamp cell
+    parameter ENCUT     = 1,         // 1=place cut cell on right
+    parameter ENPOC     = 1,         // 1=place poc cell
     parameter SIDE      = "NO",      // "NO", "SO", "EA", "WE"
-    parameter ENCUT     = 1,         // place cut cell on right
-    parameter ENPOC     = 1,         // place poc cell
     parameter IOTYPE    = "DEFAULT", // io cell type
     parameter POCTYPE   = "DEFAULT", // poc cell type
     parameter VDDTYPE   = "DEFAULT", // vdd cell type
@@ -56,13 +57,13 @@ module la_iosection
     input [N*CFGW-1:0] cfg // generic config interface
     );
 
+
    genvar 	       i;
 
    //##########################################
    //# BIDIR BUFFERS
    //##########################################
-
-   for(i=0;i<(N-NANALOG);i=i+1)
+   for(i=0;i<(N-NANALOG-NXTAL);i=i+1)
      begin
 	la_iobidir #(.SIDE(SIDE),
 		     .TYPE(IOTYPE),
@@ -106,6 +107,25 @@ module la_iosection
 		  .a      (a[i]),
 		  .z      (z[i]),
 		  .ioring (ioring[RINGW-1:0]));
+     end
+
+   //##########################################
+   //# XTAL CELL (careful with mixing with gpio)
+   //##########################################
+
+   for(i=0;i<NXTAL;i=i+1)
+     begin
+	la_ioxtal #(.SIDE(SIDE),
+		    .TYPE(IOTYPE),
+		    .RINGW(RINGW))
+	ioxtal (.pad    (pad[i]),
+		.vdd    (vdd),
+		.vss    (vss),
+		.vddio  (vddio),
+		.vssio  (vssio),
+		.a      (a[i]),
+		.z      (z[i]),
+		.ioring (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -167,6 +187,22 @@ module la_iosection
 	      .ioring  (ioring[RINGW-1:0]));
      end
 
+   //##########################################
+   //# ESD CLAMP
+   //##########################################
+
+   if (ENCLAMP)
+     begin
+	la_ioclamp #(.SIDE(SIDE),
+		     .TYPE(VSSTYPE),
+		     .RINGW(RINGW))
+	iclamp (.vdd     (vdd),
+		.vss     (vss),
+		.vddio   (vddio),
+		.vssio   (vssio),
+		.ioring  (ioring[RINGW-1:0]));
+     end
+
    //#########################################
    //# POWER ON CONTROL
    //#########################################
@@ -181,7 +217,8 @@ module la_iosection
 	      .vddio   (vddio),
 	      .vssio   (vssio),
 	      .ioring  (ioring[RINGW-1:0]));
-     end
+     end // if (ENCUT)
+
    //#########################################
    //# CUT CELLS
    //#########################################
