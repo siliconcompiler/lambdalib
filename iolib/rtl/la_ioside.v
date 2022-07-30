@@ -93,6 +93,19 @@ module la_ioside
    endfunction
 
    //##########################################
+   //# PLACE CORNER CELL
+   //##########################################
+
+   la_iocorner #(.SIDE(SIDE),
+		 .TYPE(IOTYPE),
+		 .RINGW(RINGW))
+   la_iocorner(.vdd     (vdd),
+	       .vss     (vss),
+	       .vddio   (vddio),
+	       .vssio   (vssio),
+	       .ioring  (ioring[RINGW-1:0]));
+
+   //##########################################
    //# PLACE SECTIONS
    //##########################################
 
