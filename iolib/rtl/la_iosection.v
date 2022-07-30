@@ -12,24 +12,27 @@
  ****************************************************************************/
 
 module la_iosection
-  #(parameter N         = 8,        // total pads (in section)
-    parameter NANALOG   = 0,        // Number of analog pads
-    parameter NXTAL     = 1,        // Number of xtal pads
-    parameter NVDDIO    = 1,        // total IO supply pads
-    parameter NVDD      = 1,        // total core supply pads
-    parameter NGND      = 1,        // total core ground pads
-    parameter CFGW      = 8,        // width of core config bus
-    parameter RINGW     = 8,        // width of io ring
-    parameter ENCLAMP   = 1,         // 1=place clamp cell
-    parameter ENCUT     = 1,         // 1=place cut cell on right
-    parameter ENPOC     = 1,         // 1=place poc cell
-    parameter SIDE      = "NO",      // "NO", "SO", "EA", "WE"
-    parameter IOTYPE    = "DEFAULT", // io cell type
-    parameter POCTYPE   = "DEFAULT", // poc cell type
-    parameter VDDTYPE   = "DEFAULT", // vdd cell type
-    parameter VDDIOTYPE = "DEFAULT", // vddio cell type
-    parameter VSSIOTYPE = "DEFAULT", // vssio cell type
-    parameter VSSTYPE   = "DEFAULT"  // vss cell type
+  #(parameter [15:0] SIDE      = "NO",  // "NO", "SO", "EA", "WE"
+    parameter [7:0]  N         = 8,     // total pads
+    parameter [7:0]  NGPIO     = 8,     // digital pads (in section)
+    parameter [7:0]  NANALOG   = 0,     // analog pads
+    parameter [7:0]  NXTAL     = 0,     // xtal pads
+    parameter [7:0]  NVDDIO    = 1,     // IO supply pads
+    parameter [7:0]  NVDD      = 1,     // core supply pads
+    parameter [7:0]  NGND      = 1,     // core ground pads
+    parameter [7:0]  NCLAMP    = 1,     // clamp cells
+    parameter [4:0]  CFGW      = 8,     // width of core config bus
+    parameter [4:0]  RINGW     = 8,     // width of io ring
+    parameter [0:0]  ENPOC     = 1,     // 1=place poc cell
+    // These are generally hard coded in library
+    parameter IOTYPE     = "DEFAULT", // io cell type
+    parameter XTALTYPE   = "DEFAULT", // io cell type
+    parameter ANALOGTYPE = "DEFAULT", // io cell type
+    parameter POCTYPE    = "DEFAULT", // poc cell type
+    parameter VDDTYPE    = "DEFAULT", // vdd cell type
+    parameter VDDIOTYPE  = "DEFAULT", // vddio cell type
+    parameter VSSIOTYPE  = "DEFAULT", // vssio cell type
+    parameter VSSTYPE    = "DEFAULT"  // vss cell type
     )
    (// io pad signals
     inout [N-1:0]      pad, // pad
@@ -39,11 +42,6 @@ module la_iosection
     inout 	       vddio, // io supply
     inout 	       vssio, // io ground
     inout [RINGW-1:0]  ioring, // generic io-ring
-    // floating signal signal (seen from center)
-    inout 	       vddr,
-    inout 	       vddior,
-    inout 	       vssior,
-    inout [RINGW-1:0]  ioringr,
     //core facing signals
     input [N-1:0]      a, // input from core
     output [N-1:0]     z, // output to core
@@ -53,7 +51,7 @@ module la_iosection
     input [N-1:0]      ps, // pullup select, 1 = pull-up, 0 = pull-down
     input [N-1:0]      sr, // slewrate enable 1 = slow, 1 = fast
     input [N-1:0]      st, // schmitt trigger, 1 = enable
-    input [N*2-1:0]    ds, // drive strength, 3'b0 = weakest
+    input [N*3-1:0]    ds, // drive strength, 3'b0 = weakest
     input [N*CFGW-1:0] cfg // generic config interface
     );
 
@@ -63,7 +61,7 @@ module la_iosection
    //##########################################
    //# BIDIR BUFFERS
    //##########################################
-   for(i=0;i<(N-NANALOG-NXTAL);i=i+1)
+   for(i=0;i<(NGPIO);i=i+1)
      begin
 	la_iobidir #(.SIDE(SIDE),
 		     .TYPE(IOTYPE),
@@ -191,7 +189,7 @@ module la_iosection
    //# ESD CLAMP
    //##########################################
 
-   if (ENCLAMP)
+   for(i=0;i<NCLAMP;i=i+1)
      begin
 	la_ioclamp #(.SIDE(SIDE),
 		     .TYPE(VSSTYPE),
@@ -207,7 +205,7 @@ module la_iosection
    //# POWER ON CONTROL
    //#########################################
 
-   if (ENCUT)
+   if (ENPOC)
      begin
 	la_iopoc #(.SIDE(SIDE),
 		   .TYPE(POCTYPE),
@@ -218,28 +216,6 @@ module la_iosection
 	      .vssio   (vssio),
 	      .ioring  (ioring[RINGW-1:0]));
      end // if (ENCUT)
-
-   //#########################################
-   //# CUT CELLS
-   //#########################################
-
-   if (ENCUT)
-     begin
-	la_iocut #(.SIDE(SIDE),
-		   .TYPE(POCTYPE),
-		   .RINGW(RINGW))
-	iocut (// Inouts
-	       .vss	(vss),
-	       .vddl	(vdd),
-	       .vddiol	(vddio),
-	       .vssiol	(vssio),
-	       .ioringl	(ioring[RINGW-1:0]),
-	       .vddr	(vddr),
-	       .vddior	(vddior),
-	       .vssior	(vssior),
-	       .ioringr	(ioringr[RINGW-1:0]));
-     end
-
 
 endmodule
 // Local Variables:
