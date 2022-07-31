@@ -27,6 +27,7 @@ module la_ioside
     parameter [0:0]   ENRCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENLCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENPOC      = 1,    // enable poc cells
+    parameter [0:0]   ENCORNER   = 1,    // enable corner cell
     parameter [4:0]   CFGW       = 1,    // width of core config bus
     parameter [4:0]   RINGW      = 1,    // width of io ring
     // per section  parameters (stuffed vectors)
@@ -95,22 +96,24 @@ module la_ioside
    //##########################################
    //# PLACE CORNER CELL
    //##########################################
-
-   la_iocorner #(.SIDE(SIDE),
-		 .TYPE(IOTYPE),
-		 .RINGW(RINGW))
-   la_iocorner(.vdd     (vdd),
-	       .vss     (vss),
-	       .vddio   (vddio),
-	       .vssio   (vssio),
-	       .ioring  (ioring[RINGW-1:0]));
+   if (ENCORNER)
+     begin: ila_iocorner
+	la_iocorner #(.SIDE(SIDE),
+		      .TYPE(IOTYPE),
+		      .RINGW(RINGW))
+	i0(.vdd     (vdd),
+	   .vss     (vss),
+	   .vddio   (vddio),
+	   .vssio   (vssio),
+	   .ioring  (ioring[RINGW-1:0]));
+     end
 
    //##########################################
    //# PLACE SECTIONS
    //##########################################
 
    for(i=0;i<SECTIONS;i=i+1)
-     begin
+     begin: ila_iosection
 	// figure out how many bits came before
 	localparam [7:0] START = offset(i,NGPIO) +
 				 offset(i,NANALOG) +
@@ -141,25 +144,25 @@ module la_ioside
 		       .VDDIOTYPE(VDDIOTYPE),
 		       .VSSIOTYPE(VSSIOTYPE),
 		       .VSSTYPE(VSSTYPE))
-	iosection (.vss	(vss),
-		   // Outputs
-		   .z	  (z[START+:N]),
-		   // Inouts
-		   .pad   (pad[START+:N]),
-		   .vdd   (vdd[i]),
-		   .vddio (vddio[i]),
-		   .vssio (vssio[i]),
-		   .ioring(ioring[i*RINGW+:RINGW]),
-		   // Inputs
-		   .a	(a[START+:N]),
-		   .ie	(ie[START+:N]),
-		   .oe	(oe[START+:N]),
-		   .pe	(pe[START+:N]),
-		   .ps	(ps[START+:N]),
-		   .sr	(sr[START+:N]),
-		   .st	(st[START+:N]),
-		   .ds	(ds[START*3+:3*N]),
-		   .cfg	(cfg[START*CFGW+:N*CFGW]));
+	i0 (// Outputs
+	    .z	   (z[START+:N]),
+	    // Inouts
+	    .vss	(vss),
+	    .pad   (pad[START+:N]),
+	    .vdd   (vdd[i]),
+	    .vddio (vddio[i]),
+	    .vssio (vssio[i]),
+	    .ioring(ioring[i*RINGW+:RINGW]),
+	    // Inputs
+	    .a	   (a[START+:N]),
+	    .ie	   (ie[START+:N]),
+	    .oe    (oe[START+:N]),
+	    .pe    (pe[START+:N]),
+	    .ps    (ps[START+:N]),
+	    .sr    (sr[START+:N]),
+	    .st    (st[START+:N]),
+	    .ds    (ds[START*3+:3*N]),
+	    .cfg   (cfg[START*CFGW+:N*CFGW]));
      end // for (i=0;i<SECTIONS;i=i+1)
 
    //##########################################
@@ -168,38 +171,36 @@ module la_ioside
 
    // place the last cut cell if enabled
    if (ENLCUT)
-     begin
+     begin: ila_iolcut
 	la_iocut #(.SIDE(SIDE),
 		   .TYPE(IOTYPE),
 		   .RINGW(RINGW))
-	la_iocut(// Inouts
-		 .vss	  (vss),
-		 .vddl    (vddl),
-		 .vddiol  (vddiol),
-		 .vssiol  (vssiol),
-		 .ioringl (ioringl[RINGW-1:0]),
-		 .vddr    (vdd[0]),
-		 .vddior  (vddio[0]),
-		 .vssior  (vssio[0]),
-		 .ioringr (ioring[RINGW-1:0]));
+	i0(.vss	    (vss),
+	   .vddl    (vddl),
+	   .vddiol  (vddiol),
+	   .vssiol  (vssiol),
+	   .ioringl (ioringl[RINGW-1:0]),
+	   .vddr    (vdd[0]),
+	   .vddior  (vddio[0]),
+	   .vssior  (vssio[0]),
+	   .ioringr (ioring[RINGW-1:0]));
      end // if (ENLCUT)
 
    // place the last cut cell if enabled
    if (ENRCUT)
-     begin
+     begin: ila_iorcut
 	la_iocut #(.SIDE(SIDE),
 		   .TYPE(IOTYPE),
 		   .RINGW(RINGW))
-	la_iocut(// Inouts
-		 .vss	  (vss),
-		 .vddl    (vdd[SECTIONS-1]),
-		 .vddiol  (vddio[SECTIONS-1]),
-		 .vssiol  (vssio[SECTIONS-1]),
-		 .ioringl (ioring[(SECTIONS-1)*RINGW+:RINGW]),
-		 .vddr    (vddr),
-		 .vddior  (vddior),
-		 .vssior  (vssior),
-		 .ioringr (ioringr[RINGW-1:0]));
+	i0(.vss     (vss),
+	   .vddl    (vdd[SECTIONS-1]),
+	   .vddiol  (vddio[SECTIONS-1]),
+	   .vssiol  (vssio[SECTIONS-1]),
+	   .ioringl (ioring[(SECTIONS-1)*RINGW+:RINGW]),
+	   .vddr    (vddr),
+	   .vddior  (vddior),
+	   .vssior  (vssior),
+	   .ioringr (ioringr[RINGW-1:0]));
      end // if (ENRCUT)
 
 endmodule

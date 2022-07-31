@@ -136,6 +136,42 @@ module la_iopadring
    wire [EA_SECTIONS*RINGW-1:0]  ea_ioring;
    wire [SO_SECTIONS*RINGW-1:0]  so_ioring;
    wire [WE_SECTIONS*RINGW-1:0]  we_ioring;
+   wire [NO_SECTIONS*RINGW-1:0]  no_ioringl;
+   wire [EA_SECTIONS*RINGW-1:0]  ea_ioringl;
+   wire [SO_SECTIONS*RINGW-1:0]  so_ioringl;
+   wire [WE_SECTIONS*RINGW-1:0]  we_ioringl;
+   wire [NO_SECTIONS*RINGW-1:0]  no_ioringr;
+   wire [EA_SECTIONS*RINGW-1:0]  ea_ioringr;
+   wire [SO_SECTIONS*RINGW-1:0]  so_ioringr;
+   wire [WE_SECTIONS*RINGW-1:0]  we_ioringr;
+
+
+   wire [NO_SECTIONS-1:0] 	 no_vddiol;
+   wire [NO_SECTIONS-1:0] 	 no_vddior;
+   wire [NO_SECTIONS-1:0] 	 no_vssiol;
+   wire [NO_SECTIONS-1:0] 	 no_vssior;
+   wire [NO_SECTIONS-1:0] 	 no_vddl;
+   wire [NO_SECTIONS-1:0] 	 no_vddr;
+   wire [EA_SECTIONS-1:0] 	 ea_vddiol;
+   wire [EA_SECTIONS-1:0] 	 ea_vddior;
+   wire [EA_SECTIONS-1:0] 	 ea_vssiol;
+   wire [EA_SECTIONS-1:0] 	 ea_vssior;
+   wire [EA_SECTIONS-1:0] 	 ea_vddl;
+   wire [EA_SECTIONS-1:0] 	 ea_vddr;
+   wire [SO_SECTIONS-1:0] 	 so_vddiol;
+   wire [SO_SECTIONS-1:0] 	 so_vddior;
+   wire [SO_SECTIONS-1:0] 	 so_vssiol;
+   wire [SO_SECTIONS-1:0] 	 so_vssior;
+   wire [SO_SECTIONS-1:0] 	 so_vddl;
+   wire [SO_SECTIONS-1:0] 	 so_vddr;
+   wire [WE_SECTIONS-1:0] 	 we_vddiol;
+   wire [WE_SECTIONS-1:0] 	 we_vddior;
+   wire [WE_SECTIONS-1:0] 	 we_vssiol;
+   wire [WE_SECTIONS-1:0] 	 we_vssior;
+   wire [WE_SECTIONS-1:0] 	 we_vddl;
+   wire [WE_SECTIONS-1:0] 	 we_vddr;
+
+   /*AUTOWIRE*/
 
    //#####################
    // CONNECTION TEMPLATE

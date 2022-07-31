@@ -62,30 +62,30 @@ module la_iosection
    //# BIDIR BUFFERS
    //##########################################
    for(i=0;i<(NGPIO);i=i+1)
-     begin
+     begin: ila_iobidir
 	la_iobidir #(.SIDE(SIDE),
 		     .TYPE(IOTYPE),
 		     .CFGW(CFGW),
 		     .RINGW(RINGW))
-	iobidir (// Outputs
-		 .z	(z[i]),
-		 // Inouts
-		 .pad	(pad[i]),
-		 .vdd	(vdd),
-		 .vss	(vss),
-		 .vddio (vddio),
-		 .vssio	(vssio),
-		 .ioring(ioring[RINGW-1:0]),
-		 // Inputs
-		 .a	(a[i]),
-		 .ie	(ie[i]),
-		 .oe	(oe[i]),
-		 .pe	(pe[i]),
-		 .ps	(ps[i]),
-		 .sr	(sr[i]),
-		 .st	(st[i]),
-		 .ds	(ds[i*3+:3]),
-		 .cfg	(cfg[i*CFGW+:CFGW]));
+	i0 (// Outputs
+	    .z	(z[i]),
+	    // Inouts
+	    .pad	(pad[i]),
+	    .vdd	(vdd),
+	    .vss	(vss),
+	    .vddio (vddio),
+	    .vssio	(vssio),
+	    .ioring(ioring[RINGW-1:0]),
+	    // Inputs
+	    .a	(a[i]),
+	    .ie	(ie[i]),
+	    .oe	(oe[i]),
+	    .pe	(pe[i]),
+	    .ps	(ps[i]),
+	    .sr	(sr[i]),
+	    .st	(st[i]),
+	    .ds	(ds[i*3+:3]),
+	    .cfg	(cfg[i*CFGW+:CFGW]));
      end
 
    //##########################################
@@ -93,18 +93,18 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NANALOG;i=i+1)
-     begin
+     begin: ila_ioanalog
 	la_ioanalog #(.SIDE(SIDE),
 		      .TYPE(IOTYPE),
 		      .RINGW(RINGW))
-	ioanalog (.pad    (pad[i]),
-		  .vdd    (vdd),
-		  .vss    (vss),
-		  .vddio  (vddio),
-		  .vssio  (vssio),
-		  .a      (a[i]),
-		  .z      (z[i]),
-		  .ioring (ioring[RINGW-1:0]));
+	i0 (.pad    (pad[i]),
+	    .vdd    (vdd),
+	    .vss    (vss),
+	    .vddio  (vddio),
+	    .vssio  (vssio),
+	    .a      (a[i]),
+	    .z      (z[i]),
+	    .ioring (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -112,18 +112,18 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NXTAL;i=i+1)
-     begin
+     begin: ila_ioxtal
 	la_ioxtal #(.SIDE(SIDE),
 		    .TYPE(IOTYPE),
 		    .RINGW(RINGW))
-	ioxtal (.pad    (pad[i]),
-		.vdd    (vdd),
-		.vss    (vss),
-		.vddio  (vddio),
-		.vssio  (vssio),
-		.a      (a[i]),
-		.z      (z[i]),
-		.ioring (ioring[RINGW-1:0]));
+	i0 (.pad    (pad[i]),
+	    .vdd    (vdd),
+	    .vss    (vss),
+	    .vddio  (vddio),
+	    .vssio  (vssio),
+	    .a      (a[i]),
+	    .z      (z[i]),
+	    .ioring (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -131,26 +131,28 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NVDDIO;i=i+1)
-     begin
+     begin: ila_iovddio
 	// vddio
 	la_iovddio #(.SIDE(SIDE),
 		     .TYPE(VDDIOTYPE),
 		     .RINGW(RINGW))
-	ivddio (.vdd     (vdd),
-		.vss     (vss),
-		.vddio   (vddio),
-		.vssio   (vssio),
-		.ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end // block: la_iovddio
 
-	// vssio
+   for(i=0;i<NVDDIO;i=i+1)
+     begin: ila_iovssio
 	la_iovssio #(.SIDE(SIDE),
 		     .TYPE(VSSIOTYPE),
 		     .RINGW(RINGW))
-	ivssio (.vdd     (vdd),
-		.vss     (vss),
-		.vddio   (vddio),
-		.vssio   (vssio),
-		.ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -158,15 +160,15 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NVDD;i=i+1)
-     begin
+     begin: ila_iovdd
 	la_iovdd #(.SIDE(SIDE),
 		   .TYPE(VDDTYPE),
 		   .RINGW(RINGW))
-	ivdd (.vdd     (vdd),
-	      .vss     (vss),
-	      .vddio   (vddio),
-	      .vssio   (vssio),
-	      .ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -174,15 +176,15 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NGND;i=i+1)
-     begin
+     begin: ila_iovss
 	la_iovss #(.SIDE(SIDE),
 		   .TYPE(VSSTYPE),
 		   .RINGW(RINGW))
-	ivss (.vdd     (vdd),
-	      .vss     (vss),
-	      .vddio   (vddio),
-	      .vssio   (vssio),
-	      .ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
      end
 
    //##########################################
@@ -190,15 +192,15 @@ module la_iosection
    //##########################################
 
    for(i=0;i<NCLAMP;i=i+1)
-     begin
+     begin: ila_ioclamp
 	la_ioclamp #(.SIDE(SIDE),
 		     .TYPE(VSSTYPE),
 		     .RINGW(RINGW))
-	iclamp (.vdd     (vdd),
-		.vss     (vss),
-		.vddio   (vddio),
-		.vssio   (vssio),
-		.ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
      end
 
    //#########################################
@@ -206,15 +208,15 @@ module la_iosection
    //#########################################
 
    if (ENPOC)
-     begin
+     begin: ila_iopoc
 	la_iopoc #(.SIDE(SIDE),
 		   .TYPE(POCTYPE),
 		   .RINGW(RINGW))
-	ipoc (.vdd     (vdd),
-	      .vss     (vss),
-	      .vddio   (vddio),
-	      .vssio   (vssio),
-	      .ioring  (ioring[RINGW-1:0]));
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
      end // if (ENCUT)
 
 endmodule
