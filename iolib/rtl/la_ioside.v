@@ -7,7 +7,7 @@
  *
  * Supports up to 31 individual sections per side (5 bits)
  *
- * Supports up to 255 pins per section/side (8 bits)
+ * Supports up to 63 pins per section/side (8 bits)
  *
  * Per section parameters are stuffed 8bit vectors:
  * {SECN, SECN-1, ...SEC1, SEC0}
@@ -31,13 +31,13 @@ module la_ioside
     parameter [4:0]   CFGW       = 1,    // width of core config bus
     parameter [4:0]   RINGW      = 1,    // width of io ring
     // per section  parameters (stuffed vectors)
-    parameter [255:0] NGPIO      = 1,    // digital pads
-    parameter [255:0] NANALOG    = 0,    // analog pads
-    parameter [255:0] NXTAL      = 0,    // xtal pads
-    parameter [255:0] NVDDIO     = 1,    // total IO supply/ground pads
-    parameter [255:0] NVDD       = 1,    // total core supply pads
-    parameter [255:0] NGND       = 1,    // total ground pads
-    parameter [255:0] NCLAMP     = 1,    // total esd clamp cells
+    parameter [63:0] NGPIO      = 1,    // digital pads
+    parameter [63:0] NANALOG    = 0,    // analog pads
+    parameter [63:0] NXTAL      = 0,    // xtal pads
+    parameter [63:0] NVDDIO     = 1,    // total IO supply/ground pads
+    parameter [63:0] NVDD       = 1,    // total core supply pads
+    parameter [63:0] NGND       = 1,    // total ground pads
+    parameter [63:0] NCLAMP     = 1,    // total esd clamp cells
     // options to overrride lalib
     parameter IOTYPE     = "DEFAULT",    // io cell type
     parameter XTALTYPE   = "DEFAULT",    // io cell type
@@ -62,16 +62,7 @@ module la_ioside
     input [NSIDE-1:0] 	       st, // schmitt trigger, 1 = enable
     input [NSIDE*3-1:0]        ds, // drive strength, 3'b0 = weakest
     input [NSIDE*CFGW-1:0]     cfg, // generic config interface
-    // supplies/ring
-    inout [SECTIONS-1:0]       vdd, // core supply
-    inout [SECTIONS-1:0]       vddio, // io supply
-    inout [SECTIONS-1:0]       vssio, // io ground
-    inout [SECTIONS*RINGW-1:0] ioring, // generic io-ring
     // left right braks/cuts
-    inout 		       vddl, // core supply
-    inout 		       vddiol, // io supply
-    inout 		       vssiol, // io supply
-    inout [RINGW-1:0] 	       ioringl, // generic io-ring
     inout 		       vddr, // core supply
     inout 		       vddior, // io supply
     inout 		       vssior, // io supply
@@ -81,10 +72,30 @@ module la_ioside
    genvar 	       i;
    genvar 	       j;
 
+
+   //##########################################
+   //# LOCAL WIRES
+   //##########################################
+
+   wire 	              vddl;
+   wire 	              vddiol;
+   wire 	              vssiol;
+   wire [RINGW-1:0]           ioringl;
+
+   wire [SECTIONS-1:0]        vdd;
+   wire [SECTIONS-1:0]        vddio;
+   wire [SECTIONS-1:0]        vssio;
+   wire [SECTIONS*RINGW-1:0]  ioring;
+
+
+   //##########################################
+   //# HELPER FUNCTION
+   //##########################################
+
    // calculate offset to current section
    function [7:0] offset;
       input [7:0] i;
-      input [255:0] vector;
+      input [63:0] vector;
       integer 	    ii;
       begin
 	 offset = 0;
@@ -101,11 +112,11 @@ module la_ioside
 	la_iocorner #(.SIDE(SIDE),
 		      .TYPE(IOTYPE),
 		      .RINGW(RINGW))
-	i0(.vdd     (vdd),
-	   .vss     (vss),
-	   .vddio   (vddio),
-	   .vssio   (vssio),
-	   .ioring  (ioring[RINGW-1:0]));
+	i0(.vdd     (vddl),
+	   .vss     (vssl),
+	   .vddio   (vddiol),
+	   .vssio   (vssiol),
+	   .ioring  (ioringl[RINGW-1:0]));
      end
 
    //##########################################
@@ -163,15 +174,34 @@ module la_ioside
 	    .st    (st[START+:N]),
 	    .ds    (ds[START*3+:3*N]),
 	    .cfg   (cfg[START*CFGW+:N*CFGW]));
+
      end // for (i=0;i<SECTIONS;i=i+1)
+
+
 
    //##########################################
    //# PLACE CUT CELLS
    //##########################################
 
+   for(i=0;i<SECTIONS-1;i=i+1)
+     begin: ila_iocut
+	la_iocut #(.SIDE(SIDE),
+		   .TYPE(IOTYPE),
+		   .RINGW(RINGW))
+	i0(.vss     (vss),
+	   .vddl    (vdd[i]),
+	   .vddiol  (vddio[i]),
+	   .vssiol  (vssio[i]),
+	   .ioringl (ioring[i*RINGW+:RINGW]),
+	   .vddr    (vdd[i+1]),
+	   .vddior  (vddio[i+1]),
+	   .vssior  (vssio[i+1]),
+	   .ioringr (ioring[(i+1)*RINGW+:RINGW]));
+     end
+
    // place the last cut cell if enabled
    if (ENLCUT)
-     begin: ila_iolcut
+     begin: ila_ioleftcut
 	la_iocut #(.SIDE(SIDE),
 		   .TYPE(IOTYPE),
 		   .RINGW(RINGW))
@@ -188,7 +218,7 @@ module la_ioside
 
    // place the last cut cell if enabled
    if (ENRCUT)
-     begin: ila_iorcut
+     begin: ila_iorightcut
 	la_iocut #(.SIDE(SIDE),
 		   .TYPE(IOTYPE),
 		   .RINGW(RINGW))
@@ -205,5 +235,5 @@ module la_ioside
 
 endmodule
 // Local Variables:
-// verilog-library-directories:("." )
+// verilog-library-directories:("." "../stub")
 // End:
