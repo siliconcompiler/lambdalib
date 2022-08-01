@@ -6,7 +6,7 @@
  *
  * Doc:
  *
- * - The order of pads is digital, then analog in a clock wise fashion
+ * - The order of pads is digital-->analog-->xtal in a clock wise fashion
  *
  *
  ****************************************************************************/
@@ -59,7 +59,7 @@ module la_iosection
    genvar 	       i;
 
    //##########################################
-   //# BIDIR BUFFERS
+   //# BIDIR GPIO BUFFERS
    //##########################################
    for(i=0;i<(NGPIO);i=i+1)
      begin: ila_iobidir
@@ -92,7 +92,7 @@ module la_iosection
    //# ANALOG (careful with mixing with gpio)
    //##########################################
 
-   for(i=0;i<NANALOG;i=i+1)
+   for(i=NGPIO;i<(NANALOG+NGPIO);i=i+1)
      begin: ila_ioanalog
 	la_ioanalog #(.SIDE(SIDE),
 		      .TYPE(IOTYPE),
@@ -111,7 +111,7 @@ module la_iosection
    //# XTAL CELL (careful with mixing with gpio)
    //##########################################
 
-   for(i=0;i<NXTAL;i=i+1)
+   for(i=(NANALOG+NGPIO);i<(NANALOG+NGPIO+NXTAL);i=i+1)
      begin: ila_ioxtal
 	la_ioxtal #(.SIDE(SIDE),
 		    .TYPE(IOTYPE),
@@ -221,5 +221,5 @@ module la_iosection
 
 endmodule
 // Local Variables:
-// verilog-library-directories:("." )
+// verilog-library-directories:("." "../stub")
 // End:
