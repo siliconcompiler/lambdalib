@@ -13,8 +13,8 @@
 
 module la_iopadring
   #(// global settings
-    parameter [4:0]  CFGW   = 1,         // width of core config bus
-    parameter [4:0]  RINGW  = 1,         // width of io ring
+    parameter [7:0]  CFGW   = 1,         // width of core config bus
+    parameter [7:0]  RINGW  = 1,         // width of io ring
     parameter [0:0]  ENCUT  = 1,         // enable cuts at corner
     parameter [0:0]  ENPOC  = 1,         // enable poc cells
     // optional overrides of default lib
@@ -28,41 +28,41 @@ module la_iopadring
     parameter VSSTYPE       = "DEFAULT", // vss cell type
     // per side settings (total, split up to recipe)
     parameter [4:0] NO_SECTIONS   =  1, // north
-    parameter [255:0] NO_NSIDE    =  1,
-    parameter [255:0] NO_NGPIO    =  1,
-    parameter [255:0] NO_NANALOG  =  0,
-    parameter [255:0] NO_NXTAL    =  0,
-    parameter [255:0] NO_NVDDIO   =  1,
-    parameter [255:0] NO_NVDD     =  1,
-    parameter [255:0] NO_NGND     =  1,
-    parameter [255:0] NO_NCLAMP   =  0,
+    parameter [63:0] NO_NSIDE    =  1,
+    parameter [63:0] NO_NGPIO    =  1,
+    parameter [63:0] NO_NANALOG  =  0,
+    parameter [63:0] NO_NXTAL    =  0,
+    parameter [63:0] NO_NVDDIO   =  1,
+    parameter [63:0] NO_NVDD     =  1,
+    parameter [63:0] NO_NGND     =  1,
+    parameter [63:0] NO_NCLAMP   =  0,
     parameter [4:0] EA_SECTIONS   =  1, // east
-    parameter [255:0] EA_NSIDE    =  1,
-    parameter [255:0] EA_NGPIO    =  1,
-    parameter [255:0] EA_NANALOG  =  0,
-    parameter [255:0] EA_NXTAL    =  0,
-    parameter [255:0] EA_NVDDIO   =  1,
-    parameter [255:0] EA_NVDD     =  1,
-    parameter [255:0] EA_NGND     =  1,
-    parameter [255:0] EA_NCLAMP   =  0,
+    parameter [63:0] EA_NSIDE    =  1,
+    parameter [63:0] EA_NGPIO    =  1,
+    parameter [63:0] EA_NANALOG  =  0,
+    parameter [63:0] EA_NXTAL    =  0,
+    parameter [63:0] EA_NVDDIO   =  1,
+    parameter [63:0] EA_NVDD     =  1,
+    parameter [63:0] EA_NGND     =  1,
+    parameter [63:0] EA_NCLAMP   =  0,
     parameter [4:0] SO_SECTIONS   =  1, // south
-    parameter [255:0] SO_NSIDE    =  1,
-    parameter [255:0] SO_NGPIO    =  1,
-    parameter [255:0] SO_NANALOG  =  0,
-    parameter [255:0] SO_NXTAL    =  0,
-    parameter [255:0] SO_NVDDIO   =  1,
-    parameter [255:0] SO_NVDD     =  1,
-    parameter [255:0] SO_NGND     =  1,
-    parameter [255:0] SO_NCLAMP   =  0,
+    parameter [63:0] SO_NSIDE    =  1,
+    parameter [63:0] SO_NGPIO    =  1,
+    parameter [63:0] SO_NANALOG  =  0,
+    parameter [63:0] SO_NXTAL    =  0,
+    parameter [63:0] SO_NVDDIO   =  1,
+    parameter [63:0] SO_NVDD     =  1,
+    parameter [63:0] SO_NGND     =  1,
+    parameter [63:0] SO_NCLAMP   =  0,
     parameter [4:0] WE_SECTIONS   =  1, // west
-    parameter [255:0] WE_NSIDE    =  1,
-    parameter [255:0] WE_NGPIO    =  1,
-    parameter [255:0] WE_NANALOG  =  0,
-    parameter [255:0] WE_NXTAL    =  0,
-    parameter [255:0] WE_NVDDIO   =  1,
-    parameter [255:0] WE_NVDD     =  1,
-    parameter [255:0] WE_NGND     =  1,
-    parameter [255:0] WE_NCLAMP   =  0
+    parameter [63:0] WE_NSIDE    =  1,
+    parameter [63:0] WE_NGPIO    =  1,
+    parameter [63:0] WE_NANALOG  =  0,
+    parameter [63:0] WE_NXTAL    =  0,
+    parameter [63:0] WE_NVDDIO   =  1,
+    parameter [63:0] WE_NVDD     =  1,
+    parameter [63:0] WE_NGND     =  1,
+    parameter [63:0] WE_NCLAMP   =  0
     )
    (//CONTINUOUS GROUND
     inout 		      vss,
@@ -132,44 +132,22 @@ module la_iopadring
    // LOCAL WIRES
    //#####################
 
-   wire [NO_SECTIONS*RINGW-1:0]  no_ioring;
-   wire [EA_SECTIONS*RINGW-1:0]  ea_ioring;
-   wire [SO_SECTIONS*RINGW-1:0]  so_ioring;
-   wire [WE_SECTIONS*RINGW-1:0]  we_ioring;
-   wire [NO_SECTIONS*RINGW-1:0]  no_ioringl;
-   wire [EA_SECTIONS*RINGW-1:0]  ea_ioringl;
-   wire [SO_SECTIONS*RINGW-1:0]  so_ioringl;
-   wire [WE_SECTIONS*RINGW-1:0]  we_ioringl;
-   wire [NO_SECTIONS*RINGW-1:0]  no_ioringr;
-   wire [EA_SECTIONS*RINGW-1:0]  ea_ioringr;
-   wire [SO_SECTIONS*RINGW-1:0]  so_ioringr;
-   wire [WE_SECTIONS*RINGW-1:0]  we_ioringr;
-
-
-   wire [NO_SECTIONS-1:0] 	 no_vddiol;
-   wire [NO_SECTIONS-1:0] 	 no_vddior;
-   wire [NO_SECTIONS-1:0] 	 no_vssiol;
-   wire [NO_SECTIONS-1:0] 	 no_vssior;
-   wire [NO_SECTIONS-1:0] 	 no_vddl;
-   wire [NO_SECTIONS-1:0] 	 no_vddr;
-   wire [EA_SECTIONS-1:0] 	 ea_vddiol;
-   wire [EA_SECTIONS-1:0] 	 ea_vddior;
-   wire [EA_SECTIONS-1:0] 	 ea_vssiol;
-   wire [EA_SECTIONS-1:0] 	 ea_vssior;
-   wire [EA_SECTIONS-1:0] 	 ea_vddl;
-   wire [EA_SECTIONS-1:0] 	 ea_vddr;
-   wire [SO_SECTIONS-1:0] 	 so_vddiol;
-   wire [SO_SECTIONS-1:0] 	 so_vddior;
-   wire [SO_SECTIONS-1:0] 	 so_vssiol;
-   wire [SO_SECTIONS-1:0] 	 so_vssior;
-   wire [SO_SECTIONS-1:0] 	 so_vddl;
-   wire [SO_SECTIONS-1:0] 	 so_vddr;
-   wire [WE_SECTIONS-1:0] 	 we_vddiol;
-   wire [WE_SECTIONS-1:0] 	 we_vddior;
-   wire [WE_SECTIONS-1:0] 	 we_vssiol;
-   wire [WE_SECTIONS-1:0] 	 we_vssior;
-   wire [WE_SECTIONS-1:0] 	 we_vddl;
-   wire [WE_SECTIONS-1:0] 	 we_vddr;
+   wire [RINGW-1:0]  no_ioringr;
+   wire 	     no_vddior;
+   wire 	     no_vssior;
+   wire 	     no_vddr;
+   wire [RINGW-1:0]  ea_ioringr;
+   wire 	     ea_vddior;
+   wire 	     ea_vssior;
+   wire 	     ea_vddr;
+   wire [RINGW-1:0]  so_ioringr;
+   wire 	     so_vddior;
+   wire 	     so_vssior;
+   wire 	     so_vddr;
+   wire [RINGW-1:0]  we_ioringr;
+   wire 	     we_vddior;
+   wire 	     we_vssior;
+   wire 	     we_vddr;
 
    /*AUTOWIRE*/
 
@@ -189,6 +167,7 @@ module la_iopadring
 
    la_ioside #(// per side
 	       .SIDE("NO"),
+	       .SECTIONS(NO_SECTIONS),
 	       .NSIDE(NO_NSIDE),
 	       .NGPIO(NO_NGPIO),
 	       .NANALOG(NO_NANALOG),
@@ -219,14 +198,6 @@ module la_iopadring
 	  // Inouts
 	  .pad				(no_pad),		 // Templated
 	  .vss				(vss),			 // Templated
-	  .vdd				(no_vdd),		 // Templated
-	  .vddio			(no_vddio),		 // Templated
-	  .vssio			(no_vssio),		 // Templated
-	  .ioring			(no_ioring),		 // Templated
-	  .vddl				(no_vddl),		 // Templated
-	  .vddiol			(no_vddiol),		 // Templated
-	  .vssiol			(no_vssiol),		 // Templated
-	  .ioringl			(no_ioringl),		 // Templated
 	  .vddr				(no_vddr),		 // Templated
 	  .vddior			(no_vddior),		 // Templated
 	  .vssior			(no_vssior),		 // Templated
@@ -247,6 +218,7 @@ module la_iopadring
    //#####################
    la_ioside #(// per side
 	       .SIDE("EA"),
+	       .SECTIONS(EA_SECTIONS),
 	       .NSIDE(EA_NSIDE),
 	       .NGPIO(EA_NGPIO),
 	       .NANALOG(EA_NANALOG),
@@ -277,14 +249,6 @@ module la_iopadring
 	 // Inouts
 	 .pad				(ea_pad),		 // Templated
 	 .vss				(vss),			 // Templated
-	 .vdd				(ea_vdd),		 // Templated
-	 .vddio				(ea_vddio),		 // Templated
-	 .vssio				(ea_vssio),		 // Templated
-	 .ioring			(ea_ioring),		 // Templated
-	 .vddl				(ea_vddl),		 // Templated
-	 .vddiol			(ea_vddiol),		 // Templated
-	 .vssiol			(ea_vssiol),		 // Templated
-	 .ioringl			(ea_ioringl),		 // Templated
 	 .vddr				(ea_vddr),		 // Templated
 	 .vddior			(ea_vddior),		 // Templated
 	 .vssior			(ea_vssior),		 // Templated
@@ -306,6 +270,7 @@ module la_iopadring
 
    la_ioside #(// per side
 	       .SIDE("SO"),
+	       .SECTIONS(SO_SECTIONS),
 	       .NSIDE(SO_NSIDE),
 	       .NGPIO(SO_NGPIO),
 	       .NANALOG(SO_NANALOG),
@@ -336,14 +301,6 @@ module la_iopadring
 	  // Inouts
 	  .pad				(so_pad),		 // Templated
 	  .vss				(vss),			 // Templated
-	  .vdd				(so_vdd),		 // Templated
-	  .vddio			(so_vddio),		 // Templated
-	  .vssio			(so_vssio),		 // Templated
-	  .ioring			(so_ioring),		 // Templated
-	  .vddl				(so_vddl),		 // Templated
-	  .vddiol			(so_vddiol),		 // Templated
-	  .vssiol			(so_vssiol),		 // Templated
-	  .ioringl			(so_ioringl),		 // Templated
 	  .vddr				(so_vddr),		 // Templated
 	  .vddior			(so_vddior),		 // Templated
 	  .vssior			(so_vssior),		 // Templated
@@ -365,6 +322,7 @@ module la_iopadring
 
    la_ioside #(// per side
 	       .SIDE("WE"),
+	       .SECTIONS(WE_SECTIONS),
 	       .NSIDE(WE_NSIDE),
 	       .NGPIO(WE_NGPIO),
 	       .NANALOG(WE_NANALOG),
@@ -395,14 +353,6 @@ module la_iopadring
 	 // Inouts
 	 .pad				(we_pad),		 // Templated
 	 .vss				(vss),			 // Templated
-	 .vdd				(we_vdd),		 // Templated
-	 .vddio				(we_vddio),		 // Templated
-	 .vssio				(we_vssio),		 // Templated
-	 .ioring			(we_ioring),		 // Templated
-	 .vddl				(we_vddl),		 // Templated
-	 .vddiol			(we_vddiol),		 // Templated
-	 .vssiol			(we_vssiol),		 // Templated
-	 .ioringl			(we_ioringl),		 // Templated
 	 .vddr				(we_vddr),		 // Templated
 	 .vddior			(we_vddior),		 // Templated
 	 .vssior			(we_vssior),		 // Templated
@@ -420,3 +370,6 @@ module la_iopadring
 
 
 endmodule // la_iopadring
+// Local Variables:
+// verilog-library-directories:("." "../stub")
+// End:
