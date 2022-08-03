@@ -5,42 +5,42 @@ module testbench();
    parameter [0:0] ENCUT = 1'h1;
    parameter [0:0] ENPOC = 1'h1;
 
-   parameter [4:0]  NO_SECTIONS =  2; // north
+   parameter [4:0]  NO_SECTIONS =  2;
    parameter [7:0]  NO_NSIDE    =  8'h8;
-   parameter [63:0] NO_NGPIO    =  64'h8040201008040201;
-   parameter [63:0] NO_NANALOG  =  64'h0000000001000201;
-   parameter [63:0] NO_NXTAL    =  64'h0000000001020001;
-   parameter [63:0] NO_NVDDIO   =  64'h0807060504030201;
-   parameter [63:0] NO_NVDD     =  64'h0807060504030201;
-   parameter [63:0] NO_NGND     =  64'h0807060504030201;
-   parameter [63:0] NO_NCLAMP   =  64'h0807060504030201;
-   parameter [4:0]  EA_SECTIONS =  2; // north
-   parameter [7:0]  EA_NSIDE    =  8'h10;
-   parameter [63:0] EA_NGPIO    =  64'h8040201008040201;
-   parameter [63:0] EA_NANALOG  =  64'h0000000001000201;
-   parameter [63:0] EA_NXTAL    =  64'h0000000001020001;
-   parameter [63:0] EA_NVDDIO   =  64'h0807060504030201;
-   parameter [63:0] EA_NVDD     =  64'h0807060504030201;
-   parameter [63:0] EA_NGND     =  64'h0807060504030201;
-   parameter [63:0] EA_NCLAMP   =  64'h0807060504030201;
-   parameter [4:0]  SO_SECTIONS =  2; // north
-   parameter [7:0]  SO_NSIDE    =  8'h20;
-   parameter [63:0] SO_NGPIO    =  64'h8040201008040201;
-   parameter [63:0] SO_NANALOG  =  64'h0000000001000201;
-   parameter [63:0] SO_NXTAL    =  64'h0000000001020001;
-   parameter [63:0] SO_NVDDIO   =  64'h0807060504030201;
-   parameter [63:0] SO_NVDD     =  64'h0807060504030201;
-   parameter [63:0] SO_NGND     =  64'h0807060504030201;
-   parameter [63:0] SO_NCLAMP   =  64'h0807060504030201;
-   parameter [4:0]  WE_SECTIONS =  2; // north
-   parameter [7:0]  WE_NSIDE    =  8'h40;
-   parameter [63:0] WE_NGPIO    =  64'h8040201008040201;
-   parameter [63:0] WE_NANALOG  =  64'h0000000001000201;
-   parameter [63:0] WE_NXTAL    =  64'h0000000001020001;
-   parameter [63:0] WE_NVDDIO   =  64'h0807060504030201;
-   parameter [63:0] WE_NVDD     =  64'h0807060504030201;
-   parameter [63:0] WE_NGND     =  64'h0807060504030201;
-   parameter [63:0] WE_NCLAMP   =  64'h0807060504030201;
+   parameter [63:0] NO_N        =  64'h0602;
+   parameter [63:0] NO_NSEL     =  64'h0;
+   parameter [63:0] NO_NSTART   =  64'h0602;
+   parameter [63:0] NO_NVDDIO   =  64'h0101;
+   parameter [63:0] NO_NVDD     =  64'h0101;
+   parameter [63:0] NO_NGND     =  64'h0101;
+   parameter [63:0] NO_NCLAMP   =  64'h0101;
+   parameter [4:0]  EA_SECTIONS =  2;
+   parameter [7:0]  EA_NSIDE    =  8'h8;
+   parameter [63:0] EA_N        =  64'h0404;
+   parameter [63:0] EA_NSEL     =  64'h0;
+   parameter [63:0] EA_NSTART   =  64'h0400;
+   parameter [63:0] EA_NVDDIO   =  64'h0101;
+   parameter [63:0] EA_NVDD     =  64'h0101;
+   parameter [63:0] EA_NGND     =  64'h0101;
+   parameter [63:0] EA_NCLAMP   =  64'h0101;
+   parameter [4:0]  SO_SECTIONS =  2;
+   parameter [7:0]  SO_NSIDE    =  8'h8;
+   parameter [63:0] SO_N        =  64'h0404;
+   parameter [63:0] SO_NSEL     =  64'h0;
+   parameter [63:0] SO_NSTART   =  64'h0400;
+   parameter [63:0] SO_NVDDIO   =  64'h0101;
+   parameter [63:0] SO_NVDD     =  64'h0101;
+   parameter [63:0] SO_NGND     =  64'h0101;
+   parameter [63:0] SO_NCLAMP   =  64'h0101;
+   parameter [4:0]  WE_SECTIONS =  2;
+   parameter [7:0]  WE_NSIDE    =  8'h8;
+   parameter [63:0] WE_N        =  64'h0404;
+   parameter [63:0] WE_NSEL     =  64'h0;
+   parameter [63:0] WE_NSTART   =  64'h0400;
+   parameter [63:0] WE_NVDDIO   =  64'h0101;
+   parameter [63:0] WE_NVDD     =  64'h0101;
+   parameter [63:0] WE_NGND     =  64'h0101;
+   parameter [63:0] WE_NCLAMP   =  64'h0101;
 
    // local wires
    wire [EA_NSIDE-1:0] ea_z;			// From dut of la_iopadring.v
@@ -127,9 +127,9 @@ module testbench();
    la_iopadring #(// north
 		  .NO_SECTIONS(NO_SECTIONS),
 		  .NO_NSIDE(NO_NSIDE),
-		  .NO_NGPIO(NO_NGPIO),
-		  .NO_NANALOG(NO_NANALOG),
-		  .NO_NXTAL(NO_NXTAL),
+		  .NO_N(NO_N),
+		  .NO_NSTART(NO_NSTART),
+		  .NO_NSEL(NO_NSEL),
 		  .NO_NVDDIO(NO_NVDDIO),
 		  .NO_NVDD(NO_NVDD),
 		  .NO_NGND(NO_NGND),
@@ -137,9 +137,9 @@ module testbench();
 		  // east
 		  .EA_SECTIONS(EA_SECTIONS),
 		  .EA_NSIDE(EA_NSIDE),
-		  .EA_NGPIO(EA_NGPIO),
-		  .EA_NANALOG(EA_NANALOG),
-		  .EA_NXTAL(EA_NXTAL),
+		  .EA_N(EA_N),
+		  .EA_NSTART(EA_NSTART),
+		  .EA_NSEL(EA_NSEL),
 		  .EA_NVDDIO(EA_NVDDIO),
 		  .EA_NVDD(EA_NVDD),
 		  .EA_NGND(EA_NGND),
@@ -147,9 +147,9 @@ module testbench();
 		  // south
 		  .SO_SECTIONS(SO_SECTIONS),
 		  .SO_NSIDE(SO_NSIDE),
-		  .SO_NGPIO(SO_NGPIO),
-		  .SO_NANALOG(SO_NANALOG),
-		  .SO_NXTAL(SO_NXTAL),
+		  .SO_N(SO_N),
+		  .SO_NSTART(SO_NSTART),
+		  .SO_NSEL(SO_NSEL),
 		  .SO_NVDDIO(SO_NVDDIO),
 		  .SO_NVDD(SO_NVDD),
 		  .SO_NGND(SO_NGND),
@@ -157,9 +157,9 @@ module testbench();
 		  // west
 		  .WE_SECTIONS(WE_SECTIONS),
 		  .WE_NSIDE(WE_NSIDE),
-		  .WE_NGPIO(WE_NGPIO),
-		  .WE_NANALOG(WE_NANALOG),
-		  .WE_NXTAL(WE_NXTAL),
+		  .WE_N(WE_N),
+		  .WE_NSTART(WE_NSTART),
+		  .WE_NSEL(WE_NSEL),
 		  .WE_NVDDIO(WE_NVDDIO),
 		  .WE_NVDD(WE_NVDD),
 		  .WE_NGND(WE_NGND),

@@ -13,8 +13,8 @@
 
 module la_iopadring
   #(// global settings
-    parameter [7:0]  CFGW   = 1,         // width of core config bus
-    parameter [7:0]  RINGW  = 1,         // width of io ring
+    parameter [7:0]  CFGW   = 16,        // width of core config bus
+    parameter [7:0]  RINGW  = 8,         // width of io ring
     parameter [0:0]  ENCUT  = 1,         // enable cuts at corner
     parameter [0:0]  ENPOC  = 1,         // enable poc cells
     // optional overrides of default lib
@@ -27,42 +27,42 @@ module la_iopadring
     parameter VSSIOTYPE     = "DEFAULT", // vssio cell type
     parameter VSSTYPE       = "DEFAULT", // vss cell type
     // per side settings (total, split up to recipe)
-    parameter [4:0] NO_SECTIONS   =  1, // north
-    parameter [63:0] NO_NSIDE    =  1,
-    parameter [63:0] NO_NGPIO    =  1,
-    parameter [63:0] NO_NANALOG  =  0,
-    parameter [63:0] NO_NXTAL    =  0,
-    parameter [63:0] NO_NVDDIO   =  1,
-    parameter [63:0] NO_NVDD     =  1,
-    parameter [63:0] NO_NGND     =  1,
-    parameter [63:0] NO_NCLAMP   =  0,
-    parameter [4:0] EA_SECTIONS   =  1, // east
-    parameter [63:0] EA_NSIDE    =  1,
-    parameter [63:0] EA_NGPIO    =  1,
-    parameter [63:0] EA_NANALOG  =  0,
-    parameter [63:0] EA_NXTAL    =  0,
-    parameter [63:0] EA_NVDDIO   =  1,
-    parameter [63:0] EA_NVDD     =  1,
-    parameter [63:0] EA_NGND     =  1,
-    parameter [63:0] EA_NCLAMP   =  0,
-    parameter [4:0] SO_SECTIONS   =  1, // south
-    parameter [63:0] SO_NSIDE    =  1,
-    parameter [63:0] SO_NGPIO    =  1,
-    parameter [63:0] SO_NANALOG  =  0,
-    parameter [63:0] SO_NXTAL    =  0,
-    parameter [63:0] SO_NVDDIO   =  1,
-    parameter [63:0] SO_NVDD     =  1,
-    parameter [63:0] SO_NGND     =  1,
-    parameter [63:0] SO_NCLAMP   =  0,
-    parameter [4:0] WE_SECTIONS   =  1, // west
-    parameter [63:0] WE_NSIDE    =  1,
-    parameter [63:0] WE_NGPIO    =  1,
-    parameter [63:0] WE_NANALOG  =  0,
-    parameter [63:0] WE_NXTAL    =  0,
-    parameter [63:0] WE_NVDDIO   =  1,
-    parameter [63:0] WE_NVDD     =  1,
-    parameter [63:0] WE_NGND     =  1,
-    parameter [63:0] WE_NCLAMP   =  0
+    parameter [4:0]  NO_SECTIONS =  1,
+    parameter [7:0]  NO_NSIDE    =  8'h8,
+    parameter [63:0] NO_N        =  64'h0404,
+    parameter [63:0] NO_NSEL     =  64'h0,
+    parameter [63:0] NO_NSTART   =  64'h00,
+    parameter [63:0] NO_NVDDIO   =  64'h01,
+    parameter [63:0] NO_NVDD     =  64'h01,
+    parameter [63:0] NO_NGND     =  64'h01,
+    parameter [63:0] NO_NCLAMP   =  64'h00,
+    parameter [4:0]  EA_SECTIONS =  1,
+    parameter [7:0]  EA_NSIDE    =  8'h8,
+    parameter [63:0] EA_N        =  64'h08,
+    parameter [63:0] EA_NSEL     =  64'h0,
+    parameter [63:0] EA_NSTART   =  64'h00,
+    parameter [63:0] EA_NVDDIO   =  64'h01,
+    parameter [63:0] EA_NVDD     =  64'h01,
+    parameter [63:0] EA_NGND     =  64'h01,
+    parameter [63:0] EA_NCLAMP   =  64'h00,
+    parameter [4:0]  SO_SECTIONS =  1,
+    parameter [7:0]  SO_NSIDE    =  8'h8,
+    parameter [63:0] SO_N        =  64'h08,
+    parameter [63:0] SO_NSEL     =  64'h0,
+    parameter [63:0] SO_NSTART   =  64'h00,
+    parameter [63:0] SO_NVDDIO   =  64'h01,
+    parameter [63:0] SO_NVDD     =  64'h01,
+    parameter [63:0] SO_NGND     =  64'h01,
+    parameter [63:0] SO_NCLAMP   =  64'h00,
+    parameter [4:0]  WE_SECTIONS =  1,
+    parameter [7:0]  WE_NSIDE    =  8'h8,
+    parameter [63:0] WE_N        =  64'h08,
+    parameter [63:0] WE_NSEL     =  64'h0,
+    parameter [63:0] WE_NSTART   =  64'h00,
+    parameter [63:0] WE_NVDDIO   =  64'h01,
+    parameter [63:0] WE_NVDD     =  64'h01,
+    parameter [63:0] WE_NGND     =  64'h01,
+    parameter [63:0] WE_NCLAMP   =  64'h00
     )
    (//CONTINUOUS GROUND
     inout 		      vss,
@@ -128,6 +128,7 @@ module la_iopadring
     inout [WE_SECTIONS-1:0]   we_vssio // io ground
     );
 
+
    //#####################
    // LOCAL WIRES
    //#####################
@@ -169,9 +170,9 @@ module la_iopadring
 	       .SIDE("NO"),
 	       .SECTIONS(NO_SECTIONS),
 	       .NSIDE(NO_NSIDE),
-	       .NGPIO(NO_NGPIO),
-	       .NANALOG(NO_NANALOG),
-	       .NXTAL(NO_NXTAL),
+	       .N(NO_N),
+	       .NSEL(NO_NSEL),
+	       .NSTART(NO_NSTART),
 	       .NVDDIO(NO_NVDDIO),
 	       .NVDD(NO_NVDD),
 	       .NGND(NO_NGND),
@@ -220,9 +221,9 @@ module la_iopadring
 	       .SIDE("EA"),
 	       .SECTIONS(EA_SECTIONS),
 	       .NSIDE(EA_NSIDE),
-	       .NGPIO(EA_NGPIO),
-	       .NANALOG(EA_NANALOG),
-	       .NXTAL(EA_NXTAL),
+	       .N(EA_N),
+	       .NSEL(EA_NSEL),
+	       .NSTART(EA_NSTART),
 	       .NVDDIO(EA_NVDDIO),
 	       .NVDD(EA_NVDD),
 	       .NGND(EA_NGND),
@@ -272,9 +273,9 @@ module la_iopadring
 	       .SIDE("SO"),
 	       .SECTIONS(SO_SECTIONS),
 	       .NSIDE(SO_NSIDE),
-	       .NGPIO(SO_NGPIO),
-	       .NANALOG(SO_NANALOG),
-	       .NXTAL(SO_NXTAL),
+	       .N(SO_N),
+	       .NSEL(SO_NSEL),
+	       .NSTART(SO_NSTART),
 	       .NVDDIO(SO_NVDDIO),
 	       .NVDD(SO_NVDD),
 	       .NGND(SO_NGND),
@@ -324,9 +325,9 @@ module la_iopadring
 	       .SIDE("WE"),
 	       .SECTIONS(WE_SECTIONS),
 	       .NSIDE(WE_NSIDE),
-	       .NGPIO(WE_NGPIO),
-	       .NANALOG(WE_NANALOG),
-	       .NXTAL(WE_NXTAL),
+	       .N(WE_N),
+	       .NSEL(WE_NSEL),
+	       .NSTART(WE_NSTART),
 	       .NVDDIO(WE_NVDDIO),
 	       .NVDD(WE_NVDD),
 	       .NGND(WE_NGND),
@@ -367,7 +368,6 @@ module la_iopadring
 	 .st				(we_st),		 // Templated
 	 .ds				(we_ds),		 // Templated
 	 .cfg				(we_cfg));		 // Templated
-
 
 endmodule // la_iopadring
 // Local Variables:
