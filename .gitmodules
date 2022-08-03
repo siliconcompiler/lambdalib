@@ -1,3 +1,6 @@
 [submodule "oh"]
 	path = oh
 	url = git@github.com:aolofsson/oh.git
+[submodule "openpdks"]
+	path = openpdks
+	url = git@github.com:siliconcompiler/openpdks.git
