@@ -13,14 +13,12 @@
 
 module la_iosection
   #(parameter [15:0] SIDE      = "NO",  // "NO", "SO", "EA", "WE"
-    parameter [7:0]  N         = 8,     // total pads
-    parameter [7:0]  NGPIO     = 8,     // digital pads (in section)
-    parameter [7:0]  NANALOG   = 0,     // analog pads
-    parameter [7:0]  NXTAL     = 0,     // xtal pads
-    parameter [7:0]  NVDDIO    = 1,     // IO supply pads
-    parameter [7:0]  NVDD      = 1,     // core supply pads
-    parameter [7:0]  NGND      = 1,     // core ground pads
-    parameter [7:0]  NCLAMP    = 1,     // clamp cells
+    parameter [7:0]  N         = 0,     // total pads
+    parameter [63:0] NSEL      = 0,     // 0=gpio, 1=analog, 2=xtal,..
+    parameter [7:0]  NVDDIO    = 0,     // IO supply pads
+    parameter [7:0]  NVDD      = 0,     // core supply pads
+    parameter [7:0]  NGND      = 0,     // core ground pads
+    parameter [7:0]  NCLAMP    = 0,     // clamp cells
     parameter [4:0]  CFGW      = 8,     // width of core config bus
     parameter [4:0]  RINGW     = 8,     // width of io ring
     parameter [0:0]  ENPOC     = 1,     // 1=place poc cell
@@ -61,69 +59,62 @@ module la_iosection
    //##########################################
    //# BIDIR GPIO BUFFERS
    //##########################################
-   for(i=0;i<(NGPIO);i=i+1)
-     begin: ila_iobidir
-	la_iobidir #(.SIDE(SIDE),
-		     .TYPE(IOTYPE),
-		     .CFGW(CFGW),
-		     .RINGW(RINGW))
-	i0 (// Outputs
-	    .z	(z[i]),
-	    // Inouts
-	    .pad	(pad[i]),
-	    .vdd	(vdd),
-	    .vss	(vss),
-	    .vddio (vddio),
-	    .vssio	(vssio),
-	    .ioring(ioring[RINGW-1:0]),
-	    // Inputs
-	    .a	(a[i]),
-	    .ie	(ie[i]),
-	    .oe	(oe[i]),
-	    .pe	(pe[i]),
-	    .ps	(ps[i]),
-	    .sr	(sr[i]),
-	    .st	(st[i]),
-	    .ds	(ds[i*3+:3]),
-	    .cfg	(cfg[i*CFGW+:CFGW]));
-     end
-
-   //##########################################
-   //# ANALOG (careful with mixing with gpio)
-   //##########################################
-
-   for(i=NGPIO;i<(NANALOG+NGPIO);i=i+1)
-     begin: ila_ioanalog
-	la_ioanalog #(.SIDE(SIDE),
-		      .TYPE(IOTYPE),
-		      .RINGW(RINGW))
-	i0 (.pad    (pad[i]),
-	    .vdd    (vdd),
-	    .vss    (vss),
-	    .vddio  (vddio),
-	    .vssio  (vssio),
-	    .a      (a[i]),
-	    .z      (z[i]),
-	    .ioring (ioring[RINGW-1:0]));
-     end
-
-   //##########################################
-   //# XTAL CELL (careful with mixing with gpio)
-   //##########################################
-
-   for(i=(NANALOG+NGPIO);i<(NANALOG+NGPIO+NXTAL);i=i+1)
-     begin: ila_ioxtal
-	la_ioxtal #(.SIDE(SIDE),
-		    .TYPE(IOTYPE),
-		    .RINGW(RINGW))
-	i0 (.pad    (pad[i]),
-	    .vdd    (vdd),
-	    .vss    (vss),
-	    .vddio  (vddio),
-	    .vssio  (vssio),
-	    .a      (a[i]),
-	    .z      (z[i]),
-	    .ioring (ioring[RINGW-1:0]));
+   for(i=0;i<N;i=i+1)
+     begin: ipad
+	if (NSEL[i*8+:8]==8'h0)
+	  begin: ila_iobidir
+	     la_iobidir #(.SIDE(SIDE),
+			  .TYPE(IOTYPE),
+			  .CFGW(CFGW),
+			  .RINGW(RINGW))
+	     i0 (// Outputs
+		 .z	(z[i]),
+		 // Inouts
+		 .pad	(pad[i]),
+		 .vdd	(vdd),
+		 .vss	(vss),
+		 .vddio (vddio),
+		 .vssio	(vssio),
+		 .ioring(ioring[RINGW-1:0]),
+		 // Inputs
+		 .a	(a[i]),
+		 .ie	(ie[i]),
+		 .oe	(oe[i]),
+		 .pe	(pe[i]),
+		 .ps	(ps[i]),
+		 .sr	(sr[i]),
+		 .st	(st[i]),
+		 .ds	(ds[i*3+:3]),
+		 .cfg	(cfg[i*CFGW+:CFGW]));
+	  end // block: ila_iobidir
+	else if (NSEL[i*8+:8]==8'h1)
+	  begin: ila_ioanalog
+	     la_ioanalog #(.SIDE(SIDE),
+			   .TYPE(IOTYPE),
+			   .RINGW(RINGW))
+	     i0 (.pad    (pad[i]),
+		 .vdd    (vdd),
+		 .vss    (vss),
+		 .vddio  (vddio),
+		 .vssio  (vssio),
+		 .a      (a[i]),
+		 .z      (z[i]),
+		 .ioring (ioring[RINGW-1:0]));
+	  end // block: ila_ioanalog
+	else if (NSEL[i*8+:8]==8'h2)
+	  begin
+	     la_ioxtal #(.SIDE(SIDE),
+			 .TYPE(IOTYPE),
+			 .RINGW(RINGW))
+	     i0 (.pad    (pad[i]),
+		 .vdd    (vdd),
+		 .vss    (vss),
+		 .vddio  (vddio),
+		 .vssio  (vssio),
+		 .a      (a[i]),
+		 .z      (z[i]),
+		 .ioring (ioring[RINGW-1:0]));
+	  end
      end
 
    //##########################################
