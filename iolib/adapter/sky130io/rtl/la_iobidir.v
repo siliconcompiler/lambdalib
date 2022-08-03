@@ -43,8 +43,8 @@ module la_iobidir
 
    sky130_ef_io__gpiov2_pad_wrapped
      gpio (
-	   .IN(a),
-	   .OUT(z),
+	   .IN(z),
+	   .OUT(a),
 	   .OE_N(oe),
 	   .INP_DIS(ie), // disable input when ie low
 	   .PAD(pad),
