@@ -17,8 +17,7 @@ module la_iopoc
     inout 	      vss, // core ground
     inout 	      vddio, // io supply
     inout 	      vssio, // io ground
-    inout [RINGW-1:0] ioring, // generic io-ring interface
-    output 	      poc // power valid for core logic
+    inout [RINGW-1:0] ioring // generic io-ring interface
     );
 
 endmodule
