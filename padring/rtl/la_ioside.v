@@ -22,22 +22,23 @@
 module la_ioside
   #(// per side parameters
     parameter [15:0]  SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter [7:0]   NSIDE      = 1,    // total pins
+    parameter [7:0]   NSIDE      = 1,    // total pins per side
     parameter [4:0]   SECTIONS   = 1,    // total number of sections
+    parameter [4:0]   CFGW       = 1,    // width of core config bus
+    parameter [4:0]   RINGW      = 1,    // width of io ring
     parameter [0:0]   ENRCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENLCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENPOC      = 1,    // enable poc cells
     parameter [0:0]   ENCORNER   = 1,    // enable corner cell
-    parameter [4:0]   CFGW       = 1,    // width of core config bus
-    parameter [4:0]   RINGW      = 1,    // width of io ring
     // per section  parameters (stuffed vectors)
-    parameter [63:0] NGPIO      = 1,    // digital pads
-    parameter [63:0] NANALOG    = 0,    // analog pads
-    parameter [63:0] NXTAL      = 0,    // xtal pads
-    parameter [63:0] NVDDIO     = 1,    // total IO supply/ground pads
-    parameter [63:0] NVDD       = 1,    // total core supply pads
-    parameter [63:0] NGND       = 1,    // total ground pads
-    parameter [63:0] NCLAMP     = 1,    // total esd clamp cells
+    // format is {SECN, SECN-1, ...SEC1, SEC0}
+    parameter [63:0]  N          = 1,    // number of pins
+    parameter [63:0]  NSTART     = 0,    // start position
+    parameter [63:0]  NSEL       = 0,    // 0=gpio, 1=analog, 2=xtal,..
+    parameter [63:0]  NVDDIO     = 1,    // IO supply/ground pads
+    parameter [63:0]  NVDD       = 1,    // core supply pads
+    parameter [63:0]  NGND       = 1,    // ground pads
+    parameter [63:0]  NCLAMP     = 1,    // esd clamp cells
     // options to overrride lalib
     parameter IOTYPE     = "DEFAULT",    // io cell type
     parameter XTALTYPE   = "DEFAULT",    // io cell type
@@ -69,9 +70,8 @@ module la_ioside
     inout [RINGW-1:0] 	       ioringr // generic io-ring
     );
 
-   genvar 	       i;
-   genvar 	       j;
 
+   genvar 	       j;
 
    //##########################################
    //# LOCAL WIRES
@@ -87,33 +87,17 @@ module la_ioside
    wire [SECTIONS-1:0]        vssio;
    wire [SECTIONS*RINGW-1:0]  ioring;
 
-
-   //##########################################
-   //# HELPER FUNCTION
-   //##########################################
-
-   // calculate offset to current section
-   function [7:0] offset;
-      input [7:0] i;
-      input [63:0] vector;
-      integer 	    ii;
-      begin
-	 offset = 0;
-	 for(ii=0; ii<i; ii=ii+1)
-	   offset = offset + vector[ii*8+:8];
-      end
-   endfunction
-
    //##########################################
    //# PLACE CORNER CELL
    //##########################################
+
    if (ENCORNER)
      begin: ila_iocorner
 	la_iocorner #(.SIDE(SIDE),
 		      .TYPE(IOTYPE),
 		      .RINGW(RINGW))
 	i0(.vdd     (vddl),
-	   .vss     (vssl),
+	   .vss     (vss),
 	   .vddio   (vddiol),
 	   .vssio   (vssiol),
 	   .ioring  (ioringl[RINGW-1:0]));
@@ -122,62 +106,51 @@ module la_ioside
    //##########################################
    //# PLACE SECTIONS
    //##########################################
+   genvar i;
+   generate
+      for(i=0;i<SECTIONS;i=i+1)
+	begin: ila_iosection
+	   // Assign section
+           la_iosection #(.SIDE(SIDE),
+			  .N(N[8*i+:8]),
+			  .NSEL(NSEL[8*i+:8]),
+			  .NVDDIO(NVDDIO[8*i+:8]),
+			  .NVDD(NVDD[8*i+:8]),
+			  .NGND(NGND[8*i+:8]),
+			  .NCLAMP(NCLAMP[8*i+:8]),
+			  .CFGW(CFGW),
+			  .RINGW(RINGW),
+			  .ENPOC(ENPOC),
+			  .IOTYPE(IOTYPE),
+			  .ANALOGTYPE(ANALOGTYPE),
+			  .XTALTYPE(XTALTYPE),
+			  .POCTYPE(POCTYPE),
+			  .VDDTYPE(VDDTYPE),
+			  .VDDIOTYPE(VDDIOTYPE),
+			  .VSSIOTYPE(VSSIOTYPE),
+			  .VSSTYPE(VSSTYPE))
+	   i0 (// Outputs
+	       .z	   (z[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       // Inouts
+	       .vss   (vss),
+	       .pad   (pad[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .vdd   (vdd[i]),
+	       .vddio (vddio[i]),
+	       .vssio (vssio[i]),
+	       .ioring(ioring[i*RINGW+:RINGW]),
+	       // Inputs
+	       .a     (a[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .ie    (ie[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .oe    (oe[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .pe    (pe[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .ps    (ps[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .sr    (sr[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .st    (st[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .ds    (ds[3*NSTART[i*8+:8]+:3*N[i*8+:8]]),
+	       .cfg   (cfg[CFGW*NSTART[i*8+:8]+:CFGW*N[i*8+:8]]));
 
-   for(i=0;i<SECTIONS;i=i+1)
-     begin: ila_iosection
-	// figure out how many bits came before
-	localparam [7:0] START = offset(i,NGPIO) +
-				 offset(i,NANALOG) +
-				 offset(i,NXTAL);
-
-	localparam [7:0] N = NGPIO[8*i+:8] +
-			     NANALOG[8*i+:8] +
-			     NXTAL[8*i+:8];
-
-	// Assign section
-        la_iosection #(.SIDE(SIDE),
-		       .N(N),
-		       .NGPIO(NGPIO[8*i+:8]),
-		       .NANALOG(NANALOG[8*i+:8]),
-		       .NXTAL(NXTAL[8*i+:8]),
-		       .NVDDIO(NVDDIO[8*i+:8]),
-		       .NVDD(NVDD[8*i+:8]),
-		       .NGND(NGND[8*i+:8]),
-		       .NCLAMP(NCLAMP[8*i+:8]),
-		       .CFGW(CFGW),
-		       .RINGW(RINGW),
-		       .ENPOC(ENPOC),
-		       .IOTYPE(IOTYPE),
-		       .ANALOGTYPE(ANALOGTYPE),
-		       .XTALTYPE(XTALTYPE),
-		       .POCTYPE(POCTYPE),
-		       .VDDTYPE(VDDTYPE),
-		       .VDDIOTYPE(VDDIOTYPE),
-		       .VSSIOTYPE(VSSIOTYPE),
-		       .VSSTYPE(VSSTYPE))
-	i0 (// Outputs
-	    .z	   (z[START+:N]),
-	    // Inouts
-	    .vss	(vss),
-	    .pad   (pad[START+:N]),
-	    .vdd   (vdd[i]),
-	    .vddio (vddio[i]),
-	    .vssio (vssio[i]),
-	    .ioring(ioring[i*RINGW+:RINGW]),
-	    // Inputs
-	    .a	   (a[START+:N]),
-	    .ie	   (ie[START+:N]),
-	    .oe    (oe[START+:N]),
-	    .pe    (pe[START+:N]),
-	    .ps    (ps[START+:N]),
-	    .sr    (sr[START+:N]),
-	    .st    (st[START+:N]),
-	    .ds    (ds[START*3+:3*N]),
-	    .cfg   (cfg[START*CFGW+:N*CFGW]));
-
-     end // for (i=0;i<SECTIONS;i=i+1)
-
-
+	end // for (i=0;i<SECTIONS;i=i+1)
+   endgenerate
 
    //##########################################
    //# PLACE CUT CELLS
@@ -232,6 +205,8 @@ module la_ioside
 	   .vssior  (vssior),
 	   .ioringr (ioringr[RINGW-1:0]));
      end // if (ENRCUT)
+
+
 
 endmodule
 // Local Variables:
