@@ -28,6 +28,7 @@ module la_usb
     output 	    usb_dn_out, // data output (neg)
     input 	    usb_dp_in, // data input (pos)
     input 	    usb_dn_in, // data input (pos)
+    input 	    usb_id, // indicates initial usb role for otg
     // ulpi
     input 	    ulpi_clk, // clock from PHY
     input 	    ulpi_dir, // data direction control from PHY
