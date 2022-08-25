@@ -8,9 +8,9 @@
  ****************************************************************************/
 module la_gpio
   #(
-    parameter TYPE = "DEFAULT" // interface selection
-    parameter PW   = 256,      // packet width
-    parameter N    = 8,        // number of GPIO pins
+    parameter TYPE = "DEFAULT", // interface selection
+    parameter PW   = 256,       // packet width
+    parameter N    = 8          // number of GPIO pins
     )
    (// basic control signals
     input 	    clk, // core clock
@@ -21,7 +21,7 @@ module la_gpio
     output 	    tx_ready,
     output [PW-1:0] rx_data,
     output 	    rx_valid,
-    input 	    rx_ready
+    input 	    rx_ready,
     // io interface
     output [N-1:0]  gpio_out, // data to drive to IO pins
     output [N-1:0]  gpio_dir, // IO direction(0=input)

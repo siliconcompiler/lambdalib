@@ -8,8 +8,8 @@
  ****************************************************************************/
 module la_qspi
   #(
-    parameter TYPE = "DEFAULT" // interface selection
-    parameter PW   = 256,      // packet width
+    parameter TYPE = "DEFAULT", // interface selection
+    parameter PW   = 256        // packet width
     )
    (// basic control signals
     input 	    clk, // core clock
@@ -20,7 +20,7 @@ module la_qspi
     output 	    tx_ready,
     output [PW-1:0] rx_data,
     output 	    rx_valid,
-    input 	    rx_ready
+    input 	    rx_ready,
     // io interface
     output 	    sck, //serial clock
     output 	    csn, // active low chip select

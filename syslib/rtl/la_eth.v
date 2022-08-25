@@ -8,8 +8,8 @@
  ****************************************************************************/
 module la_eth
   #(
-    parameter TYPE = "DEFAULT" // interface selection
-    parameter PW   = 256,      // packet width
+    parameter TYPE = "DEFAULT", // interface selection
+    parameter PW   = 256      // packet width
     )
    (// basic control signals
     input 	    clk, // core clock
@@ -20,7 +20,7 @@ module la_eth
     output 	    tx_ready,
     output [PW-1:0] rx_data,
     output 	    rx_valid,
-    input 	    rx_ready
+    input 	    rx_ready,
     // gmii interface
     input [7:0]     gmii_rx_data,
     input 	    gmii_rx_valid,
