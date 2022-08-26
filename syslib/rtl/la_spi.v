@@ -1,16 +1,14 @@
 /*****************************************************************************
- * Function: QSPI Interface
+ * Function: SPI Interface
  * Copyright: Lambda Project Authors. ALl rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
  * Docs:
  *
- * 1. Statically configurable as host/device by TYPE.
-
  ****************************************************************************/
-module la_qspi
+module la_spi
   #(
-    parameter TYPE = "HOST", // interface selection ("HOST/DEVICE")
+    parameter TYPE = "HOST", // interface selection
     parameter PW   = 256,    // packet width
     parameter CTRLW = 8,     // control vector width
     parameter STATW = 8      // status vector width
@@ -28,39 +26,37 @@ module la_qspi
     output 	       rx_valid,
     input 	       rx_ready,
     // inputs
-    input 	       qspi_clk_in,
-    input 	       qspi_csn_in,
-    input 	       qspi_io0_in,
-    input 	       qspi_io1_in,
-    input 	       qspi_io2_in,
-    input 	       qspi_io3_in,
+    input 	       spi_sclk_in,
+    input 	       spi_csn_in,
+    input 	       spi_mosi_in,
+    input 	       spi_miso_in,
     // outputs
-    output 	       qspi_clk_out,
-    output 	       qspi_csn_out,
-    output 	       qspi_io0_out,
-    output 	       qspi_io1_out,
-    output 	       qspi_io2_out,
-    output 	       qspi_io3_out,
+    output 	       spi_sclk_out,
+    output 	       spi_csn_out,
+    output 	       spi_mosi_out,
+    output 	       spi_miso_out,
     // output enable
-    output 	       qspi_clk_oe,
-    output 	       qspi_csn_oe,
-    output 	       qspi_io0_oe,
-    output 	       qspi_io1_oe,
-    output 	       qspi_io2_oe,
-    output 	       qspi_io3_oe
+    output 	       spi_sclk_oe,
+    output 	       spi_csn_oe,
+    output 	       spi_mosi_oe,
+    output 	       spi_miso_oe
     );
 
    generate
       if (TYPE=="HOST")
 	begin
-	   assign qspi_clk_oe = 1'b1;
-	   assign qspi_csn_oe = 1'b1;
+	   assign spi_sclk_oe = 1'b1;
+	   assign spi_csn_oe = 1'b1;
+	   assign spi_mosi_oe = 1'b1;
+	   assign spi_miso_oe = 1'b0;
 	end
       else
 	begin
-	   assign qspi_clk_oe = 1'b0;
-	   assign qspi_csn_oe = 1'b0;
+	   assign spi_sclk_oe = 1'b0;
+	   assign spi_csn_oe = 1'b0;
+	   assign spi_mosi_oe = 1'b0;
+	   assign spi_miso_oe = 1'b1;
 	end
    endgenerate
 
-endmodule // la_qspi
+endmodule // la_spi
