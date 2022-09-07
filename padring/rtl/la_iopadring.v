@@ -6,8 +6,23 @@
  * Docs:
  *
  * - Core ground (vss) is continuous around the ring
+ *
  * - Cut cells are inserted as appropriate
+ *
  * - Support for analog and digital pins
+ *
+ * - Supports up to 31 individual sections per side (5 bits)
+ *
+ * - Supports up to 63 pins per section/side (8 bits)
+ *
+ * - Per section parameters are stuffed 8bit vectors:
+ *    {SECN, SECN-1, ...SEC1, SEC0}
+ *
+ * - Example: If we have 4 sections (left to right) as seen from
+ *            center with a total of 15 pins, with pins in section0=1,
+ *            section1=2, section2=4, and section3=8, then we would enter the
+ *            "N" parameter would be specified as "parameter:
+ *             N = {8'd12, 8'd, 8'd2, 8'd1}"
  *
  ****************************************************************************/
 
@@ -27,7 +42,7 @@ module la_iopadring
     parameter VSSIOTYPE     = "DEFAULT", // vssio cell type
     parameter VSSTYPE       = "DEFAULT", // vss cell type
     // per side settings (total, split up to recipe)
-    parameter [4:0]  NO_SECTIONS =  1,
+    parameter [7:0]  NO_SECTIONS =  1,
     parameter [7:0]  NO_NSIDE    =  8'h8,
     parameter [63:0] NO_N        =  64'h0404,
     parameter [63:0] NO_NSEL     =  64'h0,
@@ -36,7 +51,7 @@ module la_iopadring
     parameter [63:0] NO_NVDD     =  64'h01,
     parameter [63:0] NO_NGND     =  64'h01,
     parameter [63:0] NO_NCLAMP   =  64'h00,
-    parameter [4:0]  EA_SECTIONS =  1,
+    parameter [7:0]  EA_SECTIONS =  1,
     parameter [7:0]  EA_NSIDE    =  8'h8,
     parameter [63:0] EA_N        =  64'h08,
     parameter [63:0] EA_NSEL     =  64'h0,
@@ -45,7 +60,7 @@ module la_iopadring
     parameter [63:0] EA_NVDD     =  64'h01,
     parameter [63:0] EA_NGND     =  64'h01,
     parameter [63:0] EA_NCLAMP   =  64'h00,
-    parameter [4:0]  SO_SECTIONS =  1,
+    parameter [7:0]  SO_SECTIONS =  1,
     parameter [7:0]  SO_NSIDE    =  8'h8,
     parameter [63:0] SO_N        =  64'h08,
     parameter [63:0] SO_NSEL     =  64'h0,
@@ -54,7 +69,7 @@ module la_iopadring
     parameter [63:0] SO_NVDD     =  64'h01,
     parameter [63:0] SO_NGND     =  64'h01,
     parameter [63:0] SO_NCLAMP   =  64'h00,
-    parameter [4:0]  WE_SECTIONS =  1,
+    parameter [7:0]  WE_SECTIONS =  1,
     parameter [7:0]  WE_NSIDE    =  8'h8,
     parameter [63:0] WE_N        =  64'h08,
     parameter [63:0] WE_NSEL     =  64'h0,

@@ -5,27 +5,18 @@
  *
  * Doc:
  *
- * Supports up to 31 individual sections per side (5 bits)
+ * (see la_iopadring.v)
  *
- * Supports up to 63 pins per section/side (8 bits)
- *
- * Per section parameters are stuffed 8bit vectors:
- * {SECN, SECN-1, ...SEC1, SEC0}
- *
- * Example: If we have 4 sections (left to right) as seen from
- *   center with a total of 15 pins, with pins in section0=1, section1=2,
- *   section2=4, and section3=8, then we would enter the "N" parameter would
- *   be specified as "parameter N = {8'd12, 8'd, 8'd2, 8'd1}"
  *
  ****************************************************************************/
 
 module la_ioside
   #(// per side parameters
     parameter [15:0]  SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter [7:0]   NSIDE      = 1,    // total pins per side
-    parameter [4:0]   SECTIONS   = 1,    // total number of sections
-    parameter [4:0]   CFGW       = 1,    // width of core config bus
-    parameter [4:0]   RINGW      = 1,    // width of io ring
+    parameter [7:0]   SECTIONS   = 1,    // total number of sections (16)
+    parameter [7:0]   NSIDE      = 1,    // total pins per side (256)
+    parameter [7:0]   CFGW       = 1,    // width of core config bus
+    parameter [7:0]   RINGW      = 1,    // width of io ring
     parameter [0:0]   ENRCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENLCUT     = 1,    // enable cut cell on far right
     parameter [0:0]   ENPOC      = 1,    // enable poc cells
@@ -69,7 +60,6 @@ module la_ioside
     inout 		       vssior, // io supply
     inout [RINGW-1:0] 	       ioringr // generic io-ring
     );
-
 
    genvar 	       j;
 
