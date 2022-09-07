@@ -1,6 +1,0 @@
-digraph v3graph {
-	graph	[label="obj_dir/Vla_iopadring_061_acyc_simp.dot",
-		 labelloc=t, labeljust=l,
-		 //size="7.5,10",
-		 rankdir=TB];
-}
