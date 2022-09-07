@@ -1,3 +1,6 @@
 [submodule "oh"]
 	path = submodules/oh
 	url = git@github.com:aolofsson/oh.git
+[submodule "submodules/lambdapdk"]
+	path = submodules/lambdapdk
+	url = git@github.com:siliconcompiler/lambdapdk.git
