@@ -1,0 +1,74 @@
+`begin_keywords "1800-2017"
+`line 1 "../../iolib//rtl/la_iobidir.v" 1
+
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+
+`line 16 "../../iolib//rtl/la_iobidir.v" 0
+ 
+module la_iobidir
+  #(
+    parameter TYPE  = "DEFAULT",  
+    parameter SIDE  = "NO",       
+    parameter CFGW  =  16,        
+    parameter RINGW =  8          
+    )
+   ( 
+    inout 	      pad,  
+    inout 	      vdd,  
+    inout 	      vss,  
+    inout 	      vddio,  
+    inout 	      vssio,  
+     
+    input 	      a,  
+    output 	      z,  
+    input 	      ie,  
+    input 	      oe,  
+    input 	      pe,  
+    input 	      ps, 
+    input 	      sr,  
+    input 	      st,  
+    input [2:0]       ds,  
+    inout [RINGW-1:0] ioring,  
+    input [CFGW-1:0]  cfg  
+    );
+
+`line 44 "../../iolib//rtl/la_iobidir.v" 0
+    
+   assign z   = ie ? pad : 1'b0;
+
+`line 47 "../../iolib//rtl/la_iobidir.v" 0
+    
+   assign pad = oe         ? a    :
+		(pe & ps)  ? 1'b1 :
+		(pe & !ps) ? 1'b0 :
+                             1'bz;
+
+`line 53 "../../iolib//rtl/la_iobidir.v" 0
+endmodule
+
+`line 55 "../../iolib//rtl/la_iobidir.v" 2

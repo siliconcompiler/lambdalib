@@ -1,0 +1,280 @@
+`begin_keywords "1800-2017"
+`line 1 "../rtl/la_ioside.v" 1
+
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+
+`line 20 "../rtl/la_ioside.v" 0
+ 
+
+`line 22 "../rtl/la_ioside.v" 0
+module la_ioside
+  #( 
+    parameter [15:0]  SIDE       = "NO",  
+    parameter [7:0]   NSIDE      = 1,     
+    parameter [4:0]   SECTIONS   = 1,     
+    parameter [4:0]   CFGW       = 1,     
+    parameter [4:0]   RINGW      = 1,     
+    parameter [0:0]   ENRCUT     = 1,     
+    parameter [0:0]   ENLCUT     = 1,     
+    parameter [0:0]   ENPOC      = 1,     
+    parameter [0:0]   ENCORNER   = 1,     
+     
+    parameter [63:0] NGPIO      = 1,     
+    parameter [63:0] NANALOG    = 0,     
+    parameter [63:0] NXTAL      = 0,     
+    parameter [63:0] NVDDIO     = 1,     
+    parameter [63:0] NVDD       = 1,     
+    parameter [63:0] NGND       = 1,     
+    parameter [63:0] NCLAMP     = 1,     
+     
+    parameter IOTYPE     = "DEFAULT",     
+    parameter XTALTYPE   = "DEFAULT",     
+    parameter ANALOGTYPE = "DEFAULT",     
+    parameter POCTYPE    = "DEFAULT",     
+    parameter VDDTYPE    = "DEFAULT",     
+    parameter VDDIOTYPE  = "DEFAULT",     
+    parameter VSSIOTYPE  = "DEFAULT",     
+    parameter VSSTYPE    = "DEFAULT"      
+    )
+   ( 
+    inout [NSIDE-1:0] 	       pad,  
+    inout 		       vss,  
+     
+    output [NSIDE-1:0] 	       z,  
+    input [NSIDE-1:0] 	       a,  
+    input [NSIDE-1:0] 	       ie,  
+    input [NSIDE-1:0] 	       oe,  
+    input [NSIDE-1:0] 	       pe,  
+    input [NSIDE-1:0] 	       ps,  
+    input [NSIDE-1:0] 	       sr,  
+    input [NSIDE-1:0] 	       st,  
+    input [NSIDE*3-1:0]        ds,  
+    input [NSIDE*CFGW-1:0]     cfg,  
+     
+    inout 		       vddr,  
+    inout 		       vddior,  
+    inout 		       vssior,  
+    inout [RINGW-1:0] 	       ioringr  
+    );
+
+`line 72 "../rtl/la_ioside.v" 0
+   genvar 	       i;
+   genvar 	       j;
+
+
+`line 76 "../rtl/la_ioside.v" 0
+    
+    
+    
+
+`line 80 "../rtl/la_ioside.v" 0
+   wire 	              vddl;
+   wire 	              vddiol;
+   wire 	              vssiol;
+   wire [RINGW-1:0]           ioringl;
+
+`line 85 "../rtl/la_ioside.v" 0
+   wire [SECTIONS-1:0]        vdd;
+   wire [SECTIONS-1:0]        vddio;
+   wire [SECTIONS-1:0]        vssio;
+   wire [SECTIONS*RINGW-1:0]  ioring;
+
+`line 90 "../rtl/la_ioside.v" 0
+    
+    
+    
+
+`line 94 "../rtl/la_ioside.v" 0
+    
+   function automatic [7:0] offset;
+      input [7:0] i;
+      input [63:0] vector;
+      integer 	    ii;
+      begin
+	 offset = 0;
+	 for(ii=0; ii<i; ii=ii+1)
+	   offset = offset + vector[ii*8+:8];
+      end
+   endfunction
+
+`line 106 "../rtl/la_ioside.v" 0
+    
+    
+    
+
+`line 110 "../rtl/la_ioside.v" 0
+   if (ENCORNER)
+     begin: ila_iocorner
+	la_iocorner #(.SIDE(SIDE),
+		      .TYPE(IOTYPE),
+		      .RINGW(RINGW))
+	i0(.vdd     (vddl),
+	   .vss     (vss),
+	   .vddio   (vddiol),
+	   .vssio   (vssiol),
+	   .ioring  (ioringl[RINGW-1:0]));
+     end
+
+`line 122 "../rtl/la_ioside.v" 0
+    
+    
+    
+
+`line 126 "../rtl/la_ioside.v" 0
+   for(i=0;i<SECTIONS;i=i+1)
+     begin: ila_iosection
+	 
+	localparam [7:0] START = offset(i,NGPIO) +
+				 offset(i,NANALOG) +
+				 offset(i,NXTAL);
+
+`line 133 "../rtl/la_ioside.v" 0
+	localparam [7:0] N = NGPIO[8*i+:8] +
+			     NANALOG[8*i+:8] +
+			     NXTAL[8*i+:8];
+
+`line 137 "../rtl/la_ioside.v" 0
+	 
+        la_iosection #(.SIDE(SIDE),
+		       .N(N),
+		       .NGPIO(NGPIO[8*i+:8]),
+		       .NANALOG(NANALOG[8*i+:8]),
+		       .NXTAL(NXTAL[8*i+:8]),
+		       .NVDDIO(NVDDIO[8*i+:8]),
+		       .NVDD(NVDD[8*i+:8]),
+		       .NGND(NGND[8*i+:8]),
+		       .NCLAMP(NCLAMP[8*i+:8]),
+		       .CFGW(CFGW),
+		       .RINGW(RINGW),
+		       .ENPOC(ENPOC),
+		       .IOTYPE(IOTYPE),
+		       .ANALOGTYPE(ANALOGTYPE),
+		       .XTALTYPE(XTALTYPE),
+		       .POCTYPE(POCTYPE),
+		       .VDDTYPE(VDDTYPE),
+		       .VDDIOTYPE(VDDIOTYPE),
+		       .VSSIOTYPE(VSSIOTYPE),
+		       .VSSTYPE(VSSTYPE))
+	i0 ( 
+	    .z	   (z[START+:N]),
+	     
+	    .vss	(vss),
+	    .pad   (pad[START+:N]),
+	    .vdd   (vdd[i]),
+	    .vddio (vddio[i]),
+	    .vssio (vssio[i]),
+	    .ioring(ioring[i*RINGW+:RINGW]),
+	     
+	    .a	   (a[START+:N]),
+	    .ie	   (ie[START+:N]),
+	    .oe    (oe[START+:N]),
+	    .pe    (pe[START+:N]),
+	    .ps    (ps[START+:N]),
+	    .sr    (sr[START+:N]),
+	    .st    (st[START+:N]),
+	    .ds    (ds[START*3+:3*N]),
+	    .cfg   (cfg[START*CFGW+:N*CFGW]));
+
+`line 178 "../rtl/la_ioside.v" 0
+     end  
+
+
+
+`line 182 "../rtl/la_ioside.v" 0
+    
+    
+    
+
+`line 186 "../rtl/la_ioside.v" 0
+   for(i=0;i<SECTIONS-1;i=i+1)
+     begin: ila_iocut
+	la_iocut #(.SIDE(SIDE),
+		   .TYPE(IOTYPE),
+		   .RINGW(RINGW))
+	i0(.vss     (vss),
+	   .vddl    (vdd[i]),
+	   .vddiol  (vddio[i]),
+	   .vssiol  (vssio[i]),
+	   .ioringl (ioring[i*RINGW+:RINGW]),
+	   .vddr    (vdd[i+1]),
+	   .vddior  (vddio[i+1]),
+	   .vssior  (vssio[i+1]),
+	   .ioringr (ioring[(i+1)*RINGW+:RINGW]));
+     end
+
+`line 202 "../rtl/la_ioside.v" 0
+    
+   if (ENLCUT)
+     begin: ila_ioleftcut
+	la_iocut #(.SIDE(SIDE),
+		   .TYPE(IOTYPE),
+		   .RINGW(RINGW))
+	i0(.vss	    (vss),
+	   .vddl    (vddl),
+	   .vddiol  (vddiol),
+	   .vssiol  (vssiol),
+	   .ioringl (ioringl[RINGW-1:0]),
+	   .vddr    (vdd[0]),
+	   .vddior  (vddio[0]),
+	   .vssior  (vssio[0]),
+	   .ioringr (ioring[RINGW-1:0]));
+     end  
+
+`line 219 "../rtl/la_ioside.v" 0
+    
+   if (ENRCUT)
+     begin: ila_iorightcut
+	la_iocut #(.SIDE(SIDE),
+		   .TYPE(IOTYPE),
+		   .RINGW(RINGW))
+	i0(.vss     (vss),
+	   .vddl    (vdd[SECTIONS-1]),
+	   .vddiol  (vddio[SECTIONS-1]),
+	   .vssiol  (vssio[SECTIONS-1]),
+	   .ioringl (ioring[(SECTIONS-1)*RINGW+:RINGW]),
+	   .vddr    (vddr),
+	   .vddior  (vddior),
+	   .vssior  (vssior),
+	   .ioringr (ioringr[RINGW-1:0]));
+     end  
+
+`line 236 "../rtl/la_ioside.v" 0
+endmodule
+ 
+ 
+ 
+
+`line 241 "../rtl/la_ioside.v" 2

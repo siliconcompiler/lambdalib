@@ -1,0 +1,258 @@
+`begin_keywords "1800-2017"
+`line 1 "../rtl/la_iosection.v" 1
+
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+
+`line 12 "../rtl/la_iosection.v" 0
+ 
+
+`line 14 "../rtl/la_iosection.v" 0
+module la_iosection
+  #(parameter [15:0] SIDE      = "NO",   
+    parameter [7:0]  N         = 8,      
+    parameter [7:0]  NGPIO     = 8,      
+    parameter [7:0]  NANALOG   = 0,      
+    parameter [7:0]  NXTAL     = 0,      
+    parameter [7:0]  NVDDIO    = 1,      
+    parameter [7:0]  NVDD      = 1,      
+    parameter [7:0]  NGND      = 1,      
+    parameter [7:0]  NCLAMP    = 1,      
+    parameter [4:0]  CFGW      = 8,      
+    parameter [4:0]  RINGW     = 8,      
+    parameter [0:0]  ENPOC     = 1,      
+     
+    parameter IOTYPE     = "DEFAULT",  
+    parameter XTALTYPE   = "DEFAULT",  
+    parameter ANALOGTYPE = "DEFAULT",  
+    parameter POCTYPE    = "DEFAULT",  
+    parameter VDDTYPE    = "DEFAULT",  
+    parameter VDDIOTYPE  = "DEFAULT",  
+    parameter VSSIOTYPE  = "DEFAULT",  
+    parameter VSSTYPE    = "DEFAULT"   
+    )
+   ( 
+    inout [N-1:0]      pad,  
+    inout 	       vss,  
+     
+    inout 	       vdd,  
+    inout 	       vddio,  
+    inout 	       vssio,  
+    inout [RINGW-1:0]  ioring,  
+     
+    input [N-1:0]      a,  
+    output [N-1:0]     z,  
+    input [N-1:0]      ie,  
+    input [N-1:0]      oe,  
+    input [N-1:0]      pe,  
+    input [N-1:0]      ps,  
+    input [N-1:0]      sr,  
+    input [N-1:0]      st,  
+    input [N*3-1:0]    ds,  
+    input [N*CFGW-1:0] cfg  
+    );
+
+
+`line 59 "../rtl/la_iosection.v" 0
+   genvar 	       i;
+
+`line 61 "../rtl/la_iosection.v" 0
+    
+    
+    
+   for(i=0;i<(NGPIO);i=i+1)
+     begin: ila_iobidir
+	la_iobidir #(.SIDE(SIDE),
+		     .TYPE(IOTYPE),
+		     .CFGW(CFGW),
+		     .RINGW(RINGW))
+	i0 ( 
+	    .z	(z[i]),
+	     
+	    .pad	(pad[i]),
+	    .vdd	(vdd),
+	    .vss	(vss),
+	    .vddio (vddio),
+	    .vssio	(vssio),
+	    .ioring(ioring[RINGW-1:0]),
+	     
+	    .a	(a[i]),
+	    .ie	(ie[i]),
+	    .oe	(oe[i]),
+	    .pe	(pe[i]),
+	    .ps	(ps[i]),
+	    .sr	(sr[i]),
+	    .st	(st[i]),
+	    .ds	(ds[i*3+:3]),
+	    .cfg	(cfg[i*CFGW+:CFGW]));
+     end
+
+`line 91 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 95 "../rtl/la_iosection.v" 0
+   for(i=NGPIO;i<(NANALOG+NGPIO);i=i+1)
+     begin: ila_ioanalog
+	la_ioanalog #(.SIDE(SIDE),
+		      .TYPE(IOTYPE),
+		      .RINGW(RINGW))
+	i0 (.pad    (pad[i]),
+	    .vdd    (vdd),
+	    .vss    (vss),
+	    .vddio  (vddio),
+	    .vssio  (vssio),
+	    .a      (a[i]),
+	    .z      (z[i]),
+	    .ioring (ioring[RINGW-1:0]));
+     end
+
+`line 110 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 114 "../rtl/la_iosection.v" 0
+   for(i=(NANALOG+NGPIO);i<(NANALOG+NGPIO+NXTAL);i=i+1)
+     begin: ila_ioxtal
+	la_ioxtal #(.SIDE(SIDE),
+		    .TYPE(IOTYPE),
+		    .RINGW(RINGW))
+	i0 (.pad    (pad[i]),
+	    .vdd    (vdd),
+	    .vss    (vss),
+	    .vddio  (vddio),
+	    .vssio  (vssio),
+	    .a      (a[i]),
+	    .z      (z[i]),
+	    .ioring (ioring[RINGW-1:0]));
+     end
+
+`line 129 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 133 "../rtl/la_iosection.v" 0
+   for(i=0;i<NVDDIO;i=i+1)
+     begin: ila_iovddio
+	 
+	la_iovddio #(.SIDE(SIDE),
+		     .TYPE(VDDIOTYPE),
+		     .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end  
+
+`line 146 "../rtl/la_iosection.v" 0
+   for(i=0;i<NVDDIO;i=i+1)
+     begin: ila_iovssio
+	la_iovssio #(.SIDE(SIDE),
+		     .TYPE(VSSIOTYPE),
+		     .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end
+
+`line 158 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 162 "../rtl/la_iosection.v" 0
+   for(i=0;i<NVDD;i=i+1)
+     begin: ila_iovdd
+	la_iovdd #(.SIDE(SIDE),
+		   .TYPE(VDDTYPE),
+		   .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end
+
+`line 174 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 178 "../rtl/la_iosection.v" 0
+   for(i=0;i<NGND;i=i+1)
+     begin: ila_iovss
+	la_iovss #(.SIDE(SIDE),
+		   .TYPE(VSSTYPE),
+		   .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end
+
+`line 190 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 194 "../rtl/la_iosection.v" 0
+   for(i=0;i<NCLAMP;i=i+1)
+     begin: ila_ioclamp
+	la_ioclamp #(.SIDE(SIDE),
+		     .TYPE(VSSTYPE),
+		     .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end
+
+`line 206 "../rtl/la_iosection.v" 0
+    
+    
+    
+
+`line 210 "../rtl/la_iosection.v" 0
+   if (ENPOC)
+     begin: ila_iopoc
+	la_iopoc #(.SIDE(SIDE),
+		   .TYPE(POCTYPE),
+		   .RINGW(RINGW))
+	i0 (.vdd     (vdd),
+	    .vss     (vss),
+	    .vddio   (vddio),
+	    .vssio   (vssio),
+	    .ioring  (ioring[RINGW-1:0]));
+     end  
+
+`line 222 "../rtl/la_iosection.v" 0
+endmodule
+ 
+ 
+ 
+
+`line 227 "../rtl/la_iosection.v" 2

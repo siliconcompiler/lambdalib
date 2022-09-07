@@ -1,0 +1,36 @@
+`begin_keywords "1800-2017"
+`line 1 "../../iolib//rtl/la_iovddio.v" 1
+
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+
+`line 9 "../../iolib//rtl/la_iovddio.v" 0
+ 
+module la_iovddio
+  #(
+    parameter TYPE  = "DEFAULT",  
+    parameter SIDE  = "NO",       
+    parameter RINGW =  8          
+    )
+   (
+    inout 	      vdd,  
+    inout 	      vss,  
+    inout 	      vddio,  
+    inout 	      vssio,  
+    inout [RINGW-1:0] ioring  
+    );
+
+`line 24 "../../iolib//rtl/la_iovddio.v" 0
+endmodule
+
+`line 26 "../../iolib//rtl/la_iovddio.v" 2

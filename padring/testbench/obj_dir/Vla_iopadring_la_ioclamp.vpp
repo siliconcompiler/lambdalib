@@ -1,0 +1,34 @@
+`begin_keywords "1800-2017"
+`line 1 "../../iolib//rtl/la_ioclamp.v" 1
+
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+
+`line 8 "../../iolib//rtl/la_ioclamp.v" 0
+ 
+module la_ioclamp
+  #(
+    parameter TYPE  = "DEFAULT",  
+    parameter SIDE  = "NO",       
+    parameter RINGW =  8          
+    )
+   ( 
+    inout 	      vdd,  
+    inout 	      vss,  
+    inout 	      vddio,  
+    inout 	      vssio,  
+    inout [RINGW-1:0] ioring  
+    );
+
+`line 23 "../../iolib//rtl/la_ioclamp.v" 0
+endmodule
+
+`line 25 "../../iolib//rtl/la_ioclamp.v" 2

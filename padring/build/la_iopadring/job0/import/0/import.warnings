@@ -1,0 +1,16 @@
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/padring/rtl/la_iopadring.v:29:1: No timescale set for "la_iopadring".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/padring/rtl/la_ioside.v:13:1: No timescale set for "la_ioside".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/padring/rtl/la_iosection.v:14:1: No timescale set for "la_iosection".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iocorner.v:10:1: No timescale set for "la_iocorner".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_ioclamp.v:9:1: No timescale set for "la_ioclamp".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovdda.v:10:1: No timescale set for "la_iovdda".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_ioanalog.v:9:1: No timescale set for "la_ioanalog".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iopoc.v:10:1: No timescale set for "la_iopoc".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iobidir.v:17:1: No timescale set for "la_iobidir".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_ioxtal.v:9:1: No timescale set for "la_ioxtal".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iocut.v:10:1: No timescale set for "la_iocut".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovssio.v:10:1: No timescale set for "la_iovssio".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovddio.v:10:1: No timescale set for "la_iovddio".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovdd.v:10:1: No timescale set for "la_iovdd".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovssa.v:10:1: No timescale set for "la_iovssa".
+[WRN:PA0205] /home/aolofsson/work/zeroasic/lambdalib/iolib/rtl/la_iovss.v:10:1: No timescale set for "la_iovss".
