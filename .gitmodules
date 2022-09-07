@@ -1,6 +1,3 @@
 [submodule "oh"]
 	path = submodules/oh
 	url = git@github.com:aolofsson/oh.git
-[submodule "openpdks"]
-	path = submodules/openpdks
-	url = git@github.com:siliconcompiler/openpdks.git
