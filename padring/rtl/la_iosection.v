@@ -6,8 +6,11 @@
  *
  * Doc:
  *
- * - The order of pads is digital-->analog-->xtal in a clock wise fashion
- *
+ * 1. NSEL selection:
+ *    0 = bidir
+ *    1 = input only
+ *    2 = analog signal
+ *    3 = xtal
  *
  ****************************************************************************/
 
@@ -41,18 +44,12 @@ module la_iosection
     inout 	       vssio, // io ground
     inout [RINGW-1:0]  ioring, // generic io-ring
     //core facing signals
-    input [N-1:0]      a, // input from core
-    output [N-1:0]     z, // output to core
+    input [N-1:0]      a, // value to pad
+    output [N-1:0]     z, // value from pad
     input [N-1:0]      ie, // input enable, 1 = active
     input [N-1:0]      oe, // output enable, 1 = active
-    input [N-1:0]      pe, // pullup enable, 1 = active
-    input [N-1:0]      ps, // pullup select, 1 = pull-up, 0 = pull-down
-    input [N-1:0]      sr, // slewrate enable 1 = slow, 1 = fast
-    input [N-1:0]      st, // schmitt trigger, 1 = enable
-    input [N*3-1:0]    ds, // drive strength, 3'b0 = weakest
     input [N*CFGW-1:0] cfg // generic config interface
     );
-
 
    genvar 	       i;
 
@@ -80,14 +77,24 @@ module la_iosection
 		 .a	(a[i]),
 		 .ie	(ie[i]),
 		 .oe	(oe[i]),
-		 .pe	(pe[i]),
-		 .ps	(ps[i]),
-		 .sr	(sr[i]),
-		 .st	(st[i]),
-		 .ds	(ds[i*3+:3]),
 		 .cfg	(cfg[i*CFGW+:CFGW]));
 	  end // block: ila_iobidir
 	else if (NSEL[i*8+:8]==8'h1)
+	  begin: ila_ioinput
+	     la_ioinput #(.SIDE(SIDE),
+			  .TYPE(IOTYPE),
+			  .RINGW(RINGW))
+	     i0 (.pad    (pad[i]),
+		 .vdd    (vdd),
+		 .vss    (vss),
+		 .vddio  (vddio),
+		 .vssio  (vssio),
+		 .ie	 (ie[i]),
+		 .z      (z[i]),
+		 .ioring (ioring[RINGW-1:0]));
+	  end // block: ila_ioanalog
+
+	else if (NSEL[i*8+:8]==8'h2)
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
 			   .TYPE(IOTYPE),
@@ -101,7 +108,7 @@ module la_iosection
 		 .z      (z[i]),
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
-	else if (NSEL[i*8+:8]==8'h2)
+	else if (NSEL[i*8+:8]==8'h3)
 	  begin
 	     la_ioxtal #(.SIDE(SIDE),
 			 .TYPE(IOTYPE),
