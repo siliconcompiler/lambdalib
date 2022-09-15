@@ -32,11 +32,6 @@ module la_iobidir
     output 	      z, // output to core
     input 	      ie, // input enable, 1 = active
     input 	      oe, // output enable, 1 = active
-    input 	      pe, // weak pull enable, 1 = active
-    input 	      ps,// pull select, 1 = pull-up, 0 = pull-down
-    input 	      sr, // slewrate enable 1 = fast, 0 = slow
-    input 	      st, // schmitt trigger, 1 = enable
-    input [2:0]       ds, // drive strength, 3'b0 = weakest
     inout [RINGW-1:0] ioring, // generic io-ring interface
     input [CFGW-1:0]  cfg // generic config interface
     );
@@ -44,10 +39,7 @@ module la_iobidir
    // to core
    assign z   = ie ? pad : 1'b0;
 
-   // to pad (verilator only)
-   assign pad = oe         ? a    :
-		(pe & ps)  ? 1'b1 :
-		(pe & !ps) ? 1'b0 :
-                             1'bz;
+   // to pad
+   assign pad = oe  ? a : 1'bz;
 
 endmodule
