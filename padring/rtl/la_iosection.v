@@ -16,8 +16,8 @@
 
 module la_iosection
   #(parameter [15:0] SIDE      = "NO",  // "NO", "SO", "EA", "WE"
-    parameter [7:0]  N         = 0,     // total pads
-    parameter [63:0] NSEL      = 0,     // 0=gpio, 1=analog, 2=xtal,..
+    parameter [7:0]  N         = 0,     // total pads in section
+    parameter [63:0] SELECT    = 0,     // 0=gpio, 1=analog, 2=xtal,..
     parameter [7:0]  NVDDIO    = 0,     // IO supply pads
     parameter [7:0]  NVDD      = 0,     // core supply pads
     parameter [7:0]  NGND      = 0,     // core ground pads
@@ -58,7 +58,7 @@ module la_iosection
    //##########################################
    for(i=0;i<N;i=i+1)
      begin: ipad
-	if (NSEL[i*8+:8]==8'h0)
+	if (SELECT[i*8+:8]==8'h0)
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
 			  .TYPE(IOTYPE),
@@ -79,7 +79,7 @@ module la_iosection
 		 .oe	(oe[i]),
 		 .cfg	(cfg[i*CFGW+:CFGW]));
 	  end // block: ila_iobidir
-	else if (NSEL[i*8+:8]==8'h1)
+	else if (SELECT[i*8+:8]==8'h1)
 	  begin: ila_ioinput
 	     la_ioinput #(.SIDE(SIDE),
 			  .TYPE(IOTYPE),
@@ -94,7 +94,7 @@ module la_iosection
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
 
-	else if (NSEL[i*8+:8]==8'h2)
+	else if (SELECT[i*8+:8]==8'h2)
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
 			   .TYPE(IOTYPE),
@@ -108,7 +108,7 @@ module la_iosection
 		 .z      (z[i]),
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
-	else if (NSEL[i*8+:8]==8'h3)
+	else if (SELECT[i*8+:8]==8'h3)
 	  begin
 	     la_ioxtal #(.SIDE(SIDE),
 			 .TYPE(IOTYPE),

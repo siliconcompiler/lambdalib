@@ -5,60 +5,56 @@
  *
  * Doc:
  *
- * (see la_iopadring.v)
+ * See repo ./README.md
  *
  *
  ****************************************************************************/
 
 module la_ioside
   #(// per side parameters
-    parameter [15:0]  SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter [7:0]   SECTIONS   = 1,    // total number of sections (16)
-    parameter [7:0]   NSIDE      = 1,    // total pins per side (256)
-    parameter [7:0]   CFGW       = 1,    // width of core config bus
-    parameter [7:0]   RINGW      = 1,    // width of io ring
-    parameter [0:0]   ENRCUT     = 1,    // enable cut cell on far right
-    parameter [0:0]   ENLCUT     = 1,    // enable cut cell on far right
-    parameter [0:0]   ENPOC      = 1,    // enable poc cells
-    parameter [0:0]   ENCORNER   = 1,    // enable corner cell
-    // per section  parameters (stuffed vectors)
-    // format is {SECN, SECN-1, ...SEC1, SEC0}
-    parameter [63:0]  N          = 1,    // number of pins
-    parameter [63:0]  NSTART     = 0,    // start position
-    parameter [63:0]  NSEL       = 0,    // 0=gpio, 1=analog, 2=xtal,..
-    parameter [63:0]  NVDDIO     = 1,    // IO supply/ground pads
-    parameter [63:0]  NVDD       = 1,    // core supply pads
-    parameter [63:0]  NGND       = 1,    // ground pads
-    parameter [63:0]  NCLAMP     = 1,    // esd clamp cells
-    // options to overrride lalib
-    parameter IOTYPE     = "DEFAULT",    // io cell type
-    parameter XTALTYPE   = "DEFAULT",    // io cell type
-    parameter ANALOGTYPE = "DEFAULT",    // io cell type
-    parameter POCTYPE    = "DEFAULT",    // poc cell type
-    parameter VDDTYPE    = "DEFAULT",    // vdd cell type
-    parameter VDDIOTYPE  = "DEFAULT",    // vddio cell type
-    parameter VSSIOTYPE  = "DEFAULT",    // vssio cell type
-    parameter VSSTYPE    = "DEFAULT"     // vss cell type
+    parameter [15:0]   SIDE       = "NO", // "NO", "SO", "EA", "WE"
+    parameter [7:0]    N          = 1,    // total pins per side (<256)
+    parameter [7:0]    SECTIONS   = 1,    // total number of sections (<256)
+    parameter [7:0]    CFGW       = 1,    // width of io config bus
+    parameter [7:0]    RINGW      = 1,    // width of io ring
+    parameter [0:0]    ENRCUT     = 1,    // enable cut cell on far right
+    parameter [0:0]    ENLCUT     = 1,    // enable cut cell on far right
+    parameter [0:0]    ENPOC      = 1,    // enable poc cells
+    parameter [0:0]    ENCORNER   = 1,    // enable corner cell
+    // per section  parameters (stuffed vectors of 8 bit values)
+    // format is {SEC255, SEC254, ..., SEC1, SEC0}
+    parameter [2047:0] NSPLIT     = 1,    // pins per section
+    parameter [2047:0] NSTART     = 0,    // start position per section
+    parameter [2047:0] NVDDIO     = 1,    // io supply cells per section
+    parameter [2047:0] NVDD       = 1,    // core supply cells per section
+    parameter [2047:0] NGND       = 1,    // ground cells per section
+    parameter [2047:0] NCLAMP     = 1,    // esd clamp cells per section
+    // options to overrride lalib (stuffed vectors of 8 bit values)
+    // format is {PIN255, PIN254, ..., PIN1, PIN0}
+    parameter [2047:0] SELECT     = 0,
+    parameter [2047:0] IOTYPE     = 0,
+    parameter [2047:0] XTALTYPE   = 0,
+    parameter [2047:0] ANALOGTYPE = 0,
+    parameter [2047:0] POCTYPE    = 0,
+    parameter [2047:0] VDDTYPE    = 0,
+    parameter [2047:0] VDDIOTYPE  = 0,
+    parameter [2047:0] VSSIOTYPE  = 0,
+    parameter [2047:0] VSSTYPE    = 0
     )
    (// io pad signals
-    inout [NSIDE-1:0] 	       pad, // pad
-    inout 		       vss, // common ground
+    inout [N-1:0]      pad, // pad
+    inout 	       vss, // common ground
     //core facing signals
-    output [NSIDE-1:0] 	       z, // output to core
-    input [NSIDE-1:0] 	       a, // input from core
-    input [NSIDE-1:0] 	       ie, // input enable, 1 = active
-    input [NSIDE-1:0] 	       oe, // output enable, 1 = active
-    input [NSIDE-1:0] 	       pe, // pullup enable, 1 = active
-    input [NSIDE-1:0] 	       ps, // pullup select, 1 = pull-up, 0 = pull-down
-    input [NSIDE-1:0] 	       sr, // slewrate enable 1 = slow, 1 = fast
-    input [NSIDE-1:0] 	       st, // schmitt trigger, 1 = enable
-    input [NSIDE*3-1:0]        ds, // drive strength, 3'b0 = weakest
-    input [NSIDE*CFGW-1:0]     cfg, // generic config interface
+    output [N-1:0]     z, // output to core
+    input [N-1:0]      a, // input from core
+    input [N-1:0]      ie, // input enable, 1 = active
+    input [N-1:0]      oe, // output enable, 1 = active
+    input [N*CFGW-1:0] cfg, // generic config interface
     // left right braks/cuts
-    inout 		       vddr, // core supply
-    inout 		       vddior, // io supply
-    inout 		       vssior, // io supply
-    inout [RINGW-1:0] 	       ioringr // generic io-ring
+    inout 	       vddr, // core supply
+    inout 	       vddior, // io supply
+    inout 	       vssior, // io supply
+    inout [RINGW-1:0]  ioringr // generic io-ring
     );
 
    genvar 	       j;
@@ -102,8 +98,8 @@ module la_ioside
 	begin: ila_iosection
 	   // Assign section
            la_iosection #(.SIDE(SIDE),
-			  .N(N[8*i+:8]),
-			  .NSEL(NSEL[8*i+:8]),
+			  .N(NSPLIT[8*i+:8]),
+			  .SELECT(SELECT[8*i+:8]),
 			  .NVDDIO(NVDDIO[8*i+:8]),
 			  .NVDD(NVDD[8*i+:8]),
 			  .NGND(NGND[8*i+:8]),
@@ -120,24 +116,19 @@ module la_ioside
 			  .VSSIOTYPE(VSSIOTYPE),
 			  .VSSTYPE(VSSTYPE))
 	   i0 (// Outputs
-	       .z	   (z[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .z	   (z[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       // Inouts
 	       .vss   (vss),
-	       .pad   (pad[NSTART[i*8+:8]+:N[i*8+:8]]),
+	       .pad   (pad[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       .vdd   (vdd[i]),
 	       .vddio (vddio[i]),
 	       .vssio (vssio[i]),
 	       .ioring(ioring[i*RINGW+:RINGW]),
 	       // Inputs
-	       .a     (a[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .ie    (ie[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .oe    (oe[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .pe    (pe[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .ps    (ps[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .sr    (sr[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .st    (st[NSTART[i*8+:8]+:N[i*8+:8]]),
-	       .ds    (ds[3*NSTART[i*8+:8]+:3*N[i*8+:8]]),
-	       .cfg   (cfg[CFGW*NSTART[i*8+:8]+:CFGW*N[i*8+:8]]));
+	       .a     (a[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
+	       .ie    (ie[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
+	       .oe    (oe[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
+	       .cfg   (cfg[CFGW*NSTART[i*8+:8]+:CFGW*NSPLIT[i*8+:8]]));
 
 	end // for (i=0;i<SECTIONS;i=i+1)
    endgenerate
