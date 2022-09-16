@@ -6,7 +6,7 @@
  *
  * Doc:
  *
- * 1. NSEL selection:
+ * 1. PINSELECT selection:
  *    0 = bidir
  *    1 = input only
  *    2 = analog signal
@@ -15,25 +15,27 @@
  ****************************************************************************/
 
 module la_iosection
-  #(parameter [15:0] SIDE      = "NO",  // "NO", "SO", "EA", "WE"
-    parameter [7:0]  N         = 0,     // total pads in section
-    parameter [63:0] SELECT    = 0,     // 0=gpio, 1=analog, 2=xtal,..
-    parameter [7:0]  NVDDIO    = 0,     // IO supply pads
-    parameter [7:0]  NVDD      = 0,     // core supply pads
-    parameter [7:0]  NGND      = 0,     // core ground pads
-    parameter [7:0]  NCLAMP    = 0,     // clamp cells
-    parameter [4:0]  CFGW      = 8,     // width of core config bus
-    parameter [4:0]  RINGW     = 8,     // width of io ring
-    parameter [0:0]  ENPOC     = 1,     // 1=place poc cell
-    // These are generally hard coded in library
-    parameter IOTYPE     = "DEFAULT", // io cell type
-    parameter XTALTYPE   = "DEFAULT", // io cell type
-    parameter ANALOGTYPE = "DEFAULT", // io cell type
-    parameter POCTYPE    = "DEFAULT", // poc cell type
-    parameter VDDTYPE    = "DEFAULT", // vdd cell type
-    parameter VDDIOTYPE  = "DEFAULT", // vddio cell type
-    parameter VSSIOTYPE  = "DEFAULT", // vssio cell type
-    parameter VSSTYPE    = "DEFAULT"  // vss cell type
+  #(parameter [15:0]   SIDE    = "NO",  // "NO", "SO", "EA", "WE"
+    parameter [4:0]    CFGW    = 8,     // width of core config bus
+    parameter [4:0]    RINGW   = 8,     // width of io ring
+    parameter [0:0]    ENPOC   = 1,     // 1=place poc cell
+    // global settings for section
+    parameter [7:0]    N       = 1,     // total cells in section
+    parameter [7:0]    NSTART  = 0,     // start position for section
+    parameter [7:0]    NVDDIO  = 0,     // IO supply cells
+    parameter [7:0]    NVDD    = 0,     // core supply cells
+    parameter [7:0]    NGND    = 0,     // ground cells
+    parameter [7:0]    NCLAMP  = 0,     // clamp cells
+    // options to overrride lib on per pin basis (8 bit values per pin)
+    // format is {PIN255, PIN254, ..., PIN1, PIN0}
+    parameter [2047:0] PINSELECT  = 0,
+    parameter [2047:0] IOTYPE     = 0,
+    parameter [2047:0] VDDIOTYPE  = 0,
+    parameter [2047:0] VSSIOTYPE  = 0,
+    parameter [2047:0] VDDTYPE    = 0,
+    parameter [2047:0] VSSTYPE    = 0,
+    parameter [2047:0] CLAMPTYPE  = 0,
+    parameter [2047:0] POCTYPE    = 0
     )
    (// io pad signals
     inout [N-1:0]      pad, // pad
@@ -58,10 +60,10 @@ module la_iosection
    //##########################################
    for(i=0;i<N;i=i+1)
      begin: ipad
-	if (SELECT[i*8+:8]==8'h0)
+	if (PINSELECT[NSTART+i*8+:8]==8'h0)
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
-			  .TYPE(IOTYPE),
+			  .TYPE(IOTYPE[NSTART+8*i+:8]),
 			  .CFGW(CFGW),
 			  .RINGW(RINGW))
 	     i0 (// Outputs
@@ -79,10 +81,10 @@ module la_iosection
 		 .oe	(oe[i]),
 		 .cfg	(cfg[i*CFGW+:CFGW]));
 	  end // block: ila_iobidir
-	else if (SELECT[i*8+:8]==8'h1)
+	else if (PINSELECT[NSTART+i*8+:8]==8'h1)
 	  begin: ila_ioinput
 	     la_ioinput #(.SIDE(SIDE),
-			  .TYPE(IOTYPE),
+			  .TYPE(IOTYPE[NSTART+8*i+:8]),
 			  .RINGW(RINGW))
 	     i0 (.pad    (pad[i]),
 		 .vdd    (vdd),
@@ -94,10 +96,10 @@ module la_iosection
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
 
-	else if (SELECT[i*8+:8]==8'h2)
+	else if (PINSELECT[NSTART+i*8+:8]==8'h2)
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
-			   .TYPE(IOTYPE),
+			   .TYPE(IOTYPE[NSTART+8*i+:8]),
 			   .RINGW(RINGW))
 	     i0 (.pad    (pad[i]),
 		 .vdd    (vdd),
@@ -108,10 +110,10 @@ module la_iosection
 		 .z      (z[i]),
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
-	else if (SELECT[i*8+:8]==8'h3)
+	else if (PINSELECT[NSTART+i*8+:8]==8'h3)
 	  begin
 	     la_ioxtal #(.SIDE(SIDE),
-			 .TYPE(IOTYPE),
+			 .TYPE(IOTYPE[NSTART+8*i+:8]),
 			 .RINGW(RINGW))
 	     i0 (.pad    (pad[i]),
 		 .vdd    (vdd),
@@ -132,7 +134,7 @@ module la_iosection
      begin: ila_iovddio
 	// vddio
 	la_iovddio #(.SIDE(SIDE),
-		     .TYPE(VDDIOTYPE),
+		     .TYPE(VDDIOTYPE[NSTART+8*i+:8]),
 		     .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),
@@ -144,7 +146,7 @@ module la_iosection
    for(i=0;i<NVDDIO;i=i+1)
      begin: ila_iovssio
 	la_iovssio #(.SIDE(SIDE),
-		     .TYPE(VSSIOTYPE),
+		     .TYPE(VSSIOTYPE[NSTART+8*i+:8]),
 		     .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),
@@ -160,7 +162,7 @@ module la_iosection
    for(i=0;i<NVDD;i=i+1)
      begin: ila_iovdd
 	la_iovdd #(.SIDE(SIDE),
-		   .TYPE(VDDTYPE),
+		   .TYPE(VDDTYPE[NSTART+8*i+:8]),
 		   .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),
@@ -176,7 +178,7 @@ module la_iosection
    for(i=0;i<NGND;i=i+1)
      begin: ila_iovss
 	la_iovss #(.SIDE(SIDE),
-		   .TYPE(VSSTYPE),
+		   .TYPE(VSSTYPE[NSTART+8*i+:8]),
 		   .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),
@@ -192,7 +194,7 @@ module la_iosection
    for(i=0;i<NCLAMP;i=i+1)
      begin: ila_ioclamp
 	la_ioclamp #(.SIDE(SIDE),
-		     .TYPE(VSSTYPE),
+		     .TYPE(CLAMPTYPE[NSTART+8*i+:8]),
 		     .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),
@@ -208,7 +210,7 @@ module la_iosection
    if (ENPOC)
      begin: ila_iopoc
 	la_iopoc #(.SIDE(SIDE),
-		   .TYPE(POCTYPE),
+		   .TYPE(POCTYPE[NSTART+:8]),
 		   .RINGW(RINGW))
 	i0 (.vdd     (vdd),
 	    .vss     (vss),

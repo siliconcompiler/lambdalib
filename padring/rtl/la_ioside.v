@@ -29,17 +29,17 @@ module la_ioside
     parameter [2047:0] NVDD       = 1,    // core supply cells per section
     parameter [2047:0] NGND       = 1,    // ground cells per section
     parameter [2047:0] NCLAMP     = 1,    // esd clamp cells per section
-    // options to overrride lalib (stuffed vectors of 8 bit values)
+    // options to overrride lib on per pin basis (8 bit values per pin)
     // format is {PIN255, PIN254, ..., PIN1, PIN0}
-    parameter [2047:0] SELECT     = 0,
+    parameter [2047:0] PINSELECT  = 0,
     parameter [2047:0] IOTYPE     = 0,
-    parameter [2047:0] XTALTYPE   = 0,
-    parameter [2047:0] ANALOGTYPE = 0,
-    parameter [2047:0] POCTYPE    = 0,
-    parameter [2047:0] VDDTYPE    = 0,
     parameter [2047:0] VDDIOTYPE  = 0,
     parameter [2047:0] VSSIOTYPE  = 0,
-    parameter [2047:0] VSSTYPE    = 0
+    parameter [2047:0] VDDTYPE    = 0,
+    parameter [2047:0] VSSTYPE    = 0,
+    parameter [2047:0] CLAMPTYPE  = 0,
+    parameter [2047:0] CUTTYPE    = 0,
+    parameter [2047:0] POCTYPE    = 0
     )
    (// io pad signals
     inout [N-1:0]      pad, // pad
@@ -80,7 +80,6 @@ module la_ioside
    if (ENCORNER)
      begin: ila_iocorner
 	la_iocorner #(.SIDE(SIDE),
-		      .TYPE(IOTYPE),
 		      .RINGW(RINGW))
 	i0(.vdd     (vddl),
 	   .vss     (vss),
@@ -99,22 +98,21 @@ module la_ioside
 	   // Assign section
            la_iosection #(.SIDE(SIDE),
 			  .N(NSPLIT[8*i+:8]),
-			  .SELECT(SELECT[8*i+:8]),
 			  .NVDDIO(NVDDIO[8*i+:8]),
 			  .NVDD(NVDD[8*i+:8]),
 			  .NGND(NGND[8*i+:8]),
 			  .NCLAMP(NCLAMP[8*i+:8]),
-			  .CFGW(CFGW),
-			  .RINGW(RINGW),
-			  .ENPOC(ENPOC),
+			  .PINSELECT(PINSELECT),
 			  .IOTYPE(IOTYPE),
-			  .ANALOGTYPE(ANALOGTYPE),
-			  .XTALTYPE(XTALTYPE),
-			  .POCTYPE(POCTYPE),
 			  .VDDTYPE(VDDTYPE),
+			  .VSSTYPE(VSSTYPE),
 			  .VDDIOTYPE(VDDIOTYPE),
 			  .VSSIOTYPE(VSSIOTYPE),
-			  .VSSTYPE(VSSTYPE))
+			  .CLAMPTYPE(CLAMPTYPE),
+			  .POCTYPE(POCTYPE),
+			  .CFGW(CFGW),
+			  .RINGW(RINGW),
+			  .ENPOC(ENPOC))
 	   i0 (// Outputs
 	       .z	   (z[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       // Inouts
@@ -140,7 +138,7 @@ module la_ioside
    for(i=0;i<SECTIONS-1;i=i+1)
      begin: ila_iocut
 	la_iocut #(.SIDE(SIDE),
-		   .TYPE(IOTYPE),
+		   .TYPE(CUTTYPE),
 		   .RINGW(RINGW))
 	i0(.vss     (vss),
 	   .vddl    (vdd[i]),
@@ -157,7 +155,7 @@ module la_ioside
    if (ENLCUT)
      begin: ila_ioleftcut
 	la_iocut #(.SIDE(SIDE),
-		   .TYPE(IOTYPE),
+		   .TYPE(CUTTYPE),
 		   .RINGW(RINGW))
 	i0(.vss	    (vss),
 	   .vddl    (vddl),
@@ -174,7 +172,7 @@ module la_ioside
    if (ENRCUT)
      begin: ila_iorightcut
 	la_iocut #(.SIDE(SIDE),
-		   .TYPE(IOTYPE),
+		   .TYPE(CUTTYPE),
 		   .RINGW(RINGW))
 	i0(.vss     (vss),
 	   .vddl    (vdd[SECTIONS-1]),
