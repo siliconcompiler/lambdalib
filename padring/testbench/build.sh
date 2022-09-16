@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile and Run Icarus
-iverilog tb_la_iopadring.v -y ../rtl/ -y ../../iolib/rtl -y ../../oh/stdlib/testbench/
+iverilog tb_la_iopadring.v -y ../rtl/ -y ../../iolib/rtl -y ../../../oh/stdlib/testbench/
 ./a.out
 
 # Compile Verilator
