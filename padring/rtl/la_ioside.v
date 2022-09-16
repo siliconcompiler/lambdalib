@@ -185,8 +185,6 @@ module la_ioside
 	   .ioringr (ioringr[RINGW-1:0]));
      end // if (ENRCUT)
 
-
-
 endmodule
 // Local Variables:
 // verilog-library-directories:("." "../stub")
