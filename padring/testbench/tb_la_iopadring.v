@@ -197,37 +197,18 @@ module testbench();
 	.no_a				({NO_NSIDE{1'b0}}),	 // Templated
 	.no_ie				({NO_NSIDE{1'b0}}),	 // Templated
 	.no_oe				({NO_NSIDE{1'b0}}),	 // Templated
-	.no_pe				({NO_NSIDE{1'b0}}),	 // Templated
-	.no_ps				({NO_NSIDE{1'b0}}),	 // Templated
-	.no_sr				({NO_NSIDE{1'b0}}),	 // Templated
-	.no_st				({NO_NSIDE{1'b0}}),	 // Templated
-	.no_ds				({3*NO_NSIDE{1'b0}}),	 // Templated
 	.no_cfg				({NO_CFGW{1'b0}}),	 // Templated
 	.ea_a				({EA_NSIDE{1'b0}}),	 // Templated
 	.ea_ie				({EA_NSIDE{1'b0}}),	 // Templated
 	.ea_oe				({EA_NSIDE{1'b0}}),	 // Templated
-	.ea_pe				({EA_NSIDE{1'b0}}),	 // Templated
-	.ea_ps				({EA_NSIDE{1'b0}}),	 // Templated
-	.ea_sr				({EA_NSIDE{1'b0}}),	 // Templated
-	.ea_st				({EA_NSIDE{1'b0}}),	 // Templated
-	.ea_ds				({3*EA_NSIDE{1'b0}}),	 // Templated
 	.ea_cfg				({EA_CFGW{1'b0}}),	 // Templated
 	.so_a				({SO_NSIDE{1'b0}}),	 // Templated
 	.so_ie				({SO_NSIDE{1'b0}}),	 // Templated
 	.so_oe				({SO_NSIDE{1'b0}}),	 // Templated
-	.so_pe				({SO_NSIDE{1'b0}}),	 // Templated
-	.so_ps				({SO_NSIDE{1'b0}}),	 // Templated
-	.so_sr				({SO_NSIDE{1'b0}}),	 // Templated
-	.so_st				({SO_NSIDE{1'b0}}),	 // Templated
-	.so_ds				({3*SO_NSIDE{1'b0}}),	 // Templated
 	.so_cfg				({SO_CFGW{1'b0}}),	 // Templated
 	.we_a				({WE_NSIDE{1'b0}}),	 // Templated
 	.we_ie				({WE_NSIDE{1'b0}}),	 // Templated
 	.we_oe				({WE_NSIDE{1'b0}}),	 // Templated
-	.we_pe				({WE_NSIDE{1'b0}}),	 // Templated
-	.we_ps				({WE_NSIDE{1'b0}}),	 // Templated
-	.we_sr				({WE_NSIDE{1'b0}}),	 // Templated
-	.we_st				({WE_NSIDE{1'b0}}),	 // Templated
 	.we_ds				({3*WE_NSIDE{1'b0}}),	 // Templated
 	.we_cfg				({WE_CFGW{1'b0}}));	 // Templated
 
@@ -242,5 +223,5 @@ module testbench();
 
 endmodule // testbench
 // Local Variables:
-// verilog-library-directories:("../rtl" "../../oh/stdlib/testbench")
+// verilog-library-directories:("../rtl" "../../../oh/stdlib/testbench")
 // End:
