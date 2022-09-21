@@ -140,7 +140,6 @@ module la_iopadring
     input [WE_N-1:0] 	    we_a, // input from core
     input [WE_N-1:0] 	    we_ie, // input enable, 1 = active
     input [WE_N-1:0] 	    we_oe, // output enable, 1 = active
-    input [WE_N*3-1:0] 	    we_ds, // drive strength, 3'b0 = weakest
     input [WE_N*CFGW-1:0]   we_cfg, // generic config interface
     inout [WE_SECTIONS-1:0] we_vdd, // core supply
     inout [WE_SECTIONS-1:0] we_vddio, // io supply
