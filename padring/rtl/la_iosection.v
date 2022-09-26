@@ -46,6 +46,7 @@ module la_iosection
     inout 	       vssio, // io ground
     inout [RINGW-1:0]  ioring, // generic io-ring
     //core facing signals
+    inout [N-1:0]      aio, // analog inout
     input [N-1:0]      a, // value to pad
     output [N-1:0]     z, // value from pad
     input [N-1:0]      ie, // input enable, 1 = active
@@ -106,8 +107,7 @@ module la_iosection
 		 .vss    (vss),
 		 .vddio  (vddio),
 		 .vssio  (vssio),
-		 .a      (a[i]),
-		 .z      (z[i]),
+		 .aio    (aio[i]),
 		 .ioring (ioring[RINGW-1:0]));
 	  end // block: ila_ioanalog
 	else if (PINSELECT[NSTART+i*8+:8]==8'h3)

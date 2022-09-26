@@ -45,6 +45,7 @@ module la_ioside
     inout [N-1:0]      pad, // pad
     inout 	       vss, // common ground
     //core facing signals
+    inout [N-1:0]      aio, // analog inout
     output [N-1:0]     z, // output to core
     input [N-1:0]      a, // input from core
     input [N-1:0]      ie, // input enable, 1 = active
@@ -114,7 +115,7 @@ module la_ioside
 			  .RINGW(RINGW),
 			  .ENPOC(ENPOC))
 	   i0 (// Outputs
-	       .z	   (z[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
+	       .z     (z[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       // Inouts
 	       .vss   (vss),
 	       .pad   (pad[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
@@ -122,6 +123,7 @@ module la_ioside
 	       .vddio (vddio[i]),
 	       .vssio (vssio[i]),
 	       .ioring(ioring[i*RINGW+:RINGW]),
+	       .aio   (aio[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       // Inputs
 	       .a     (a[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
 	       .ie    (ie[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),

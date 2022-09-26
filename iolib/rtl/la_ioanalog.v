@@ -20,8 +20,7 @@ module la_ioanalog
     inout 	      vssio, // io ground
     inout [RINGW-1:0] ioring, // generic io-ring interface
     // core interface
-    input 	      a, // analog input from core
-    output 	      z // analog output to core
+    inout 	      aio // analog core signal
     );
 
 endmodule

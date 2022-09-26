@@ -33,11 +33,11 @@ module la_iopadring
     parameter ENCUT  = 1,         // enable cuts at corner
     parameter ENPOC  = 1,         // enable poc cells
     // per side settings
-    parameter [7:0]    NO_SECTIONS   =  1,
-    parameter [7:0]    NO_N          =  8'h8,
-    parameter [2047:0] NO_NSPLIT     =  2048'h08,
-    parameter [2047:0] NO_NSTART     =  2048'h00,
-    parameter [2047:0] NO_NVDDIO     =  2048'h01,
+    parameter [7:0]    NO_SECTIONS   =  1,        // sections per side
+    parameter [7:0]    NO_N          =  8'h8,     // IO pins per side
+    parameter [2047:0] NO_NSPLIT     =  2048'h08, // pins per section
+    parameter [2047:0] NO_NSTART     =  2048'h00, // start position per section
+    parameter [2047:0] NO_NVDDIO     =  2048'h01, // pin selection
     parameter [2047:0] NO_NVDD       =  2048'h01,
     parameter [2047:0] NO_NGND       =  2048'h01,
     parameter [2047:0] NO_NCLAMP     =  2048'h00,
@@ -106,6 +106,7 @@ module la_iopadring
     inout 		    vss,
     // NORTH
     inout [NO_N-1:0] 	    no_pad, // pad
+    inout [NO_N-1:0] 	    no_aio, // analog inout
     output [NO_N-1:0] 	    no_z, // output to core
     input [NO_N-1:0] 	    no_a, // input from core
     input [NO_N-1:0] 	    no_ie, // input enable, 1 = active
@@ -116,6 +117,7 @@ module la_iopadring
     inout [NO_SECTIONS-1:0] no_vssio, // io ground
     // EAST
     inout [EA_N-1:0] 	    ea_pad, // pad
+    inout [EA_N-1:0] 	    ea_aio, // analog inout
     output [EA_N-1:0] 	    ea_z, // output to core
     input [EA_N-1:0] 	    ea_a, // input from core
     input [EA_N-1:0] 	    ea_ie, // input enable, 1 = active
@@ -126,6 +128,7 @@ module la_iopadring
     inout [EA_SECTIONS-1:0] ea_vssio, // io ground
     // SOUTH
     inout [SO_N-1:0] 	    so_pad, // pad
+    inout [SO_N-1:0] 	    so_aio, // analog inout
     output [SO_N-1:0] 	    so_z, // output to core
     input [SO_N-1:0] 	    so_a, // input from core
     input [SO_N-1:0] 	    so_ie, // input enable, 1 = active
@@ -136,6 +139,7 @@ module la_iopadring
     inout [SO_SECTIONS-1:0] so_vssio, // io ground
     // WEST
     inout [WE_N-1:0] 	    we_pad, // pad
+    inout [WE_N-1:0] 	    we_aio, // analog inout
     output [WE_N-1:0] 	    we_z, // output to core
     input [WE_N-1:0] 	    we_a, // input from core
     input [WE_N-1:0] 	    we_ie, // input enable, 1 = active
@@ -217,6 +221,7 @@ module la_iopadring
 	  // Inouts
 	  .pad				(no_pad),		 // Templated
 	  .vss				(vss),			 // Templated
+	  .aio				(no_aio),		 // Templated
 	  .vddr				(no_vddr),		 // Templated
 	  .vddior			(no_vddior),		 // Templated
 	  .vssior			(no_vssior),		 // Templated
@@ -264,6 +269,7 @@ module la_iopadring
 	 // Inouts
 	 .pad				(ea_pad),		 // Templated
 	 .vss				(vss),			 // Templated
+	 .aio				(ea_aio),		 // Templated
 	 .vddr				(ea_vddr),		 // Templated
 	 .vddior			(ea_vddior),		 // Templated
 	 .vssior			(ea_vssior),		 // Templated
@@ -312,6 +318,7 @@ module la_iopadring
 	  // Inouts
 	  .pad				(so_pad),		 // Templated
 	  .vss				(vss),			 // Templated
+	  .aio				(so_aio),		 // Templated
 	  .vddr				(so_vddr),		 // Templated
 	  .vddior			(so_vddior),		 // Templated
 	  .vssior			(so_vssior),		 // Templated
@@ -354,13 +361,13 @@ module la_iopadring
 	       .ENRCUT(ENCUT),
 	       .ENLCUT(ENCUT))
 
-
    iwest(/*AUTOINST*/
 	 // Outputs
 	 .z				(we_z),			 // Templated
 	 // Inouts
 	 .pad				(we_pad),		 // Templated
 	 .vss				(vss),			 // Templated
+	 .aio				(we_aio),		 // Templated
 	 .vddr				(we_vddr),		 // Templated
 	 .vddior			(we_vddior),		 // Templated
 	 .vssior			(we_vssior),		 // Templated
