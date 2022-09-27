@@ -5,6 +5,10 @@
  *
  * Docs:
  *
+ * aio[0] = pass through from pad (with esd clamp)
+ * aio[1] = small series resistance
+ * aio[2] = big series resistance
+ *
  ****************************************************************************/
 module la_ioanalog
   #(
@@ -20,7 +24,7 @@ module la_ioanalog
     inout 	      vssio, // io ground
     inout [RINGW-1:0] ioring, // generic io-ring interface
     // core interface
-    inout 	      aio // analog core signal
+    inout [2:0]       aio // analog core signal
     );
 
 endmodule

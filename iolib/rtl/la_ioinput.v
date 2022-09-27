@@ -14,7 +14,7 @@
  * different IP cells for the placing cells vvertically or horizontally.
  *
  ****************************************************************************/
-module la_iobidir
+module la_ioinput
   #(
     parameter TYPE  = "DEFAULT", // cell type
     parameter SIDE  = "NO",      // "NO", "SO", "EA", "WE"
