@@ -5,28 +5,7 @@
  *
  * Doc:
  *
- * See repo ./README.md
- *
- * CELLTYPE:
- *
- * 0 = bidir
- * 1 = input
- * 2 = analog
- * 3 = xtal
- * 4 = RESERVED
- * 5 = RESERVED
- * 6 = RESERVED
- * 7 = RESERVED
- * 8 = vddio
- * 9 = vssio
- * 10 = vdd
- * 11 = vss
- * 12 = vdda
- * 13 = vssa
- * 14 = poc
- * 15 = cut
- * 16 = INTERAL
- * 17 = INTERNAL
+ * See repo ./README.md and ./la_iopadrong.v
  *
  ****************************************************************************/
 
@@ -74,7 +53,7 @@ module la_ioside
    for(i=0;i<NCELLS;i=i+1)
      begin: ipadcell
 	// BIDIR
-	if (CELLTYPE[i*8+:4]==LA_BIDIR)
+	if (CELLTYPE[i*8+:4]==LA_BIDIR[3:0])
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
 			  .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -97,7 +76,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// INPUT
-	else if (CELLTYPE[i*8+:4]==LA_INPUT)
+	else if (CELLTYPE[i*8+:4]==LA_INPUT[3:0])
 	  begin: ila_ioinput
 	     la_ioinput #(.SIDE(SIDE),
 			  .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -118,7 +97,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// ANALOG
-	else if (CELLTYPE[i*8+:4]==LA_ANALOG)
+	else if (CELLTYPE[i*8+:4]==LA_ANALOG[3:0])
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
 			   .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -136,7 +115,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// XTAL
-	else if (CELLTYPE[i*8+:4]==LA_XTAL)
+	else if (CELLTYPE[i*8+:4]==LA_XTAL[3:0])
 	    begin: ila_ioxtal
 	     la_ioxtal #(.SIDE(SIDE),
 			 .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -153,7 +132,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	    end
 	// POC
-	else if (CELLTYPE[i*8+:4]==LA_POC)
+	else if (CELLTYPE[i*8+:4]==LA_POC[3:0])
 	  begin: ila_iopoc
 	     la_iopoc #(.SIDE(SIDE),
 			.TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -167,14 +146,14 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// CUT
-	else if (CELLTYPE[i*8+:4]==LA_CUT)
+	else if (CELLTYPE[i*8+:4]==LA_CUT[3:0])
 	  begin: ila_iocut
 	     la_iocut #(.SIDE(SIDE),
 			.TYPE(CELLTYPE[(i*8+4)+:4]),
 			.RINGW(RINGW))
 	     i0();
 	  end
-	else if (CELLTYPE[i*8+:4]==LA_VDDIO)
+	else if (CELLTYPE[i*8+:4]==LA_VDDIO[3:0])
 	  begin: ila_iovddio
 	     la_iovddio #(.SIDE(SIDE),
 			  .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -188,7 +167,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// VSSIO
-	else if (CELLTYPE[i*8+:4]==LA_VSSIO)
+	else if (CELLTYPE[i*8+:4]==LA_VSSIO[3:0])
 	  begin: ila_iovssio
 	     la_iovssio #(.SIDE(SIDE),
 			  .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -202,7 +181,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// VDD
-	else if (CELLTYPE[i*8+:4]==LA_VDD)
+	else if (CELLTYPE[i*8+:4]==LA_VDD[3:0])
 	  begin: ila_iovdd
 	     la_iovdd #(.SIDE(SIDE),
 			.TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -216,7 +195,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// VSS
-	else if (CELLTYPE[i*8+:4]==LA_VSS)
+	else if (CELLTYPE[i*8+:4]==LA_VSS[3:0])
 	  begin: ila_iovss
 	     la_iovss #(.SIDE(SIDE),
 			.TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -230,7 +209,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// VDDA
-	else if (CELLTYPE[i*8+:4]==LA_VDDA)
+	else if (CELLTYPE[i*8+:4]==LA_VDDA[3:0])
 	  begin: ila_iovdda
 	     la_iovdda #(.SIDE(SIDE),
 			 .TYPE(CELLTYPE[(i*8+4)+:4]),
@@ -244,7 +223,7 @@ module la_ioside
 		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
 	  end
 	// VSSA
-	else if (CELLTYPE[i*8+:4]==LA_VSSA)
+	else if (CELLTYPE[i*8+:4]==LA_VSSA[3:0])
 	  begin: ila_iovssa
 	     la_iovssa #(.SIDE(SIDE),
 			 .TYPE(CELLTYPE[(i*8+4)+:4]),
