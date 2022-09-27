@@ -7,185 +7,257 @@
  *
  * See repo ./README.md
  *
+ * CELLTYPE:
+ *
+ * 0 = bidir
+ * 1 = input
+ * 2 = analog
+ * 3 = xtal
+ * 4 = RESERVED
+ * 5 = RESERVED
+ * 6 = RESERVED
+ * 7 = RESERVED
+ * 8 = vddio
+ * 9 = vssio
+ * 10 = vdd
+ * 11 = vss
+ * 12 = vdda
+ * 13 = vssa
+ * 14 = poc
+ * 15 = cut
+ * 16 = INTERAL
+ * 17 = INTERNAL
  *
  ****************************************************************************/
 
 module la_ioside
   #(// per side parameters
     parameter [15:0]   SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter [7:0]    N          = 1,    // total pins per side (<256)
-    parameter [7:0]    SECTIONS   = 1,    // total number of sections (<256)
-    parameter [7:0]    CFGW       = 1,    // width of io config bus
+    parameter [7:0]    NPINS      = 4,    // total pins per side (<256)
+    parameter [7:0]    NCELLS     = 8,    // total cells per side (<256)
+    parameter [7:0]    NSECTIONS  = 8,    // total secti0ns per side (<256)
+    parameter [2047:0] CELLTYPE   = 0,    // per cell type
+    parameter [2047:0] PINMAP     = 0,    // cell to pin map
+    parameter [2047:0] CUTMAP     = 0,    // cell to pin map
     parameter [7:0]    RINGW      = 1,    // width of io ring
-    parameter [0:0]    ENRCUT     = 1,    // enable cut cell on far right
-    parameter [0:0]    ENLCUT     = 1,    // enable cut cell on far right
-    parameter [0:0]    ENPOC      = 1,    // enable poc cells
-    parameter [0:0]    ENCORNER   = 1,    // enable corner cell
-    // per section  parameters (stuffed vectors of 8 bit values)
-    // format is {SEC255, SEC254, ..., SEC1, SEC0}
-    parameter [2047:0] NSPLIT     = 1,    // pins per section
-    parameter [2047:0] NSTART     = 0,    // start position per section
-    parameter [2047:0] NVDDIO     = 1,    // io supply cells per section
-    parameter [2047:0] NVDD       = 1,    // core supply cells per section
-    parameter [2047:0] NGND       = 1,    // ground cells per section
-    parameter [2047:0] NCLAMP     = 1,    // esd clamp cells per section
-    // options to overrride lib on per pin basis (8 bit values per pin)
-    // format is {PIN255, PIN254, ..., PIN1, PIN0}
-    parameter [2047:0] PINSELECT  = 0,
-    parameter [2047:0] IOTYPE     = 0,
-    parameter [2047:0] VDDIOTYPE  = 0,
-    parameter [2047:0] VSSIOTYPE  = 0,
-    parameter [2047:0] VDDTYPE    = 0,
-    parameter [2047:0] VSSTYPE    = 0,
-    parameter [2047:0] CLAMPTYPE  = 0,
-    parameter [2047:0] CUTTYPE    = 0,
-    parameter [2047:0] POCTYPE    = 0
+    parameter [7:0]    CFGW       = 1     // config width
     )
    (// io pad signals
-    inout [N-1:0]      pad, // pad
-    inout 	       vss, // common ground
+    inout [NPINS-1:0] 		pad, // pad
     //core facing signals
-    inout [N-1:0]      aio, // analog inout
-    output [N-1:0]     z, // output to core
-    input [N-1:0]      a, // input from core
-    input [N-1:0]      ie, // input enable, 1 = active
-    input [N-1:0]      oe, // output enable, 1 = active
-    input [N*CFGW-1:0] cfg, // generic config interface
-    // left right braks/cuts
-    inout 	       vddr, // core supply
-    inout 	       vddior, // io supply
-    inout 	       vssior, // io supply
-    inout [RINGW-1:0]  ioringr // generic io-ring
+    inout [NPINS*3-1:0] 	aio, // analog inout
+    output [NPINS-1:0] 		z, // output to core
+    input [NPINS-1:0] 		a, // input from core
+    input [NPINS-1:0] 		ie, // input enable, 1 = active
+    input [NPINS-1:0] 		oe, // output enable, 1 = active
+    input [NPINS*CFGW-1:0] 	cfg, // generic config interface
+    // supplies/ring (per cell)
+    inout 			vss, // common ground
+    inout [NSECTIONS-1:0] 	vdd, // core supply
+    inout [NSECTIONS-1:0] 	vddio, // io supply
+    inout [NSECTIONS-1:0] 	vssio, // io ground
+    inout [NSECTIONS*RINGW-1:0] ioring // generic io-ring
     );
 
-   genvar 	       j;
-
    //##########################################
-   //# LOCAL WIRES
+   //# PER CELL SELECTION
    //##########################################
 
-   wire 	              vddl;
-   wire 	              vddiol;
-   wire 	              vssiol;
-   wire [RINGW-1:0]           ioringl;
+   genvar  i,j;
 
-   wire [SECTIONS-1:0]        vdd;
-   wire [SECTIONS-1:0]        vddio;
-   wire [SECTIONS-1:0]        vssio;
-   wire [SECTIONS*RINGW-1:0]  ioring;
-
-   //##########################################
-   //# PLACE CORNER CELL
-   //##########################################
-
-   if (ENCORNER)
-     begin: ila_iocorner
-	la_iocorner #(.SIDE(SIDE),
-		      .RINGW(RINGW))
-	i0(.vdd     (vddl),
-	   .vss     (vss),
-	   .vddio   (vddiol),
-	   .vssio   (vssiol),
-	   .ioring  (ioringl[RINGW-1:0]));
-     end
-
-   //##########################################
-   //# PLACE SECTIONS
-   //##########################################
-   genvar i;
-   generate
-      for(i=0;i<SECTIONS;i=i+1)
-	begin: ila_iosection
-	   // Assign section
-           la_iosection #(.SIDE(SIDE),
-			  .N(NSPLIT[8*i+:8]),
-			  .NVDDIO(NVDDIO[8*i+:8]),
-			  .NVDD(NVDD[8*i+:8]),
-			  .NGND(NGND[8*i+:8]),
-			  .NCLAMP(NCLAMP[8*i+:8]),
-			  .PINSELECT(PINSELECT),
-			  .IOTYPE(IOTYPE),
-			  .VDDTYPE(VDDTYPE),
-			  .VSSTYPE(VSSTYPE),
-			  .VDDIOTYPE(VDDIOTYPE),
-			  .VSSIOTYPE(VSSIOTYPE),
-			  .CLAMPTYPE(CLAMPTYPE),
-			  .POCTYPE(POCTYPE),
+   for(i=0;i<NCELLS;i=i+1)
+     begin: ipadcell
+	// BIDIR
+	if (CELLTYPE[i*8+:4]==4'h0)
+	  begin: ila_iobidir
+	     la_iobidir #(.SIDE(SIDE),
+			  .TYPE(CELLTYPE[(i*8+4)+:4]),
 			  .CFGW(CFGW),
-			  .RINGW(RINGW),
-			  .ENPOC(ENPOC))
-	   i0 (// Outputs
-	       .z     (z[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       // Inouts
-	       .vss   (vss),
-	       .pad   (pad[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       .vdd   (vdd[i]),
-	       .vddio (vddio[i]),
-	       .vssio (vssio[i]),
-	       .ioring(ioring[i*RINGW+:RINGW]),
-	       .aio   (aio[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       // Inputs
-	       .a     (a[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       .ie    (ie[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       .oe    (oe[NSTART[i*8+:8]+:NSPLIT[i*8+:8]]),
-	       .cfg   (cfg[CFGW*NSTART[i*8+:8]+:CFGW*NSPLIT[i*8+:8]]));
-
-	end // for (i=0;i<SECTIONS;i=i+1)
-   endgenerate
-
-   //##########################################
-   //# PLACE CUT CELLS
-   //##########################################
-
-   for(i=0;i<SECTIONS-1;i=i+1)
-     begin: ila_iocut
-	la_iocut #(.SIDE(SIDE),
-		   .TYPE(CUTTYPE),
-		   .RINGW(RINGW))
-	i0(.vss     (vss),
-	   .vddl    (vdd[i]),
-	   .vddiol  (vddio[i]),
-	   .vssiol  (vssio[i]),
-	   .ioringl (ioring[i*RINGW+:RINGW]),
-	   .vddr    (vdd[i+1]),
-	   .vddior  (vddio[i+1]),
-	   .vssior  (vssio[i+1]),
-	   .ioringr (ioring[(i+1)*RINGW+:RINGW]));
+			  .RINGW(RINGW))
+	     i0 (// pad
+		 .pad	(pad[PINMAP[i*8+:8]]),
+		 // core signalas
+		 .z	(z[PINMAP[i*8+:8]]),
+		 .a	(a[PINMAP[i*8+:8]]),
+		 .ie	(ie[PINMAP[i*8+:8]]),
+		 .oe	(oe[PINMAP[i*8+:8]]),
+		 .cfg	(cfg[PINMAP[i*8+:8]*CFGW+:CFGW]),
+		 // supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// INPUT
+	else if (CELLTYPE[i*8+:4]==4'h1)
+	  begin: ila_ioinput
+	     la_ioinput #(.SIDE(SIDE),
+			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .CFGW(CFGW),
+			  .RINGW(RINGW))
+	     i0 (// pad
+		 .pad	(pad[PINMAP[i*8+:8]]),
+		 // core signalas
+		 .z	(z[PINMAP[i*8+:8]]),
+		 .ie	(ie[PINMAP[i*8+:8]]),
+		 .cfg	(cfg[PINMAP[i*8+:8]*CFGW+:CFGW]),
+		 // supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// ANALOG
+	else if (CELLTYPE[i*8+:4]==4'h2)
+	  begin: ila_ioanalog
+	     la_ioanalog #(.SIDE(SIDE),
+			   .TYPE(CELLTYPE[(i*8+4)+:4]),
+			   .RINGW(RINGW))
+	     i0 (// pad
+		 .pad	(pad[PINMAP[i*8+:8]]),
+		 // core signalas
+		 .aio	(aio[i*3+:3]),
+		 // supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// XTAL
+	else if (CELLTYPE[i*8+:4]==4'h3)
+	    begin: ila_ioxtal
+	     la_ioxtal #(.SIDE(SIDE),
+			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .RINGW(RINGW))
+	     i0 (// pad
+		 .padi  (pad[PINMAP[i*8+:8]]),
+		 .pado  (pad[i+1]), //TODO: fix!
+		 // supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	    end
+	// POC
+	else if (CELLTYPE[i*8+:4]==4'h4)
+	  begin: ila_iopoc
+	     la_iopoc #(.SIDE(SIDE),
+			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// CUT
+	else if (CELLTYPE[i*8+:4]==4'h5)
+	  begin: ila_iocut
+	     la_iocut #(.SIDE(SIDE),
+			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.RINGW(RINGW))
+	     i0();
+	  end
+	// CLAMP
+	else if (CELLTYPE[i*8+:4]==4'h6)
+	  begin: ila_ioclamp
+	     // TODO
+	  end
+	// VDDIO
+	else if (CELLTYPE[i*8+:4]==4'h8)
+	  begin: ila_iovddio
+	     la_iovddio #(.SIDE(SIDE),
+			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// VSSIO
+	else if (CELLTYPE[i*8+:4]==4'h9)
+	  begin: ila_iovssio
+	     la_iovssio #(.SIDE(SIDE),
+			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// VDD
+	else if (CELLTYPE[i*8+:4]==4'hA)
+	  begin: ila_iovdd
+	     la_iovdd #(.SIDE(SIDE),
+			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// VSS
+	else if (CELLTYPE[i*8+:4]==4'hB)
+	  begin: ila_iovss
+	     la_iovss #(.SIDE(SIDE),
+			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// VDDA
+	else if (CELLTYPE[i*8+:4]==4'hC)
+	  begin: ila_iovdda
+	     la_iovdda #(.SIDE(SIDE),
+			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end
+	// VSSA
+	else if (CELLTYPE[i*8+:4]==4'hD)
+	  begin: ila_iovssa
+	     la_iovssa #(.SIDE(SIDE),
+			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .RINGW(RINGW))
+	     i0 (// supplies
+		 .vss	(vss),
+		 .vdd	(vdd[CUTMAP[i*8+:8]]),
+		 .vddio (vddio[CUTMAP[i*8+:8]]),
+		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 // ring
+		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+	  end // block: ila_iovssa
      end
-
-   // place the last cut cell if enabled
-   if (ENLCUT)
-     begin: ila_ioleftcut
-	la_iocut #(.SIDE(SIDE),
-		   .TYPE(CUTTYPE),
-		   .RINGW(RINGW))
-	i0(.vss	    (vss),
-	   .vddl    (vddl),
-	   .vddiol  (vddiol),
-	   .vssiol  (vssiol),
-	   .ioringl (ioringl[RINGW-1:0]),
-	   .vddr    (vdd[0]),
-	   .vddior  (vddio[0]),
-	   .vssior  (vssio[0]),
-	   .ioringr (ioring[RINGW-1:0]));
-     end // if (ENLCUT)
-
-   // place the last cut cell if enabled
-   if (ENRCUT)
-     begin: ila_iorightcut
-	la_iocut #(.SIDE(SIDE),
-		   .TYPE(CUTTYPE),
-		   .RINGW(RINGW))
-	i0(.vss     (vss),
-	   .vddl    (vdd[SECTIONS-1]),
-	   .vddiol  (vddio[SECTIONS-1]),
-	   .vssiol  (vssio[SECTIONS-1]),
-	   .ioringl (ioring[(SECTIONS-1)*RINGW+:RINGW]),
-	   .vddr    (vddr),
-	   .vddior  (vddior),
-	   .vssior  (vssior),
-	   .ioringr (ioringr[RINGW-1:0]));
-     end // if (ENRCUT)
 
 endmodule
 // Local Variables:
