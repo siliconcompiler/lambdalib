@@ -14,26 +14,9 @@
  *
  * - CUTMAP specifies which section a cell belongs to, one entry per cell.
  *
- * - CELLTYPE[3:0]
+ * - CELLTYPE[3:0] (see la_iopadring.vh)
  *
- *   0 = bidir
- *   1 = input
- *   2 = analog
- *   3 = xtal
- *   4 = RESERVED
- *   5 = RESERVED
- *   6 = RESERVED
- *   7 = RESERVED
- *   8 = vddio
- *   9 = vssio
- *   10 = vdd
- *   11 = vss
- *   12 = vdda
- *   13 = vssa
- *   14 = poc
- *   15 = cut
- *
- * - CELLTYPE[7:4] is used by the lambda cell itself
+ * - CELLTYPE[7:4] is used by inside lambda cells for selection
  *
  ****************************************************************************/
 
@@ -118,6 +101,8 @@ module la_iopadring
     inout [WE_NSECTIONS-1:0] 	   we_vssio, // io ground
     inout [WE_NSECTIONS*RINGW-1:0] we_ioring // io ring
     );
+
+
 
    //#####################
    // LOCAL WIRES
