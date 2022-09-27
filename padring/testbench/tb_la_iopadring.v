@@ -1,89 +1,119 @@
 module testbench();
 
+`include "la_iopadring.vh"
 
    initial
      begin
 	$dumpvars();
      end
 
-   parameter           CFGW         = 8;
-   parameter           RINGW        = 8;
-   // per side settings
-   parameter [7:0]     NO_NPINS     =  8'h5; //xtal is an extra pin
-   parameter [7:0]     NO_NCELLS    =  8'h10;
-   parameter [7:0]     NO_NSECTIONS =  8'h2;
-   parameter [2048:0]  NO_CELLTYPE  =  2048'h0F_0E_0D_0C_0B_0A_09_08_07_06_05_04_03_02_01_00;
-   parameter [2048:0]  NO_PINMAP    =  2048'h00_00_00_00_03_02_01_00;
-   parameter [2048:0]  NO_CUTMAP    =  2048'h01_01_01_00_00_00_00_00;
-   parameter [7:0]     EA_NPINS     =  8'h1;
-   parameter [7:0]     EA_NCELLS    =  8'h1;
-   parameter [7:0]     EA_NSECTIONS =  8'h2;
-   parameter [2048:0]  EA_CELLTYPE  =  2048'h0;
-   parameter [2048:0]  EA_PINMAP    =  2048'h0;
-   parameter [2048:0]  EA_CUTMAP    =  2048'h0;
-   parameter [7:0]     SO_NPINS     =  8'h1;
-   parameter [7:0]     SO_NCELLS    =  8'h1;
-   parameter [7:0]     SO_NSECTIONS =  8'h1;
-   parameter [2048:0]  SO_CELLTYPE  =  2048'h0;
-   parameter [2048:0]  SO_PINMAP    =  2048'h0;
-   parameter [2048:0]  SO_CUTMAP    =  2048'h0;
-   parameter [7:0]     WE_NPINS     =  8'h1;
-   parameter [7:0]     WE_NCELLS    =  8'h1;
-   parameter [7:0]     WE_NSECTIONS =  8'h1;
-   parameter [2048:0]  WE_CELLTYPE  =  2048'h0;
-   parameter [2048:0]  WE_PINMAP    =  2048'h0;
-   parameter [2048:0]  WE_CUTMAP    =  2048'h0;
+   // padring parameters (implementation)
+   parameter CFGW      = 16;  // config bus width
+   parameter RINGW     = 16;  // ring width
+   parameter NCELLS    = 46;  // cells per side
+   parameter NPINS     = 22;  /// number of io pins per side
+   parameter NSECTIONS = 2;
+
+   // CELL MAP
+   parameter [24*NCELLS-1:0] CELLMAP = {//{SECTION, PIN#, TYPE}
+				       {8'd1,8'd0,LA_VDDIO},
+				       {8'd1,8'd0,LA_VSSIO},
+				       {8'd1,8'd0,LA_VDD},
+				       {8'd1,8'd0,LA_VSS},
+				       {8'd1,8'd21,LA_BIDIR},
+				       {8'd1,8'd20,LA_BIDIR},
+				       {8'd1,8'd19,LA_BIDIR},
+				       {8'd1,8'd18,LA_BIDIR},
+				       {8'd1,8'd17,LA_BIDIR},
+				       {8'd1,8'd0,LA_VDDIO},
+				       {8'd1,8'd0,LA_VSSIO},
+				       {8'd1,8'd0,LA_VDD},
+				       {8'd1,8'd0,LA_VSS},
+				       {8'd1,8'd16,LA_BIDIR},
+				       {8'd1,8'd15,LA_BIDIR},
+				       {8'd1,8'd14,LA_BIDIR},
+				       {8'd1,8'd13,LA_BIDIR},
+				       {8'd1,8'd12,LA_BIDIR},
+				       {8'd1,8'd0,LA_VDDIO},
+				       {8'd1,8'd0,LA_VSSIO},
+				       {8'd1,8'd0,LA_VDD},
+				       {8'd1,8'd0,LA_VSS},
+				       {8'd1,8'd11,LA_BIDIR},
+				       {8'd1,8'd10,LA_BIDIR},
+				       {8'd1,8'd9,LA_BIDIR},
+				       {8'd1,8'd8,LA_BIDIR},
+				       {8'd1,8'd7,LA_BIDIR},
+				       {8'd1,8'd0,LA_VDDIO},
+				       {8'd1,8'd0,LA_VSSIO},
+				       {8'd1,8'd0,LA_VDD},
+				       {8'd1,8'd0,LA_VSS},
+				       {8'd1,8'd6,LA_BIDIR},
+				       {8'd1,8'd5,LA_BIDIR},
+				       {8'd1,8'd4,LA_BIDIR},
+				       {8'd1,8'd3,LA_BIDIR},
+				       {8'd1,8'd2,LA_BIDIR},
+				       {8'd1,8'd0,LA_VDDIO},
+				       {8'd1,8'd0,LA_VSSIO},
+				       {8'd1,8'd0,LA_VDD},
+				       {8'd1,8'd0,LA_VSS},
+				       //ANALOG SECTION (6)
+				       {8'd0,8'd1,LA_CUT},
+				       {8'd0,8'd1,LA_ANALOG},
+				       {8'd0,8'd0,LA_ANALOG},
+				       {8'd0,8'd1,LA_VDDA},
+				       {8'd0,8'd1,LA_VSSA},
+				       {8'd0,8'd1,LA_CUT}};
 
 
-   wire [EA_NPINS-1:0]	ea_a;			// To dut of la_iopadring.v
-   wire [EA_NPINS*CFGW-1:0] ea_cfg;		// To dut of la_iopadring.v
-   wire [EA_NPINS-1:0]	ea_ie;			// To dut of la_iopadring.v
-   wire [EA_NPINS-1:0]	ea_oe;			// To dut of la_iopadring.v
-   wire [NO_NPINS-1:0]	no_a;			// To dut of la_iopadring.v
-   wire [NO_NPINS*CFGW-1:0] no_cfg;		// To dut of la_iopadring.v
-   wire [NO_NPINS-1:0]	no_ie;			// To dut of la_iopadring.v
-   wire [NO_NPINS-1:0]	no_oe;			// To dut of la_iopadring.v
-   wire [SO_NPINS-1:0]	so_a;			// To dut of la_iopadring.v
-   wire [SO_NPINS*CFGW-1:0] so_cfg;		// To dut of la_iopadring.v
-   wire [SO_NPINS-1:0]	so_ie;			// To dut of la_iopadring.v
-   wire [SO_NPINS-1:0]	so_oe;			// To dut of la_iopadring.v
-   wire [WE_NPINS-1:0]	we_a;			// To dut of la_iopadring.v
-   wire [WE_NPINS*CFGW-1:0] we_cfg;		// To dut of la_iopadring.v
-   wire [WE_NPINS-1:0]	we_ie;			// To dut of la_iopadring.v
-   wire [WE_NPINS-1:0] 	we_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	ea_a;			// To dut of la_iopadring.v
+   wire [CFGW*NSECTIONS-1:0] ea_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0]	ea_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	ea_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	no_a;			// To dut of la_iopadring.v
+   wire [CFGW*NSECTIONS-1:0] no_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0]	no_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	no_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	so_a;			// To dut of la_iopadring.v
+   wire [CFGW*NSECTIONS-1:0] so_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0]	so_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	so_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	we_a;			// To dut of la_iopadring.v
+   wire [CFGW*NSECTIONS-1:0] we_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0]	we_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	we_oe;			// To dut of la_iopadring.v
 
    /*AUTOINPUT*/
    /*AUTOWIRE*/
    // Beginning of automatic wires (for undeclared instantiated-module outputs)
-   wire [EA_NPINS*3-1:0] ea_aio;		// To/From dut of la_iopadring.v
-   wire [EA_NSECTIONS*RINGW-1:0] ea_ioring;	// To/From dut of la_iopadring.v
-   wire [EA_NPINS-1:0]	ea_pad;			// To/From dut of la_iopadring.v
-   wire [EA_NSECTIONS-1:0] ea_vdd;		// To/From dut of la_iopadring.v
-   wire [EA_NSECTIONS-1:0] ea_vddio;		// To/From dut of la_iopadring.v
-   wire [EA_NSECTIONS-1:0] ea_vssio;		// To/From dut of la_iopadring.v
-   wire [EA_NPINS-1:0]	ea_z;			// From dut of la_iopadring.v
-   wire [NO_NPINS*3-1:0] no_aio;		// To/From dut of la_iopadring.v
-   wire [NO_NSECTIONS*RINGW-1:0] no_ioring;	// To/From dut of la_iopadring.v
-   wire [NO_NPINS-1:0]	no_pad;			// To/From dut of la_iopadring.v
-   wire [NO_NSECTIONS-1:0] no_vdd;		// To/From dut of la_iopadring.v
-   wire [NO_NSECTIONS-1:0] no_vddio;		// To/From dut of la_iopadring.v
-   wire [NO_NSECTIONS-1:0] no_vssio;		// To/From dut of la_iopadring.v
-   wire [NO_NPINS-1:0]	no_z;			// From dut of la_iopadring.v
-   wire [SO_NPINS*3-1:0] so_aio;		// To/From dut of la_iopadring.v
-   wire [SO_NSECTIONS*RINGW-1:0] so_ioring;	// To/From dut of la_iopadring.v
-   wire [SO_NPINS-1:0]	so_pad;			// To/From dut of la_iopadring.v
-   wire [SO_NSECTIONS-1:0] so_vdd;		// To/From dut of la_iopadring.v
-   wire [SO_NSECTIONS-1:0] so_vddio;		// To/From dut of la_iopadring.v
-   wire [SO_NSECTIONS-1:0] so_vssio;		// To/From dut of la_iopadring.v
-   wire [SO_NPINS-1:0]	so_z;			// From dut of la_iopadring.v
+   wire [3*NPINS-1:0]	ea_aio;			// To/From dut of la_iopadring.v
+   wire [RINGW*NSECTIONS-1:0] ea_io;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	ea_pad;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	ea_vdd;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	ea_vddio;		// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	ea_vssio;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	ea_z;			// From dut of la_iopadring.v
+   wire [3*NPINS-1:0]	no_aio;			// To/From dut of la_iopadring.v
+   wire [RINGW*NSECTIONS-1:0] no_io;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	no_pad;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	no_vdd;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	no_vddio;		// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	no_vssio;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	no_z;			// From dut of la_iopadring.v
+   wire [3*NPINS-1:0]	so_aio;			// To/From dut of la_iopadring.v
+   wire [RINGW*NSECTIONS-1:0] so_io;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	so_pad;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	so_vdd;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	so_vddio;		// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	so_vssio;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	so_z;			// From dut of la_iopadring.v
    wire			vss;			// To/From dut of la_iopadring.v
-   wire [WE_NPINS*3-1:0] we_aio;		// To/From dut of la_iopadring.v
-   wire [WE_NSECTIONS*RINGW-1:0] we_ioring;	// To/From dut of la_iopadring.v
-   wire [WE_NPINS-1:0]	we_pad;			// To/From dut of la_iopadring.v
-   wire [WE_NSECTIONS-1:0] we_vdd;		// To/From dut of la_iopadring.v
-   wire [WE_NSECTIONS-1:0] we_vddio;		// To/From dut of la_iopadring.v
-   wire [WE_NSECTIONS-1:0] we_vssio;		// To/From dut of la_iopadring.v
-   wire [WE_NPINS-1:0]	we_z;			// From dut of la_iopadring.v
+   wire [3*NPINS-1:0]	we_aio;			// To/From dut of la_iopadring.v
+   wire [RINGW*NSECTIONS-1:0] we_io;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	we_pad;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	we_vdd;			// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	we_vddio;		// To/From dut of la_iopadring.v
+   wire [NSECTIONS-1:0]	we_vssio;		// To/From dut of la_iopadring.v
+   wire [NPINS-1:0]	we_z;			// From dut of la_iopadring.v
    // End of automatics
 
 
@@ -93,85 +123,82 @@ module testbench();
    //#################################
 
    /*la_iopadring AUTO_TEMPLATE (//outputs
+    .\(.*\)_v\(.*\) (\1_v\2[NSECTIONS-1:0]),
+    .\(.*\)_ioring  (\1_io\2[RINGW*NSECTIONS-1:0]),
+    .\(.*\)_cfg     (\1_cfg\2[CFGW*NPINS-1:0]),
+    .\(.*\)_aio     (\1_aio\2[3*NPINS-1:0]),
+    .\(.*\)_\(.*\)  (\1_\2[NPINS-1:0]),
     );
     */
 
    la_iopadring #(.RINGW(RINGW),
 		  .CFGW(CFGW),
-		  .NO_NPINS(NO_NPINS),
-		  .NO_NCELLS(NO_NCELLS),
-		  .NO_NSECTIONS(NO_NSECTIONS),
-		  .NO_CELLTYPE(NO_CELLTYPE),
-		  .NO_PINMAP(NO_PINMAP),
-		  .NO_CUTMAP(NO_CUTMAP),
-		  .EA_NPINS(EA_NPINS),
-		  .EA_NCELLS(EA_NCELLS),
-		  .EA_NSECTIONS(EA_NSECTIONS),
-		  .EA_CELLTYPE(EA_CELLTYPE),
-		  .EA_PINMAP(EA_PINMAP),
-		  .EA_CUTMAP(EA_CUTMAP),
-		  .SO_NPINS(SO_NPINS),
-		  .SO_NCELLS(SO_NCELLS),
-		  .SO_NSECTIONS(SO_NSECTIONS),
-		  .SO_CELLTYPE(SO_CELLTYPE),
-		  .SO_PINMAP(SO_PINMAP),
-		  .SO_CUTMAP(SO_CUTMAP),
-		  .WE_NPINS(WE_NPINS),
-		  .WE_NCELLS(WE_NCELLS),
-		  .WE_NSECTIONS(WE_NSECTIONS),
-		  .WE_CELLTYPE(WE_CELLTYPE),
-		  .WE_PINMAP(WE_PINMAP),
-		  .WE_CUTMAP(WE_CUTMAP))
+		  .NO_NPINS(NPINS),
+		  .NO_NCELLS(NCELLS),
+		  .NO_NSECTIONS(NSECTIONS),
+		  .NO_CELLMAP(CELLMAP),
+		  .EA_NPINS(NPINS),
+		  .EA_NCELLS(NCELLS),
+		  .EA_NSECTIONS(NSECTIONS),
+		  .EA_CELLMAP(CELLMAP),
+		  .SO_NPINS(NPINS),
+		  .SO_NCELLS(NCELLS),
+		  .SO_NSECTIONS(NSECTIONS),
+		  .SO_CELLMAP(CELLMAP),
+		  .WE_NPINS(NPINS),
+		  .WE_NCELLS(NCELLS),
+		  .WE_NSECTIONS(NSECTIONS),
+		  .WE_CELLMAP(CELLMAP))
 
    dut (/*AUTOINST*/
 	// Outputs
-	.no_z				(no_z[NO_NPINS-1:0]),
-	.ea_z				(ea_z[EA_NPINS-1:0]),
-	.so_z				(so_z[SO_NPINS-1:0]),
-	.we_z				(we_z[WE_NPINS-1:0]),
+	.no_z				(no_z[NPINS-1:0]),	 // Templated
+	.ea_z				(ea_z[NPINS-1:0]),	 // Templated
+	.so_z				(so_z[NPINS-1:0]),	 // Templated
+	.we_z				(we_z[NPINS-1:0]),	 // Templated
 	// Inouts
 	.vss				(vss),
-	.no_pad				(no_pad[NO_NPINS-1:0]),
-	.no_aio				(no_aio[NO_NPINS*3-1:0]),
-	.no_vdd				(no_vdd[NO_NSECTIONS-1:0]),
-	.no_vddio			(no_vddio[NO_NSECTIONS-1:0]),
-	.no_vssio			(no_vssio[NO_NSECTIONS-1:0]),
-	.no_ioring			(no_ioring[NO_NSECTIONS*RINGW-1:0]),
-	.ea_pad				(ea_pad[EA_NPINS-1:0]),
-	.ea_aio				(ea_aio[EA_NPINS*3-1:0]),
-	.ea_vdd				(ea_vdd[EA_NSECTIONS-1:0]),
-	.ea_vddio			(ea_vddio[EA_NSECTIONS-1:0]),
-	.ea_vssio			(ea_vssio[EA_NSECTIONS-1:0]),
-	.ea_ioring			(ea_ioring[EA_NSECTIONS*RINGW-1:0]),
-	.so_pad				(so_pad[SO_NPINS-1:0]),
-	.so_aio				(so_aio[SO_NPINS*3-1:0]),
-	.so_vdd				(so_vdd[SO_NSECTIONS-1:0]),
-	.so_vddio			(so_vddio[SO_NSECTIONS-1:0]),
-	.so_vssio			(so_vssio[SO_NSECTIONS-1:0]),
-	.so_ioring			(so_ioring[SO_NSECTIONS*RINGW-1:0]),
-	.we_pad				(we_pad[WE_NPINS-1:0]),
-	.we_aio				(we_aio[WE_NPINS*3-1:0]),
-	.we_vdd				(we_vdd[WE_NSECTIONS-1:0]),
-	.we_vddio			(we_vddio[WE_NSECTIONS-1:0]),
-	.we_vssio			(we_vssio[WE_NSECTIONS-1:0]),
-	.we_ioring			(we_ioring[WE_NSECTIONS*RINGW-1:0]),
+	.no_pad				(no_pad[NPINS-1:0]),	 // Templated
+	.no_aio				(no_aio[3*NPINS-1:0]),	 // Templated
+	.no_vdd				(no_vdd[NSECTIONS-1:0]), // Templated
+	.no_vddio			(no_vddio[NSECTIONS-1:0]), // Templated
+	.no_vssio			(no_vssio[NSECTIONS-1:0]), // Templated
+	.no_ioring			(no_io[RINGW*NSECTIONS-1:0]), // Templated
+	.ea_pad				(ea_pad[NPINS-1:0]),	 // Templated
+	.ea_aio				(ea_aio[3*NPINS-1:0]),	 // Templated
+	.ea_vdd				(ea_vdd[NSECTIONS-1:0]), // Templated
+	.ea_vddio			(ea_vddio[NSECTIONS-1:0]), // Templated
+	.ea_vssio			(ea_vssio[NSECTIONS-1:0]), // Templated
+	.ea_ioring			(ea_io[RINGW*NSECTIONS-1:0]), // Templated
+	.so_pad				(so_pad[NPINS-1:0]),	 // Templated
+	.so_aio				(so_aio[3*NPINS-1:0]),	 // Templated
+	.so_vdd				(so_vdd[NSECTIONS-1:0]), // Templated
+	.so_vddio			(so_vddio[NSECTIONS-1:0]), // Templated
+	.so_vssio			(so_vssio[NSECTIONS-1:0]), // Templated
+	.so_ioring			(so_io[RINGW*NSECTIONS-1:0]), // Templated
+	.we_pad				(we_pad[NPINS-1:0]),	 // Templated
+	.we_aio				(we_aio[3*NPINS-1:0]),	 // Templated
+	.we_vdd				(we_vdd[NSECTIONS-1:0]), // Templated
+	.we_vddio			(we_vddio[NSECTIONS-1:0]), // Templated
+	.we_vssio			(we_vssio[NSECTIONS-1:0]), // Templated
+	.we_ioring			(we_io[RINGW*NSECTIONS-1:0]), // Templated
 	// Inputs
-	.no_a				(no_a[NO_NPINS-1:0]),
-	.no_ie				(no_ie[NO_NPINS-1:0]),
-	.no_oe				(no_oe[NO_NPINS-1:0]),
-	.no_cfg				(no_cfg[NO_NPINS*CFGW-1:0]),
-	.ea_a				(ea_a[EA_NPINS-1:0]),
-	.ea_ie				(ea_ie[EA_NPINS-1:0]),
-	.ea_oe				(ea_oe[EA_NPINS-1:0]),
-	.ea_cfg				(ea_cfg[EA_NPINS*CFGW-1:0]),
-	.so_a				(so_a[SO_NPINS-1:0]),
-	.so_ie				(so_ie[SO_NPINS-1:0]),
-	.so_oe				(so_oe[SO_NPINS-1:0]),
-	.so_cfg				(so_cfg[SO_NPINS*CFGW-1:0]),
-	.we_a				(we_a[WE_NPINS-1:0]),
-	.we_ie				(we_ie[WE_NPINS-1:0]),
-	.we_oe				(we_oe[WE_NPINS-1:0]),
-	.we_cfg				(we_cfg[WE_NPINS*CFGW-1:0]));
+	.no_a				(no_a[NPINS-1:0]),	 // Templated
+	.no_ie				(no_ie[NPINS-1:0]),	 // Templated
+	.no_oe				(no_oe[NPINS-1:0]),	 // Templated
+	.no_cfg				(no_cfg[CFGW*NPINS-1:0]), // Templated
+	.ea_a				(ea_a[NPINS-1:0]),	 // Templated
+	.ea_ie				(ea_ie[NPINS-1:0]),	 // Templated
+	.ea_oe				(ea_oe[NPINS-1:0]),	 // Templated
+	.ea_cfg				(ea_cfg[CFGW*NPINS-1:0]), // Templated
+	.so_a				(so_a[NPINS-1:0]),	 // Templated
+	.so_ie				(so_ie[NPINS-1:0]),	 // Templated
+	.so_oe				(so_oe[NPINS-1:0]),	 // Templated
+	.so_cfg				(so_cfg[CFGW*NPINS-1:0]), // Templated
+	.we_a				(we_a[NPINS-1:0]),	 // Templated
+	.we_ie				(we_ie[NPINS-1:0]),	 // Templated
+	.we_oe				(we_oe[NPINS-1:0]),	 // Templated
+	.we_cfg				(we_cfg[CFGW*NPINS-1:0])); // Templated
 
 
 

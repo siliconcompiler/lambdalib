@@ -5,21 +5,19 @@
  *
  * Doc:
  *
- * See repo ./README.md and ./la_iopadrong.v
+ * See repo ./README.md and ./la_iopadring.v
  *
  ****************************************************************************/
 
 module la_ioside
   #(// per side parameters
-    parameter [15:0]   SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter [7:0]    NPINS      = 4,    // total pins per side (<256)
-    parameter [7:0]    NCELLS     = 8,    // total cells per side (<256)
-    parameter [7:0]    NSECTIONS  = 8,    // total secti0ns per side (<256)
-    parameter [2047:0] CELLTYPE   = 0,    // per cell type
-    parameter [2047:0] PINMAP     = 0,    // cell to pin map
-    parameter [2047:0] CUTMAP     = 0,    // cell to pin map
-    parameter [7:0]    RINGW      = 1,    // width of io ring
-    parameter [7:0]    CFGW       = 1     // config width
+    parameter SIDE       = "NO", // "NO", "SO", "EA", "WE"
+    parameter NPINS      = 4,    // total pins per side (<256)
+    parameter NCELLS     = 8,    // total cells per side (<256)
+    parameter NSECTIONS  = 8,    // total secti0ns per side (<256)
+    parameter CELLMAP    = 0,    // {SECTION#, PIN#, CELLMAP}
+    parameter RINGW      = 1,    // width of io ring
+    parameter CFGW       = 1     // config width
     )
    (// io pad signals
     inout [NPINS-1:0] 		pad, // pad
@@ -53,188 +51,188 @@ module la_ioside
    for(i=0;i<NCELLS;i=i+1)
      begin: ipadcell
 	// BIDIR
-	if (CELLTYPE[i*8+:4]==LA_BIDIR[3:0])
+	if (CELLMAP[i*24+:4]==LA_BIDIR[3:0])
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
-			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .TYPE(CELLMAP[(i*24+4)+:4]),
 			  .CFGW(CFGW),
 			  .RINGW(RINGW))
 	     i0 (// pad
-		 .pad	(pad[PINMAP[i*8+:8]]),
+		 .pad	(pad[CELLMAP[(i*24+8)+:8]]),
 		 // core signalas
-		 .z	(z[PINMAP[i*8+:8]]),
-		 .a	(a[PINMAP[i*8+:8]]),
-		 .ie	(ie[PINMAP[i*8+:8]]),
-		 .oe	(oe[PINMAP[i*8+:8]]),
-		 .cfg	(cfg[PINMAP[i*8+:8]*CFGW+:CFGW]),
+		 .z	(z[CELLMAP[(i*24+8)+:8]]),
+		 .a	(a[CELLMAP[(i*24+8)+:8]]),
+		 .ie	(ie[CELLMAP[(i*24+8)+:8]]),
+		 .oe	(oe[CELLMAP[(i*24+8)+:8]]),
+		 .cfg	(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
 		 // supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// INPUT
-	else if (CELLTYPE[i*8+:4]==LA_INPUT[3:0])
+	else if (CELLMAP[i*24+:4]==LA_INPUT[3:0])
 	  begin: ila_ioinput
 	     la_ioinput #(.SIDE(SIDE),
-			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .TYPE(CELLMAP[(i*24+4)+:4]),
 			  .CFGW(CFGW),
 			  .RINGW(RINGW))
 	     i0 (// pad
-		 .pad	(pad[PINMAP[i*8+:8]]),
+		 .pad	(pad[CELLMAP[(i*24+8)+:8]]),
 		 // core signalas
-		 .z	(z[PINMAP[i*8+:8]]),
-		 .ie	(ie[PINMAP[i*8+:8]]),
-		 .cfg	(cfg[PINMAP[i*8+:8]*CFGW+:CFGW]),
+		 .z	(z[CELLMAP[(i*24+8)+:8]]),
+		 .ie	(ie[CELLMAP[(i*24+8)+:8]]),
+		 .cfg	(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
 		 // supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// ANALOG
-	else if (CELLTYPE[i*8+:4]==LA_ANALOG[3:0])
+	else if (CELLMAP[i*24+:4]==LA_ANALOG[3:0])
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
-			   .TYPE(CELLTYPE[(i*8+4)+:4]),
+			   .TYPE(CELLMAP[(i*24+4)+:4]),
 			   .RINGW(RINGW))
 	     i0 (// pad
-		 .pad	(pad[PINMAP[i*8+:8]]),
+		 .pad	(pad[CELLMAP[(i*24+8)+:8]]),
 		 // core signalas
 		 .aio	(aio[i*3+:3]),
 		 // supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// XTAL
-	else if (CELLTYPE[i*8+:4]==LA_XTAL[3:0])
+	else if (CELLMAP[i*24+:4]==LA_XTAL[3:0])
 	    begin: ila_ioxtal
 	     la_ioxtal #(.SIDE(SIDE),
-			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .TYPE(CELLMAP[(i*24+4)+:4]),
 			 .RINGW(RINGW))
 	     i0 (// pad
-		 .padi  (pad[PINMAP[i*8+:8]]),
+		 .padi  (pad[CELLMAP[(i*24+8)+:8]]),
 		 .pado  (pad[i+1]), //TODO: fix!
 		 // supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	    end
 	// POC
-	else if (CELLTYPE[i*8+:4]==LA_POC[3:0])
+	else if (CELLMAP[i*24+:4]==LA_POC[3:0])
 	  begin: ila_iopoc
 	     la_iopoc #(.SIDE(SIDE),
-			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// CUT
-	else if (CELLTYPE[i*8+:4]==LA_CUT[3:0])
+	else if (CELLMAP[i*24+:4]==LA_CUT[3:0])
 	  begin: ila_iocut
 	     la_iocut #(.SIDE(SIDE),
-			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
 	     i0();
 	  end
-	else if (CELLTYPE[i*8+:4]==LA_VDDIO[3:0])
+	else if (CELLMAP[(i*24+8)+:4]==LA_VDDIO[3:0])
 	  begin: ila_iovddio
 	     la_iovddio #(.SIDE(SIDE),
-			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .TYPE(CELLMAP[((i*24+8)+4)+:4]),
 			  .RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSSIO
-	else if (CELLTYPE[i*8+:4]==LA_VSSIO[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VSSIO[3:0])
 	  begin: ila_iovssio
 	     la_iovssio #(.SIDE(SIDE),
-			  .TYPE(CELLTYPE[(i*8+4)+:4]),
+			  .TYPE(CELLMAP[(i*24+4)+:4]),
 			  .RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VDD
-	else if (CELLTYPE[i*8+:4]==LA_VDD[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VDD[3:0])
 	  begin: ila_iovdd
 	     la_iovdd #(.SIDE(SIDE),
-			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSS
-	else if (CELLTYPE[i*8+:4]==LA_VSS[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VSS[3:0])
 	  begin: ila_iovss
 	     la_iovss #(.SIDE(SIDE),
-			.TYPE(CELLTYPE[(i*8+4)+:4]),
+			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VDDA
-	else if (CELLTYPE[i*8+:4]==LA_VDDA[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VDDA[3:0])
 	  begin: ila_iovdda
 	     la_iovdda #(.SIDE(SIDE),
-			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .TYPE(CELLMAP[(i*24+4)+:4]),
 			 .RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSSA
-	else if (CELLTYPE[i*8+:4]==LA_VSSA[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VSSA[3:0])
 	  begin: ila_iovssa
 	     la_iovssa #(.SIDE(SIDE),
-			 .TYPE(CELLTYPE[(i*8+4)+:4]),
+			 .TYPE(CELLMAP[(i*24+4)+:4]),
 			 .RINGW(RINGW))
 	     i0 (// supplies
 		 .vss	(vss),
-		 .vdd	(vdd[CUTMAP[i*8+:8]]),
-		 .vddio (vddio[CUTMAP[i*8+:8]]),
-		 .vssio	(vssio[CUTMAP[i*8+:8]]),
+		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
+		 .vddio (vddio[CELLMAP[(i*24+16)+:8]]),
+		 .vssio	(vssio[CELLMAP[(i*24+16)+:8]]),
 		 // ring
-		 .ioring(ioring[CUTMAP[i*8+:8]*RINGW+:RINGW]));
+		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end // block: ila_iovssa
      end
 

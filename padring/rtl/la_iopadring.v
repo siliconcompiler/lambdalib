@@ -10,11 +10,13 @@
  * - Default is for ioring to be cut at corners, user must short rings
  *   at top level in RTl/netlist if abutted ring extends across corners.
  *
- * - PINMAP specifies which pin a cell belongs to, one entry per cell.
+ * - CELLMAP = {SECTION#, PIN#, CELLTYPE}
  *
- * - CUTMAP specifies which section a cell belongs to, one entry per cell.
+ * - SECTION specifies which power domain the pin belongs to
  *
- * - CELLTYPE[3:0] (see la_iopadring.vh)
+ * - PIN maps the cell to the pin number
+ *
+ * - CELLTYPE[3:0] specifies the cell type (see la_iopadring.vh)
  *
  * - CELLTYPE[7:4] is used by inside lambda cells for selection
  *
@@ -25,30 +27,22 @@ module la_iopadring
     parameter           CFGW         = 8,        // width of config bus
     parameter           RINGW        = 8,        // width of io ring
     // per side settings
-    parameter [7:0]     NO_NPINS     =  8'h1,    // IO pins per side
-    parameter [7:0]     NO_NCELLS    =  8'h1,    // cells per side
-    parameter [7:0]     NO_NSECTIONS =  8'h1,    // sections per side
-    parameter [2048:0]  NO_CELLTYPE  =  2048'h0, // type per cell
-    parameter [2048:0]  NO_PINMAP    =  2048'h0, // cell to pinmap
-    parameter [2048:0]  NO_CUTMAP    =  2048'h0, // maps cell to section
-    parameter [7:0]     EA_NPINS     =  8'h1,    // IO pins per side
-    parameter [7:0]     EA_NCELLS    =  8'h1,    // cells per side
-    parameter [7:0]     EA_NSECTIONS =  8'h2,    // sections per side
-    parameter [2048:0]  EA_CELLTYPE  =  2048'h0, // type per cell
-    parameter [2048:0]  EA_PINMAP    =  2048'h0, // cell to pinmap
-    parameter [2048:0]  EA_CUTMAP    =  2048'h0, // maps cell to section
-    parameter [7:0]     SO_NPINS     =  8'h1,    // IO pins per side
-    parameter [7:0]     SO_NCELLS    =  8'h1,    // cells per side
-    parameter [7:0]     SO_NSECTIONS =  8'h1,    // sections per side
-    parameter [2048:0]  SO_CELLTYPE  =  2048'h0, // type per cell
-    parameter [2048:0]  SO_PINMAP    =  2048'h0, // maps cell to pin
-    parameter [2048:0]  SO_CUTMAP    =  2048'h0, // maps cell to section
-    parameter [7:0]     WE_NPINS     =  8'h1,    // IO pins per side
-    parameter [7:0]     WE_NCELLS    =  8'h1,    // cells per side
-    parameter [7:0]     WE_NSECTIONS =  8'h1,    // sections per side
-    parameter [2048:0]  WE_CELLTYPE  =  2048'h0, // type per cell
-    parameter [2048:0]  WE_PINMAP    =  2048'h0, // cell to pinmap
-    parameter [2048:0]  WE_CUTMAP    =  2048'h0  // maps cell to section
+    parameter NO_NPINS     =  0, // IO pins per side
+    parameter NO_NCELLS    =  0, // cells per side
+    parameter NO_NSECTIONS =  0, // sections per side
+    parameter NO_CELLMAP   =  0, // type per cell
+    parameter EA_NPINS     =  0, // IO pins per side
+    parameter EA_NCELLS    =  0, // cells per side
+    parameter EA_NSECTIONS =  0, // sections per side
+    parameter EA_CELLMAP   =  0, // type per cell
+    parameter SO_NPINS     =  0, // IO pins per side
+    parameter SO_NCELLS    =  0, // cells per side
+    parameter SO_NSECTIONS =  0, // sections per side
+    parameter SO_CELLMAP   =  0, // type per cell
+    parameter WE_NPINS     =  0, // IO pins per side
+    parameter WE_NCELLS    =  0, // cells per side
+    parameter WE_NSECTIONS =  0, // sections per side
+    parameter WE_CELLMAP   =  0  // type per cell
     )
    (// CONTINUOUS GROUND
     inout 			   vss,
@@ -125,9 +119,7 @@ module la_iopadring
 	       .NPINS(NO_NPINS),
 	       .NCELLS(NO_NCELLS),
 	       .NSECTIONS(NO_NSECTIONS),
-	       .CELLTYPE(NO_CELLTYPE),
-	       .PINMAP(NO_PINMAP),
-	       .CUTMAP(NO_CUTMAP),
+	       .CELLMAP(NO_CELLMAP),
 	       .RINGW(RINGW),
 	       .CFGW(CFGW))
    inorth(/*AUTOINST*/
@@ -154,9 +146,7 @@ module la_iopadring
 	       .NPINS(EA_NPINS),
 	       .NCELLS(EA_NCELLS),
 	       .NSECTIONS(EA_NSECTIONS),
-	       .CELLTYPE(EA_CELLTYPE),
-	       .PINMAP(EA_PINMAP),
-	       .CUTMAP(NO_CUTMAP),
+	       .CELLMAP(EA_CELLMAP),
 	       .RINGW(RINGW),
 	       .CFGW(CFGW))
    ieast(/*AUTOINST*/
@@ -184,9 +174,7 @@ module la_iopadring
 	       .NPINS(SO_NPINS),
 	       .NCELLS(SO_NCELLS),
 	       .NSECTIONS(SO_NSECTIONS),
-	       .CELLTYPE(SO_CELLTYPE),
-	       .PINMAP(SO_PINMAP),
-	       .CUTMAP(SO_CUTMAP),
+	       .CELLMAP(SO_CELLMAP),
 	       .RINGW(RINGW),
 	       .CFGW(CFGW))
    isouth(/*AUTOINST*/
@@ -214,9 +202,7 @@ module la_iopadring
 	       .NPINS(WE_NPINS),
 	       .NCELLS(WE_NCELLS),
 	       .NSECTIONS(WE_NSECTIONS),
-	       .CELLTYPE(WE_CELLTYPE),
-	       .PINMAP(WE_PINMAP),
-	       .CUTMAP(WE_CUTMAP),
+	       .CELLMAP(WE_CELLMAP),
 	       .RINGW(RINGW),
 	       .CFGW(CFGW))
    iwest(/*AUTOINST*/
