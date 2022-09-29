@@ -10,6 +10,7 @@ module la_ioxtal
   #(
     parameter TYPE = "DEFAULT", // cell type
     parameter SIDE  = "NO",     // "NO", "SO", "EA", "WE"
+    parameter CFGW  =  16,       // width of core config bus
     parameter RINGW =  8        // width of io ring
     )
    (// io pad signals
@@ -20,9 +21,9 @@ module la_ioxtal
     inout 	      vddio, // io supply
     inout 	      vssio, // io ground
     inout [RINGW-1:0] ioring, // generic io-ring interface
+    input [CFGW-1:0]  cfg, // generic config interface
     // core interface
-    input 	      a, // analog input from core
-    output 	      z // analog output to core
+    output 	      z // clock output to core
     );
 
 endmodule
