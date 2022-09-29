@@ -65,22 +65,22 @@ module testbench();
 				       {8'd0,8'd1,LA_CUT}};
 
 
-   wire [NPINS-1:0]	ea_a;			// To dut of la_iopadring.v
-   wire [CFGW*NSECTIONS-1:0] ea_cfg;		// To dut of la_iopadring.v
-   wire [NPINS-1:0]	ea_ie;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	ea_oe;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	no_a;			// To dut of la_iopadring.v
-   wire [CFGW*NSECTIONS-1:0] no_cfg;		// To dut of la_iopadring.v
-   wire [NPINS-1:0]	no_ie;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	no_oe;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	so_a;			// To dut of la_iopadring.v
-   wire [CFGW*NSECTIONS-1:0] so_cfg;		// To dut of la_iopadring.v
-   wire [NPINS-1:0]	so_ie;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	so_oe;			// To dut of la_iopadring.v
-   wire [NPINS-1:0]	we_a;			// To dut of la_iopadring.v
-   wire [CFGW*NSECTIONS-1:0] we_cfg;		// To dut of la_iopadring.v
-   wire [NPINS-1:0]	we_ie;			// To dut of la_iopadring.v
-   wire [NPINS-1:0] 	we_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0]	 ea_a;			// To dut of la_iopadring.v
+   wire [CFGW*NPINS-1:0] ea_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 ea_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 ea_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 no_a;			// To dut of la_iopadring.v
+   wire [CFGW*NPINS-1:0] no_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 no_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 no_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 so_a;			// To dut of la_iopadring.v
+   wire [CFGW*NPINS-1:0] so_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 so_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 so_oe;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 we_a;			// To dut of la_iopadring.v
+   wire [CFGW*NPINS-1:0] we_cfg;		// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 we_ie;			// To dut of la_iopadring.v
+   wire [NPINS-1:0] 	 we_oe;			// To dut of la_iopadring.v
 
    /*AUTOINPUT*/
    /*AUTOWIRE*/

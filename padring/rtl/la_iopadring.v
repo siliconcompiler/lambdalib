@@ -24,25 +24,41 @@
 
 module la_iopadring
   #(// global settings
-    parameter           CFGW         = 8,        // width of config bus
-    parameter           RINGW        = 8,        // width of io ring
+    parameter CFGW         = 8, // width of config bus
+    parameter RINGW        = 8, // width of io ring
     // per side settings
-    parameter NO_NPINS     =  0, // IO pins per side
-    parameter NO_NCELLS    =  0, // cells per side
-    parameter NO_NSECTIONS =  0, // sections per side
-    parameter NO_CELLMAP   =  0, // type per cell
-    parameter EA_NPINS     =  0, // IO pins per side
-    parameter EA_NCELLS    =  0, // cells per side
-    parameter EA_NSECTIONS =  0, // sections per side
-    parameter EA_CELLMAP   =  0, // type per cell
-    parameter SO_NPINS     =  0, // IO pins per side
-    parameter SO_NCELLS    =  0, // cells per side
-    parameter SO_NSECTIONS =  0, // sections per side
-    parameter SO_CELLMAP   =  0, // type per cell
-    parameter WE_NPINS     =  0, // IO pins per side
-    parameter WE_NCELLS    =  0, // cells per side
-    parameter WE_NSECTIONS =  0, // sections per side
-    parameter WE_CELLMAP   =  0  // type per cell
+    parameter NO_NPINS     =  1, // IO pins per side
+    parameter NO_NCELLS    =  5, // cells per side
+    parameter NO_NSECTIONS =  1, // sections per side
+    parameter NO_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
+			       {8'd0,8'd0,LA_VSSIO},
+			       {8'd0,8'd1,LA_BIDIR},
+			       {8'd0,8'd0,LA_VDD},
+			       {8'd0,8'd0,LA_VSS}},
+    parameter EA_NPINS     =  1, // IO pins per side
+    parameter EA_NCELLS    =  5, // cells per side
+    parameter EA_NSECTIONS =  1, // sections per side
+    parameter EA_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
+			       {8'd0,8'd0,LA_VSSIO},
+			       {8'd0,8'd1,LA_BIDIR},
+			       {8'd0,8'd0,LA_VDD},
+			       {8'd0,8'd0,LA_VSS}},
+    parameter SO_NPINS     =  1, // IO pins per side
+    parameter SO_NCELLS    =  5, // cells per side
+    parameter SO_NSECTIONS =  1, // sections per side
+    parameter SO_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
+			       {8'd0,8'd0,LA_VSSIO},
+			       {8'd0,8'd1,LA_BIDIR},
+			       {8'd0,8'd0,LA_VDD},
+			       {8'd0,8'd0,LA_VSS}},
+    parameter WE_NPINS     =  1, // IO pins per side
+    parameter WE_NCELLS    =  5, // cells per side
+    parameter WE_NSECTIONS =  1, // sections per side
+    parameter WE_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
+			       {8'd0,8'd0,LA_VSSIO},
+			       {8'd0,8'd1,LA_BIDIR},
+			       {8'd0,8'd0,LA_VDD},
+			       {8'd0,8'd0,LA_VSS}}
     )
    (// CONTINUOUS GROUND
     inout 			   vss,
@@ -96,7 +112,7 @@ module la_iopadring
     inout [WE_NSECTIONS*RINGW-1:0] we_ioring // io ring
     );
 
-
+`include "la_iopadring.vh"
 
    //#####################
    // LOCAL WIRES

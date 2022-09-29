@@ -51,6 +51,8 @@ module la_ioside
    for(i=0;i<NCELLS;i=i+1)
      begin: ipadcell
 	// BIDIR
+	// initial
+	// $display("cell=%d, pin=%d",i, CELLMAP[(i*24+8)+:8]);
 	if (CELLMAP[i*24+:4]==LA_BIDIR[3:0])
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
@@ -121,6 +123,9 @@ module la_ioside
 	     i0 (// pad
 		 .padi  (pad[CELLMAP[(i*24+8)+:8]]),
 		 .pado  (pad[i+1]), //TODO: fix!
+		 // core
+		 .z	(z[CELLMAP[(i*24+8)+:8]]),
+		 .cfg	(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
 		 // supplies
 		 .vss	(vss),
 		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
@@ -149,7 +154,7 @@ module la_ioside
 	     la_iocut #(.SIDE(SIDE),
 			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
-	     i0();
+	     i0(.vss	(vss));
 	  end
 	else if (CELLMAP[(i*24+8)+:4]==LA_VDDIO[3:0])
 	  begin: ila_iovddio
