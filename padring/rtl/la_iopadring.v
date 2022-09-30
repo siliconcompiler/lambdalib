@@ -28,37 +28,21 @@ module la_iopadring
     parameter RINGW        = 8, // width of io ring
     // per side settings
     parameter NO_NPINS     =  1, // IO pins per side
-    parameter NO_NCELLS    =  5, // cells per side
+    parameter NO_NCELLS    =  1, // cells per side
     parameter NO_NSECTIONS =  1, // sections per side
-    parameter NO_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
-			       {8'd0,8'd0,LA_VSSIO},
-			       {8'd0,8'd1,LA_BIDIR},
-			       {8'd0,8'd0,LA_VDD},
-			       {8'd0,8'd0,LA_VSS}},
-    parameter EA_NPINS     =  1, // IO pins per side
-    parameter EA_NCELLS    =  5, // cells per side
-    parameter EA_NSECTIONS =  1, // sections per side
-    parameter EA_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
-			       {8'd0,8'd0,LA_VSSIO},
-			       {8'd0,8'd1,LA_BIDIR},
-			       {8'd0,8'd0,LA_VDD},
-			       {8'd0,8'd0,LA_VSS}},
-    parameter SO_NPINS     =  1, // IO pins per side
-    parameter SO_NCELLS    =  5, // cells per side
-    parameter SO_NSECTIONS =  1, // sections per side
-    parameter SO_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
-			       {8'd0,8'd0,LA_VSSIO},
-			       {8'd0,8'd1,LA_BIDIR},
-			       {8'd0,8'd0,LA_VDD},
-			       {8'd0,8'd0,LA_VSS}},
-    parameter WE_NPINS     =  1, // IO pins per side
-    parameter WE_NCELLS    =  5, // cells per side
-    parameter WE_NSECTIONS =  1, // sections per side
-    parameter WE_CELLMAP   =  {{8'd0,8'd0,LA_VDDIO},
-			       {8'd0,8'd0,LA_VSSIO},
-			       {8'd0,8'd1,LA_BIDIR},
-			       {8'd0,8'd0,LA_VDD},
-			       {8'd0,8'd0,LA_VSS}}
+    parameter NO_CELLMAP   =  0, // per cell, {SECTION#, PIN#, CELLTYPE}
+    parameter EA_NPINS     =  1,
+    parameter EA_NCELLS    =  1,
+    parameter EA_NSECTIONS =  1,
+    parameter EA_CELLMAP   =  0,
+    parameter SO_NPINS     =  1,
+    parameter SO_NCELLS    =  1,
+    parameter SO_NSECTIONS =  1,
+    parameter SO_CELLMAP   =  0,
+    parameter WE_NPINS     =  1,
+    parameter WE_NCELLS    =  1,
+    parameter WE_NSECTIONS =  1,
+    parameter WE_CELLMAP   =  0
     )
    (// CONTINUOUS GROUND
     inout 			   vss,
@@ -75,17 +59,17 @@ module la_iopadring
     inout [NO_NSECTIONS-1:0] 	   no_vssio, // io/analog ground
     inout [NO_NSECTIONS*RINGW-1:0] no_ioring, // io ring
     // EAST
-    inout [EA_NPINS-1:0] 	   ea_pad, // pad
-    inout [EA_NPINS*3-1:0] 	   ea_aio, // analog inout
-    output [EA_NPINS-1:0] 	   ea_z, // output to core
-    input [EA_NPINS-1:0] 	   ea_a, // input from core
-    input [EA_NPINS-1:0] 	   ea_ie, // input enable, 1 = active
-    input [EA_NPINS-1:0] 	   ea_oe, // output enable, 1 = active
-    input [EA_NPINS*CFGW-1:0] 	   ea_cfg, // generic config interface
-    inout [EA_NSECTIONS-1:0] 	   ea_vdd, // core supply
-    inout [EA_NSECTIONS-1:0] 	   ea_vddio, // io supply
-    inout [EA_NSECTIONS-1:0] 	   ea_vssio, // io ground
-    inout [EA_NSECTIONS*RINGW-1:0] ea_ioring, // io ring
+    inout [EA_NPINS-1:0] 	   ea_pad,
+    inout [EA_NPINS*3-1:0] 	   ea_aio,
+    output [EA_NPINS-1:0] 	   ea_z,
+    input [EA_NPINS-1:0] 	   ea_a,
+    input [EA_NPINS-1:0] 	   ea_ie,
+    input [EA_NPINS-1:0] 	   ea_oe,
+    input [EA_NPINS*CFGW-1:0] 	   ea_cfg,
+    inout [EA_NSECTIONS-1:0] 	   ea_vdd,
+    inout [EA_NSECTIONS-1:0] 	   ea_vddio,
+    inout [EA_NSECTIONS-1:0] 	   ea_vssio,
+    inout [EA_NSECTIONS*RINGW-1:0] ea_ioring,
     // SOUTH
     inout [SO_NPINS-1:0] 	   so_pad, // pad
     inout [SO_NPINS*3-1:0] 	   so_aio, // analog inout
@@ -99,17 +83,17 @@ module la_iopadring
     inout [SO_NSECTIONS-1:0] 	   so_vssio, // io ground
     inout [SO_NSECTIONS*RINGW-1:0] so_ioring, // io ring
     // WEST
-    inout [WE_NPINS-1:0] 	   we_pad, // pad
-    inout [WE_NPINS*3-1:0] 	   we_aio, // analog inout
-    output [WE_NPINS-1:0] 	   we_z, // output to core
-    input [WE_NPINS-1:0] 	   we_a, // input from core
-    input [WE_NPINS-1:0] 	   we_ie, // input enable, 1 = active
-    input [WE_NPINS-1:0] 	   we_oe, // output enable, 1 = active
-    input [WE_NPINS*CFGW-1:0] 	   we_cfg, // generic config interface
-    inout [WE_NSECTIONS-1:0] 	   we_vdd, // core supply
-    inout [WE_NSECTIONS-1:0] 	   we_vddio, // io supply
-    inout [WE_NSECTIONS-1:0] 	   we_vssio, // io ground
-    inout [WE_NSECTIONS*RINGW-1:0] we_ioring // io ring
+    inout [WE_NPINS-1:0] 	   we_pad,
+    inout [WE_NPINS*3-1:0] 	   we_aio,
+    output [WE_NPINS-1:0] 	   we_z,
+    input [WE_NPINS-1:0] 	   we_a,
+    input [WE_NPINS-1:0] 	   we_ie,
+    input [WE_NPINS-1:0] 	   we_oe,
+    input [WE_NPINS*CFGW-1:0] 	   we_cfg,
+    inout [WE_NSECTIONS-1:0] 	   we_vdd,
+    inout [WE_NSECTIONS-1:0] 	   we_vddio,
+    inout [WE_NSECTIONS-1:0] 	   we_vssio,
+    inout [WE_NSECTIONS*RINGW-1:0] we_ioring
     );
 
 `include "la_iopadring.vh"
