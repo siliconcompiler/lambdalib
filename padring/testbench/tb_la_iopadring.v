@@ -57,12 +57,12 @@ module testbench();
 				       {8'd1,8'd0,LA_VDD},
 				       {8'd1,8'd0,LA_VSS},
 				       //ANALOG SECTION (6)
-				       {8'd0,8'd1,LA_CUT},
+				       {8'd0,8'd0,LA_CUT},
 				       {8'd0,8'd1,LA_ANALOG},
 				       {8'd0,8'd0,LA_ANALOG},
-				       {8'd0,8'd1,LA_VDDA},
-				       {8'd0,8'd1,LA_VSSA},
-				       {8'd0,8'd1,LA_CUT}};
+				       {8'd0,8'd0,LA_VDDA},
+				       {8'd0,8'd0,LA_VSSA},
+				       {8'd0,8'd0,LA_CUT}};
 
 
    wire [NPINS-1:0]	 ea_a;			// To dut of la_iopadring.v

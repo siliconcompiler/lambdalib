@@ -12,9 +12,9 @@
 module la_ioside
   #(// per side parameters
     parameter SIDE       = "NO", // "NO", "SO", "EA", "WE"
-    parameter NPINS      = 4,    // total pins per side (<256)
-    parameter NCELLS     = 8,    // total cells per side (<256)
-    parameter NSECTIONS  = 8,    // total secti0ns per side (<256)
+    parameter NPINS      = 1,    // total pins per side (<256)
+    parameter NCELLS     = 1,    // total cells per side (<256)
+    parameter NSECTIONS  = 1,    // total secti0ns per side (<256)
     parameter CELLMAP    = 0,    // {SECTION#, PIN#, CELLMAP}
     parameter RINGW      = 1,    // width of io ring
     parameter CFGW       = 1     // config width

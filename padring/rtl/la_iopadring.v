@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Padframe Generator
+ * Function: Padring Generator
  * Copyright: Lambda Project Authors. ALl rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
