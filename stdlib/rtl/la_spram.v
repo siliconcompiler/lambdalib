@@ -20,53 +20,53 @@
  *
  ****************************************************************************/
 
-module la_ram
-  #(parameter N      = 32,            // Memory width
+module la_spram
+  #(parameter DW     = 32,            // Memory width
     parameter DEPTH  = 32,            // Memory depth
-    parameter TYPE   = "DEFAULT",     // pass through variable for hard macro
-    parameter REG    = 1,             // adds pipeline stage to RAM
     parameter AW     = $clog2(DEPTH), // address width (derived)
-    parameter CFGW   = 128,           // width of config interface
-    parameter TESTW  = 128            // width of test interface
+    parameter TYPE   = "DEFAULT",     // pass through variable for hard macro
+    parameter REG    = 1,             // adds pipeline stage to soft RAM
+    parameter CTRLW  = 128,           // width of asic ctrl interface
+    parameter TESTW  = 128            // width of asic teset interface
     )
    (// Memory interface (dual port)
     input 	      clk, // write clock
     input 	      ce, // chip enable
     input 	      we, // write enable
-    input [N-1:0]     wmask, //per bit write mask
+    input [DW-1:0]    wmask, //per bit write mask
     input [AW-1:0]    addr,//write address
-    input [N-1:0]     din, //write data
-    output [N-1:0]    dout,//read output data
+    input [DW-1:0]    din, //write data
+    output [DW-1:0]   dout,//read output data
     // Power signals
     input 	      vss, // ground signal
     input 	      vdd, // memory core array power
     input 	      vddio, // periphery/io power
     // Generic interfaces
-    input [CFGW-1:0]  cfg, // generic config/test interface
-    input [TESTW-1:0] test // generic test interface
+    input [CTRLW-1:0] ctrl, // pass through ASIC control interface
+    input [TESTW-1:0] test // pass through ASIC test interface
     );
 
    // Generic RTL RAM
-   reg [N-1:0] 	       ram    [0:DEPTH-1];
-   integer 	       i;
-   wire [N-1:0]        rdata;
+   reg [DW-1:0]       ram    [0:DEPTH-1];
+   reg [DW-1:0]       rd_reg;
+   wire [DW-1:0]      rdata;
+   integer 	      i;
 
    //write port
    always @(posedge clk)
-     for (i=0;i<N;i=i+1)
+     for (i=0;i<DW;i=i+1)
        if (ce & we & wmask[i])
          ram[addr[AW-1:0]][i] <= din[i];
 
    //read port
-   assign rdata[N-1:0] = ram[addr[AW-1:0]];
+   assign rdata[DW-1:0] = ram[addr[AW-1:0]];
 
    //configurable output register
-   reg [N-1:0] 		  rd_reg;
    always @ (posedge clk)
      if(ce)
-       rd_reg[N-1:0] <= rdata[N-1:0];
+       rd_reg[DW-1:0] <= rdata[DW-1:0];
 
    //Drive output from register or RAM directly
-   assign dout[N-1:0] = (REG==1) ? rd_reg[N-1:0] : rdata[N-1:0];
+   assign dout[DW-1:0] = (REG==1) ? rd_reg[DW-1:0] : rdata[DW-1:0];
 
 endmodule
