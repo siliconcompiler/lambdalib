@@ -26,6 +26,7 @@ module la_asyncfifo
     parameter NS        = 1,        // Number of power supplies
     parameter CTRLW     = 1,        // width of asic ctrl interface
     parameter TESTW     = 1,        // width of asic teset interface
+    parameter CHAOS     = 0,        // generates random full logic when set
     parameter TYPE      = "DEFAULT" // Pass through variable for hard macro
     )
    (// write port
@@ -33,6 +34,7 @@ module la_asyncfifo
     input 	      wr_nreset,
     input [DW-1:0]    wr_din, // data to write
     input 	      wr_en, // write fifo
+    input 	      wr_chaosmode,// randomly assert fifo full when set
     output 	      wr_full, // fifo full
     // read port
     input 	      rd_clk,
@@ -58,6 +60,7 @@ module la_asyncfifo
    wire [AW:0] 	  wr_grayptr_nxt;
    wire [AW:0] 	  wr_binptr_nxt;
    wire [AW:0] 	  wr_grayptr_sync;
+   wire 	  wr_chaosfull;
 
    reg [AW:0] 	  rd_grayptr;
    reg [AW:0] 	  rd_binptr;
@@ -65,6 +68,7 @@ module la_asyncfifo
    wire [AW:0] 	  rd_grayptr_nxt;
    wire [AW:0] 	  rd_binptr_nxt;
    wire [AW:0] 	  rd_grayptr_sync;
+
 
    genvar 	  i;
 
@@ -95,7 +99,8 @@ module la_asyncfifo
      if (~wr_nreset)
        wr_full <= 1'b0;
      else
-       wr_full <= (wr_grayptr_nxt[AW:0] == {~rd_grayptr_sync[AW:AW-1],
+       wr_full <= (wr_chaosfull & wr_chaosmode) |
+		  (wr_grayptr_nxt[AW:0] == {~rd_grayptr_sync[AW:AW-1],
 					    rd_grayptr_sync[AW-2:0]});
 
    // Write --> Read clock synchronizer
@@ -155,5 +160,29 @@ module la_asyncfifo
 
    // Read port (FIFO output)
    assign rd_dout[DW-1:0] = ram[rd_binptr[AW-1:0]];
+
+   //############################
+   // Randomly Asserts FIFO full
+   //############################
+
+   generate
+      if (CHAOS)
+	begin
+	   // TODO: implement LFSR
+	   reg chaosreg;
+	   always @ (posedge wr_clk or negedge wr_nreset)
+	     if (~wr_nreset)
+	       chaosreg <= 1'b0;
+	     else
+	       chaosreg <= ~chaosreg;
+	   assign wr_chaosfull = chaosreg;
+	end
+      else
+	begin
+	   assign wr_chaosfull = 1'b0;
+	end
+
+   endgenerate
+
 
 endmodule
