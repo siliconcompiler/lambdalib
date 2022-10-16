@@ -27,4 +27,8 @@ module la_ioanalog
     inout [2:0]       aio // analog core signal
     );
 
+   tran t0(pad, aio[0]);
+   tran t1(pad, aio[1]);
+   tran t2(pad, aio[2]);
+
 endmodule
