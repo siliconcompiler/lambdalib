@@ -111,7 +111,7 @@ module la_ioside
 	     i0 (// pad
 		 .pad	(pad[CELLMAP[(i*24+8)+:8]]),
 		 // core signalas
-		 .aio	(aio[i*3+:3]),
+		 .aio	(aio[CELLMAP[(i*24+8)+:8]*3+:3]),
 		 // supplies
 		 .vss	(vss),
 		 .vdd	(vdd[CELLMAP[(i*24+16)+:8]]),
