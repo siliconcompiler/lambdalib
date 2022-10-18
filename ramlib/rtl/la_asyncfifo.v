@@ -51,7 +51,7 @@ module la_asyncfifo
     );
 
    // local params
-   parameter AW  = $clog2(DEPTH);
+   localparam AW  = $clog2(DEPTH);
 
    // local wires
    reg [AW:0] 	  wr_grayptr;
