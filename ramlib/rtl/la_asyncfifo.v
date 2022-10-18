@@ -35,13 +35,13 @@ module la_asyncfifo
     input [DW-1:0]    wr_din, // data to write
     input 	      wr_en, // write fifo
     input 	      wr_chaosmode,// randomly assert fifo full when set
-    output 	      wr_full, // fifo full
+    output reg 	      wr_full, // fifo full
     // read port
     input 	      rd_clk,
     input 	      rd_nreset,
     output [DW-1:0]   rd_dout, // output data (next cycle)
     input 	      rd_en, // read fifo
-    output 	      rd_empty, // fifo is empty
+    output reg 	      rd_empty, // fifo is empty
     // Power signals
     input 	      vss, // ground signal
     input [NS-1:0]    vdd, // supplies
@@ -56,7 +56,6 @@ module la_asyncfifo
    // local wires
    reg [AW:0] 	  wr_grayptr;
    reg [AW:0] 	  wr_binptr;
-   reg 		  wr_full;
    wire [AW:0] 	  wr_grayptr_nxt;
    wire [AW:0] 	  wr_binptr_nxt;
    wire [AW:0] 	  wr_grayptr_sync;
@@ -64,7 +63,6 @@ module la_asyncfifo
 
    reg [AW:0] 	  rd_grayptr;
    reg [AW:0] 	  rd_binptr;
-   reg 		  rd_empty;
    wire [AW:0] 	  rd_grayptr_nxt;
    wire [AW:0] 	  rd_binptr_nxt;
    wire [AW:0] 	  rd_grayptr_sync;
