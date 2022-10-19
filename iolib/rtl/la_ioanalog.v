@@ -27,8 +27,17 @@ module la_ioanalog
     inout [2:0]       aio // analog core signal
     );
 
+
+`ifdef VERILATOR
+   // TODO!: input only for verilator bases simulation
+   assign aio[0] = pad;
+   assign aio[1] = pad;
+   assign aio[2] = pad;
+
+`else
    tran t0(pad, aio[0]);
    tran t1(pad, aio[1]);
    tran t2(pad, aio[2]);
+`endif
 
 endmodule
