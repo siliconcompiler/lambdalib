@@ -19,7 +19,7 @@ module la_dsync
      if(!nreset)
        shiftreg[STAGES-1:0] <= 'b0;
      else
-       shiftreg[STAGES-1:0] <= {shiftreg[STAGES-1:0],in};
+       shiftreg[STAGES-1:0] <= {shiftreg[STAGES-2:0],in};
 
    assign out = shiftreg[STAGES-1];
 
