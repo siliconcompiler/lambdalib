@@ -23,18 +23,8 @@ module la_ioshort
    assign a = a2b  ? b : 1'bz;
    assign b = ~a2b ? a : 1'bz;
 `else
+   // single port pass through short/hack
    la_pt la_pt(a,b);
 `endif
 
 endmodule // la_ioshort
-
-//########################################
-// THIS FUNCTION DOESN"T WORK IN VERILATOR
-//########################################
-
-`ifndef VERILATOR
-// Hidden pass through function
-module la_pt(a,a);
-   inout a;
-endmodule // la_pt
-`endif
