@@ -18,13 +18,23 @@ module la_ioshort
    input a2b
    );
 
-
 `ifdef VERILATOR
    // Using direction to break the loop
    assign a = a2b  ? b : 1'bz;
    assign b = ~a2b ? a : 1'bz;
 `else
-   tran t0 (a,b);
+   la_pt la_pt(a,b);
 `endif
 
-endmodule
+endmodule // la_ioshort
+
+//########################################
+// THIS FUNCTION DOESN"T WORK IN VERILATOR
+//########################################
+
+`ifndef VERILATOR
+// Hidden pass through function
+module la_pt(a,a);
+   inout a;
+endmodule // la_pt
+`endif
