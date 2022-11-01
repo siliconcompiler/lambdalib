@@ -20,8 +20,8 @@ module la_ioshort
 
 `ifdef VERILATOR
    // Using direction to break the loop
-   assign a = a2b  ? b : 1'bz;
-   assign b = ~a2b ? a : 1'bz;
+   assign a = ~a2b ? b : 1'bz;
+   assign b = a2b  ? a : 1'bz;
 `else
    // single port pass through short/hack
    la_pt la_pt(a,b);
