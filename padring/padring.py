@@ -1,12 +1,20 @@
 import siliconcompiler
+import os
 
-chip = siliconcompiler.Chip("la_iopadring")
+########################
+# SiliconCompiler Setup
+########################
 
-chip.add('input', 'verilog', 'rtl/la_iopadring.v')
-chip.add('option', 'ydir', 'rtl')
-chip.add('option', 'idir', 'rtl')
-chip.add('option', 'ydir', '../iolib/rtl')
-chip.load_target("freepdk45_demo")
-chip.set('option', 'quiet', True)
-chip.set('option', 'steplist', ['import', 'syn'])
-chip.run()
+def setup(target=None):
+    '''Lambdalib Padring Setup'''
+
+    # Create chip object
+    chip = siliconcompiler.Chip('la_iopadring')
+
+    # Project sources
+    root = os.path.dirname(__file__)
+    chip.add('input', 'verilog', f"{root}/rtl/la_iopadring.v")
+    chip.add('input', 'verilog', f"{root}/rtl/la_ioside.v")
+    chip.add('option', 'idir', f"{root}/rtl")
+
+    return chip
