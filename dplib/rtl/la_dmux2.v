@@ -4,15 +4,20 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_dmux2 #(parameter PROP = "DEFAULT")   (
-    input  sel1,
-    input  sel0,
-    input  in1,
-    input  in0,
-    output out
+module la_dmux2
+  #(
+    parameter N = 1,            // width of mux
+    parameter PROP = "DEFAULT"  // cell property
+    )
+   (
+    input 	   sel1,
+    input 	   sel0,
+    input [N-1:0]  in1,
+    input [N-1:0]  in0,
+    output [N-1:0] out  //selected data output
     );
 
-   assign out = sel0 & in0 |
-		sel1 & in1;
+   assign out[N-1:0] = ({(N){sel0}} & in0[N-1:0] |
+			{(N){sel1}} & in1[N-1:0]);
 
 endmodule
