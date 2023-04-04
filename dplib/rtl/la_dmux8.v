@@ -6,7 +6,7 @@
 
 module la_dmux8
   #(
-    parameter N = 1,            // width of mux
+    parameter N    = 1,         // width of mux
     parameter PROP = "DEFAULT"  // cell property
     )
    (
