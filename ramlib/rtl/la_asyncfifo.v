@@ -106,7 +106,6 @@ module la_asyncfifo
      begin
 	la_dsync wrsync(.out(wr_grayptr_sync[i]),
 			.clk(rd_clk),
-			.nreset(rd_nreset),
 			.in(wr_grayptr[i]));
      end
 
@@ -141,7 +140,6 @@ module la_asyncfifo
      begin
 	la_dsync rdsync(.out(rd_grayptr_sync[i]),
 			.clk(wr_clk),
-			.nreset(wr_nreset),
 			.in(rd_grayptr[i]));
      end
 
