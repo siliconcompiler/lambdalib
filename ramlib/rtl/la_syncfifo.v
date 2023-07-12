@@ -51,7 +51,7 @@ module la_syncfifo
    //############################
 
    assign wr_full     = (chaosfull & chaosmode) |
-			{wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW-1:0];
+			{~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
 
    assign rd_empty    = wr_addr[AW:0] == rd_addr[AW:0];
 
