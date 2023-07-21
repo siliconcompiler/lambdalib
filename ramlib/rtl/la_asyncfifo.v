@@ -39,7 +39,7 @@ module la_asyncfifo
     // read port
     input 	      rd_clk,
     input 	      rd_nreset,
-    output [DW-1:0]   rd_dout, // output data (next cycle)
+    output reg [DW-1:0]   rd_dout, // output data (next cycle)
     input 	      rd_en, // read fifo
     output reg 	      rd_empty, // fifo is empty
     // Power signals
@@ -157,7 +157,9 @@ module la_asyncfifo
        ram[wr_binptr[AW-1:0]] <= wr_din[DW-1:0];
 
    // Read port (FIFO output)
-   assign rd_dout[DW-1:0] = ram[rd_binptr[AW-1:0]];
+   always @(posedge rd_clk)
+    if (rd_en)
+      rd_dout[DW-1:0] <= ram[rd_binptr[AW-1:0]];
 
    //############################
    // Randomly Asserts FIFO full
