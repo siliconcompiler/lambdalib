@@ -49,10 +49,16 @@ module la_spram
    integer 	      i;
 
    // Write port
+//   always @(posedge clk)
+//     for (i=0;i<DW;i=i+1)
+//       if (ce & we & wmask[i])
+//         ram[addr[AW-1:0]][i] <= din[i];
+
+   // Re-writing as a mux for verilator
    always @(posedge clk)
-     for (i=0;i<DW;i=i+1)
-       if (ce & we & wmask[i])
-         ram[addr[AW-1:0]][i] <= din[i];
+     if (ce & we)
+       ram[addr[AW-1:0]] <= din[DW-1:0]       & wmask[DW-1:0] |
+                            ram[addr[AW-1:0]] & ~wmask[DW-1:0];
 
    // Read Port
    always @ (posedge clk)
