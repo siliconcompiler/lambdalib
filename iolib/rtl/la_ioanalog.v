@@ -34,8 +34,18 @@ module la_ioanalog
    assign aio[1] = pad;
    assign aio[2] = pad;
 
+`elsif YOSYS
+   assign pad=aio[0];
+   assign pad=aio[1];
+   assign pad=aio[2];
+   assign aio[0] = pad;
+   assign aio[1] = pad;
+   assign aio[2] = pad;
+
 `else
+
    // replace tran with alias in order to work in Yosis
+   la_pt la_pt_0(pad,aio[0]);
    la_pt la_pt_1(pad,aio[1]);
    la_pt la_pt_2(pad,aio[2]);
 //   tran t1(pad, aio[1]);
