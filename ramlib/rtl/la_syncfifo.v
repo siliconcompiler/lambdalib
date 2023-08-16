@@ -44,7 +44,29 @@ module la_syncfifo
    reg [AW:0] 	      rd_addr;
    wire 	      fifo_read;
    wire 	      fifo_write;
-   wire 	      chaosfull;
+
+   //############################
+   // Randomly Asserts FIFO full
+   //############################
+
+   generate
+      if (CHAOS)
+	begin
+	   // TODO: implement LFSR
+	   reg chaosfull;
+	   always @ (posedge clk or negedge nreset)
+	     if (~nreset)
+	       chaosfull <= 1'b0;
+	     else
+	       chaosfull <= ~chaosfull;
+	end
+      else
+	begin
+	   wire chaosfull;
+	   assign chaosfull = 1'b0;
+	end
+
+   endgenerate
 
    //############################
    // FIFO Empty/Full
@@ -96,28 +118,5 @@ module la_syncfifo
 
    // Read port (FIFO output)
    assign rd_dout[DW-1:0] = ram[rd_addr[AW-1:0]];
-
-
-   //############################
-   // Randomly Asserts FIFO full
-   //############################
-
-   generate
-      if (CHAOS)
-	begin
-	   // TODO: implement LFSR
-	   reg chaosfull;
-	   always @ (posedge clk or negedge nreset)
-	     if (~nreset)
-	       chaosfull <= 1'b0;
-	     else
-	       chaosfull <= ~chaosfull;
-	end
-      else
-	begin
-	   assign chaosfull = 1'b0;
-	end
-
-   endgenerate
 
 endmodule
