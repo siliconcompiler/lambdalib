@@ -45,13 +45,18 @@ module la_syncfifo
    wire 	      fifo_read;
    wire 	      fifo_write;
    wire 	      chaosfull;
+   wire [AW:0]        fifo_used;
 
    //############################
    // FIFO Empty/Full
    //############################
 
+   // support any fifo depth
+   assign fifo_used   = (wr_addr - rd_addr);
+
    assign wr_full     = (chaosfull & chaosmode) |
-			{~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
+                        (fifo_used == DEPTH);
+//                        {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
 
    assign rd_empty    = wr_addr[AW:0] == rd_addr[AW:0];
 
