@@ -13,6 +13,7 @@ module la_dsync
     );
 
    localparam STAGES=2;
+   localparam RND = 1;
 
    reg [STAGES:0] shiftreg;
    integer        sync_delay;
@@ -28,7 +29,7 @@ module la_dsync
 `ifdef SYNTHESIS
    assign out = shiftreg[STAGES-1];
 `else
-   assign out = (|sync_delay) ? shiftreg[STAGES] : shiftreg[STAGES-1];
+   assign out = (|sync_delay & (|RND)) ? shiftreg[STAGES] : shiftreg[STAGES-1];
 `endif
 
 endmodule
