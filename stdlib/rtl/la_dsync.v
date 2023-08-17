@@ -28,7 +28,7 @@ module la_dsync
 `ifdef SYNTHESIS
    assign out = shiftreg[STAGES-1];
 `else
-   assign out = sync_delay ? shiftreg[STAGES] : shiftreg[STAGES-1];
+   assign out = (|sync_delay) ? shiftreg[STAGES] : shiftreg[STAGES-1];
 `endif
 
 endmodule

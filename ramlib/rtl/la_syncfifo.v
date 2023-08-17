@@ -65,11 +65,11 @@ module la_syncfifo
    //############################
    // FIFO Pointers - wrap around DEPTH-1
    //############################
-   assign rd_addr_nxt[AW]     = (rd_addr[AW-1:0] == (DEPTH-1)) ? ~rd_addr[AW] : rd_addr[AW];
-   assign rd_addr_nxt[AW-1:0] = (rd_addr[AW-1:0] == (DEPTH-1)) ? 'b0 : (rd_addr[AW-1:0] + 1);
+   assign rd_addr_nxt[AW]     = (rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~rd_addr[AW] : rd_addr[AW];
+   assign rd_addr_nxt[AW-1:0] = (rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? 'b0 : (rd_addr[AW-1:0] + 1);
 
-   assign wr_addr_nxt[AW]     = (wr_addr[AW-1:0] == (DEPTH-1)) ? ~wr_addr[AW] : wr_addr[AW];
-   assign wr_addr_nxt[AW-1:0] = (wr_addr[AW-1:0] == (DEPTH-1)) ? 'b0 : (wr_addr[AW-1:0] + 1);
+   assign wr_addr_nxt[AW]     = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~wr_addr[AW] : wr_addr[AW];
+   assign wr_addr_nxt[AW-1:0] = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? 'b0 : (wr_addr[AW-1:0] + 1);
 
    always @ (posedge clk or negedge nreset)
      if(~nreset)
