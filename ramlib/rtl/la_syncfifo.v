@@ -41,17 +41,22 @@ module la_syncfifo
 
    // local wires
    reg [AW:0] 	      wr_addr;
+   wire [AW:0]        wr_addr_nxt;
    reg [AW:0] 	      rd_addr;
+   wire [AW:0]        rd_addr_nxt;
    wire 	      fifo_read;
    wire 	      fifo_write;
    wire 	      chaosfull;
+   wire               rd_wrap_around;
+   wire               wr_wrap_around;
 
    //############################
    // FIFO Empty/Full
    //############################
 
+   // support any fifo depth
    assign wr_full     = (chaosfull & chaosmode) |
-			{~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
+                        {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
 
    assign rd_empty    = wr_addr[AW:0] == rd_addr[AW:0];
 
@@ -60,8 +65,16 @@ module la_syncfifo
    assign fifo_write  = wr_en & ~wr_full;
 
    //############################
-   // FIFO Pointers
+   // FIFO Pointers - wrap around DEPTH-1
    //############################
+   assign rd_wrap_around       = rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1);
+   assign wr_wrap_around       = wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1);
+
+   assign rd_addr_nxt[AW]     = rd_wrap_around ? ~rd_addr[AW] : rd_addr[AW];
+   assign rd_addr_nxt[AW-1:0] = rd_wrap_around ? 'b0 : (rd_addr[AW-1:0] + 1);
+
+   assign wr_addr_nxt[AW]     = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~wr_addr[AW] : wr_addr[AW];
+   assign wr_addr_nxt[AW-1:0] = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? 'b0 : (wr_addr[AW-1:0] + 1);
 
    always @ (posedge clk or negedge nreset)
      if(~nreset)
@@ -71,16 +84,16 @@ module la_syncfifo
        end
      else if(fifo_write & fifo_read)
        begin
-	  wr_addr[AW:0] <= wr_addr[AW:0] + 'd1;
-	  rd_addr[AW:0] <= rd_addr[AW:0] + 'd1;
+	  wr_addr[AW:0] <= wr_addr_nxt[AW:0];
+	  rd_addr[AW:0] <= rd_addr_nxt[AW:0];
        end
      else if(fifo_write)
        begin
-	  wr_addr[AW:0] <= wr_addr[AW:0] + 'd1;
+	  wr_addr[AW:0] <= wr_addr_nxt[AW:0];
        end
      else if(fifo_read)
        begin
-          rd_addr[AW:0] <= rd_addr[AW:0] + 'd1;
+          rd_addr[AW:0] <= rd_addr_nxt[AW:0];
        end
 
    //###########################
