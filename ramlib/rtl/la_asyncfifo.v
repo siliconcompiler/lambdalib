@@ -121,8 +121,6 @@ module la_asyncfifo
      else
        wr_full <= (wr_chaosfull & wr_chaosmode) |
                   (fifo_used + (wr_en & ~wr_full)) == DEPTH;
-   //		  (wr_grayptr_nxt[AW:0] == {~rd_grayptr_sync[AW:AW-1],
-   //					    rd_grayptr_sync[AW-2:0]});
 
    // Write --> Read clock synchronizer
    for (i=0;i<(AW+1);i=i+1)

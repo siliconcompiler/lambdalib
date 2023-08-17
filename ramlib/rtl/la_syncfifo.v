@@ -47,6 +47,8 @@ module la_syncfifo
    wire 	      fifo_read;
    wire 	      fifo_write;
    wire 	      chaosfull;
+   wire               rd_wrap_around;
+   wire               wr_wrap_around;
 
    //############################
    // FIFO Empty/Full
@@ -65,8 +67,11 @@ module la_syncfifo
    //############################
    // FIFO Pointers - wrap around DEPTH-1
    //############################
-   assign rd_addr_nxt[AW]     = (rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~rd_addr[AW] : rd_addr[AW];
-   assign rd_addr_nxt[AW-1:0] = (rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? 'b0 : (rd_addr[AW-1:0] + 1);
+   assign rd_wrap_around       = rd_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1);
+   assign wr_wrap_around       = wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1);
+
+   assign rd_addr_nxt[AW]     = rd_wrap_around ? ~rd_addr[AW] : rd_addr[AW];
+   assign rd_addr_nxt[AW-1:0] = rd_wrap_around ? 'b0 : (rd_addr[AW-1:0] + 1);
 
    assign wr_addr_nxt[AW]     = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~wr_addr[AW] : wr_addr[AW];
    assign wr_addr_nxt[AW-1:0] = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? 'b0 : (wr_addr[AW-1:0] + 1);
