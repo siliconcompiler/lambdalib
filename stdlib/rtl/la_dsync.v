@@ -22,7 +22,7 @@ module la_dsync
      begin
         shiftreg[STAGES:0] <= {shiftreg[STAGES-1:0],in};
 `ifndef SYNTHESIS
-        sync_delay <= {$random} %2;
+        sync_delay <= {$random} % 2;
 `endif
      end
 

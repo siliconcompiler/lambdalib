@@ -20,7 +20,7 @@ module la_rsync
 
 `ifndef SYNTHESIS
    always @ (posedge clk)
-     sync_delay <= {$random} %2;
+     sync_delay <= {$random} % 2;
 `endif
 
    always @ (posedge clk or negedge nrst_in)
