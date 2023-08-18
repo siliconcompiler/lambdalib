@@ -22,9 +22,6 @@ module la_ioshort
    // Using direction to break the loop
    assign a = ~a2b ? b : 1'bz;
    assign b = a2b  ? a : 1'bz;
-`elsif YOSYS
-   assign a = b;
-   assign b = a;
 `else
    // single port pass through short/hack
    la_pt la_pt(a,b);
