@@ -19,34 +19,34 @@ module la_syncfifo
     parameter TYPE      = "DEFAULT" // Pass through variable for hard macro
     )
    (// common clock, reset, power, ctrl
-    input 	      clk,
-    input 	      nreset,
-    input 	      vss, // ground signal
+    input             clk,
+    input             nreset,
+    input             vss, // ground signal
     input [NS-1:0]    vdd, // supplies
-    input 	      chaosmode,// randomly assert fifo full when set
+    input             chaosmode,// randomly assert fifo full when set
     input [CTRLW-1:0] ctrl, // pass through ASIC control interface
     input [TESTW-1:0] test, // pass through ASIC test interface
     // write input
-    input 	      wr_en, // write fifo
+    input             wr_en, // write fifo
     input [DW-1:0]    wr_din, // data to write
-    output 	      wr_full, // fifo full
+    output            wr_full, // fifo full
     // read output
-    input 	      rd_en, // read fifo
+    input             rd_en, // read fifo
     output [DW-1:0]   rd_dout, // output data
-    output 	      rd_empty // fifo is empty
+    output            rd_empty // fifo is empty
     );
 
    // local params
    parameter AW  = $clog2(DEPTH);
 
    // local wires
-   reg [AW:0] 	      wr_addr;
+   reg [AW:0]         wr_addr;
    wire [AW:0]        wr_addr_nxt;
-   reg [AW:0] 	      rd_addr;
+   reg [AW:0]         rd_addr;
    wire [AW:0]        rd_addr_nxt;
-   wire 	      fifo_read;
-   wire 	      fifo_write;
-   wire 	      chaosfull;
+   wire               fifo_read;
+   wire               fifo_write;
+   wire               chaosfull;
    wire               rd_wrap_around;
    wire               wr_wrap_around;
 
@@ -84,12 +84,12 @@ module la_syncfifo
        end
      else if(fifo_write & fifo_read)
        begin
-	  wr_addr[AW:0] <= wr_addr_nxt[AW:0];
-	  rd_addr[AW:0] <= rd_addr_nxt[AW:0];
+          wr_addr[AW:0] <= wr_addr_nxt[AW:0];
+          rd_addr[AW:0] <= rd_addr_nxt[AW:0];
        end
      else if(fifo_write)
        begin
-	  wr_addr[AW:0] <= wr_addr_nxt[AW:0];
+          wr_addr[AW:0] <= wr_addr_nxt[AW:0];
        end
      else if(fifo_read)
        begin
@@ -100,7 +100,7 @@ module la_syncfifo
    //# Dual Port Memory
    //###########################
 
-   reg [DW-1:0] 	ram[DEPTH-1:0];
+   reg [DW-1:0]         ram[DEPTH-1:0];
 
    // Write port (FIFO input)
    always @(posedge clk)
@@ -117,20 +117,20 @@ module la_syncfifo
 
    generate
       if (CHAOS)
-	begin
-	   // TODO: implement LFSR
-	   reg chaosfull;
-	   always @ (posedge clk or negedge nreset)
-	     if (~nreset)
-	       chaosfull <= 1'b0;
-	     else
-	       chaosfull <= ~chaosfull;
-	end
+        begin
+           // TODO: implement LFSR
+           reg chaosreg;
+           always @ (posedge clk or negedge nreset)
+             if (~nreset)
+               chaosreg <= 1'b0;
+             else
+               chaosreg <= ~chaosreg;
+           assign wr_chaosfull = chaosreg;
+        end
       else
-	begin
-	   assign chaosfull = 1'b0;
-	end
-
+        begin
+           assign wr_chaosfull = 1'b0;
+        end
    endgenerate
 
 endmodule
