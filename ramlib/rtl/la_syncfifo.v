@@ -125,11 +125,11 @@ module la_syncfifo
                chaosreg <= 1'b0;
              else
                chaosreg <= ~chaosreg;
-           assign wr_chaosfull = chaosreg;
+           assign chaosfull = chaosreg;
         end
       else
         begin
-           assign wr_chaosfull = 1'b0;
+           assign chaosfull = 1'b0;
         end
    endgenerate
 
