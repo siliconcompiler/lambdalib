@@ -30,20 +30,20 @@ module la_asyncfifo
     parameter TYPE      = "DEFAULT" // Pass through variable for hard macro
     )
    (// write port
-    input 	      wr_clk,
-    input 	      wr_nreset,
+    input             wr_clk,
+    input             wr_nreset,
     input [DW-1:0]    wr_din, // data to write
-    input 	      wr_en, // write fifo
-    input 	      wr_chaosmode,// randomly assert fifo full when set
-    output reg 	      wr_full, // fifo full
+    input             wr_en, // write fifo
+    input             wr_chaosmode,// randomly assert fifo full when set
+    output reg        wr_full, // fifo full
     // read port
-    input 	      rd_clk,
-    input 	      rd_nreset,
+    input             rd_clk,
+    input             rd_nreset,
     output [DW-1:0]   rd_dout, // output data (next cycle)
-    input 	      rd_en, // read fifo
-    output reg 	      rd_empty, // fifo is empty
+    input             rd_en, // read fifo
+    output reg        rd_empty, // fifo is empty
     // Power signals
-    input 	      vss, // ground signal
+    input             vss, // ground signal
     input [NS-1:0]    vdd, // supplies
     // Generic interfaces
     input [CTRLW-1:0] ctrl, // pass through ASIC control interface
@@ -51,27 +51,28 @@ module la_asyncfifo
     );
 
    // local params
-   localparam AW  = $clog2(DEPTH);
+   // The last part is to support DEPTH of 1
+   localparam AW  = $clog2(DEPTH) + {31'h0,(DEPTH == 1)};
 
    // local wires
-   reg [AW:0] 	  wr_grayptr;
-   reg [AW:0] 	  wr_binptr;
-   reg [AW:0] 	  wr_binptr_mem;
-   wire [AW:0] 	  wr_grayptr_nxt;
-   wire [AW:0] 	  wr_binptr_nxt;
-   wire [AW:0] 	  wr_binptr_mem_nxt;
-   wire [AW:0] 	  wr_grayptr_sync;
-   wire 	  wr_chaosfull;
+   reg [AW:0]     wr_grayptr;
+   reg [AW:0]     wr_binptr;
+   reg [AW:0]     wr_binptr_mem;
+   wire [AW:0]    wr_grayptr_nxt;
+   wire [AW:0]    wr_binptr_nxt;
+   wire [AW:0]    wr_binptr_mem_nxt;
+   wire [AW:0]    wr_grayptr_sync;
+   wire           wr_chaosfull;
 
-   reg [AW:0] 	  rd_grayptr;
-   reg [AW:0] 	  rd_binptr;
-   reg [AW:0] 	  rd_binptr_mem;
-   wire [AW:0] 	  rd_grayptr_nxt;
-   wire [AW:0] 	  rd_binptr_nxt;
-   wire [AW:0] 	  rd_binptr_mem_nxt;
-   wire [AW:0] 	  rd_grayptr_sync;
+   reg [AW:0]     rd_grayptr;
+   reg [AW:0]     rd_binptr;
+   reg [AW:0]     rd_binptr_mem;
+   wire [AW:0]    rd_grayptr_nxt;
+   wire [AW:0]    rd_binptr_nxt;
+   wire [AW:0]    rd_binptr_mem_nxt;
+   wire [AW:0]    rd_grayptr_sync;
 
-   genvar 	  i;
+   genvar         i;
 
    //###########################
    //# WRITE SIDE LOGIC
@@ -80,20 +81,20 @@ module la_asyncfifo
    always @ ( posedge wr_clk or negedge wr_nreset)
      if(~wr_nreset)
        begin
-	  wr_binptr_mem[AW:0] <= 'b0;
-	  wr_binptr[AW:0]     <= 'b0;
-	  wr_grayptr[AW:0]    <= 'b0;
+          wr_binptr_mem[AW:0] <= 'b0;
+          wr_binptr[AW:0]     <= 'b0;
+          wr_grayptr[AW:0]    <= 'b0;
        end
      else
        begin
           wr_binptr_mem[AW:0] <= (wr_binptr_mem_nxt[AW:0] == DEPTH) ? 'b0 : wr_binptr_mem_nxt[AW:0];
-	  wr_binptr[AW:0]     <= wr_binptr_nxt[AW:0];
-	  wr_grayptr[AW:0]    <= wr_grayptr_nxt[AW:0];
+          wr_binptr[AW:0]     <= wr_binptr_nxt[AW:0];
+          wr_grayptr[AW:0]    <= wr_grayptr_nxt[AW:0];
        end
 
    // Update binary pointer on write and not full
-   assign wr_binptr_mem_nxt[AW:0] = wr_binptr_mem[AW-1:0] + (wr_en & ~wr_full);
-   assign wr_binptr_nxt[AW:0]     = wr_binptr[AW:0] + (wr_en & ~wr_full);
+   assign wr_binptr_mem_nxt[AW:0] = wr_binptr_mem[AW-1:0] + (wr_en && ~wr_full);
+   assign wr_binptr_nxt[AW:0]     = wr_binptr[AW:0] + (wr_en && ~wr_full);
 
    // Convert binary point to gray pointer for sync
    assign wr_grayptr_nxt[AW:0] =  wr_binptr_nxt[AW:0] ^ {1'b0, wr_binptr_nxt[AW:1]};
@@ -120,14 +121,14 @@ module la_asyncfifo
        wr_full <= 1'b0;
      else
        wr_full <= (wr_chaosfull & wr_chaosmode) |
-                  (fifo_used + (wr_en & ~wr_full)) == DEPTH;
+                  (fifo_used + (wr_en && ~wr_full)) == DEPTH;
 
    // Write --> Read clock synchronizer
    for (i=0;i<(AW+1);i=i+1)
      begin
-	la_dsync wrsync(.out(wr_grayptr_sync[i]),
-			.clk(rd_clk),
-			.in(wr_grayptr[i]));
+        la_dsync wrsync(.out(wr_grayptr_sync[i]),
+                        .clk(rd_clk),
+                        .in(wr_grayptr[i]));
      end
 
    //###########################
@@ -138,18 +139,18 @@ module la_asyncfifo
      if(~rd_nreset)
        begin
           rd_binptr_mem[AW:0] <= 'b0;
-	  rd_binptr[AW:0]     <= 'b0;
-	  rd_grayptr[AW:0]    <= 'b0;
+          rd_binptr[AW:0]     <= 'b0;
+          rd_grayptr[AW:0]    <= 'b0;
        end
      else
        begin
           rd_binptr_mem[AW:0] <= (rd_binptr_mem_nxt[AW:0] == DEPTH) ? 'b0 : rd_binptr_mem_nxt[AW:0];
-	  rd_binptr[AW:0]  <= rd_binptr_nxt[AW:0];
-	  rd_grayptr[AW:0] <= rd_grayptr_nxt[AW:0];
+          rd_binptr[AW:0]  <= rd_binptr_nxt[AW:0];
+          rd_grayptr[AW:0] <= rd_grayptr_nxt[AW:0];
        end
 
-   assign rd_binptr_mem_nxt[AW:0] = rd_binptr_mem[AW-1:0] + (rd_en & ~rd_empty);
-   assign rd_binptr_nxt[AW:0]     = rd_binptr[AW:0] + (rd_en & ~rd_empty);
+   assign rd_binptr_mem_nxt[AW:0] = rd_binptr_mem[AW-1:0] + (rd_en && ~rd_empty);
+   assign rd_binptr_nxt[AW:0]     = rd_binptr[AW:0] + (rd_en && ~rd_empty);
    assign rd_grayptr_nxt[AW:0]    = rd_binptr_nxt[AW:0] ^ {1'b0, rd_binptr_nxt[AW:1]};
 
    // Full comparison (gray pointer based)
@@ -162,16 +163,16 @@ module la_asyncfifo
    // Read --> write clock synchronizer
    for (i=0;i<(AW+1);i=i+1)
      begin
-	la_dsync rdsync(.out(rd_grayptr_sync[i]),
-			.clk(wr_clk),
-			.in(rd_grayptr[i]));
+        la_dsync rdsync(.out(rd_grayptr_sync[i]),
+                        .clk(wr_clk),
+                        .in(rd_grayptr[i]));
      end
 
    //###########################
    //# Dual Port Memory
    //###########################
 
-   reg [DW-1:0] 	ram[DEPTH-1:0];
+   reg [DW-1:0]         ram[DEPTH-1:0];
 
    // Write port (FIFO input)
    always @(posedge wr_clk)
@@ -187,20 +188,20 @@ module la_asyncfifo
 
    generate
       if (CHAOS)
-	begin
-	   // TODO: implement LFSR
-	   reg chaosreg;
-	   always @ (posedge wr_clk or negedge wr_nreset)
-	     if (~wr_nreset)
-	       chaosreg <= 1'b0;
-	     else
-	       chaosreg <= ~chaosreg;
-	   assign wr_chaosfull = chaosreg;
-	end
+        begin
+           // TODO: implement LFSR
+           reg chaosreg;
+           always @ (posedge wr_clk or negedge wr_nreset)
+             if (~wr_nreset)
+               chaosreg <= 1'b0;
+             else
+               chaosreg <= ~chaosreg;
+           assign wr_chaosfull = chaosreg;
+        end
       else
-	begin
-	   assign wr_chaosfull = 1'b0;
-	end
+        begin
+           assign wr_chaosfull = 1'b0;
+        end
 
    endgenerate
 
