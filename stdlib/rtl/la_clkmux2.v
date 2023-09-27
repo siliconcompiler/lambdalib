@@ -21,26 +21,26 @@ module la_clkmux2
    wire [1:0] clkg;
 
    // invert mask (2)
-   la_inv iinv[1:0] (.a(ensync[1:0]), .z(maskb[1:0]));
+   la_inv iinv[1:0] (.a({ensync[0],ensync[1]}), .z(maskb[1:0]));
 
    // clock enable (2)
    la_and2 isel[1:0] (.a({sel1,sel0}),
-		      .b(maskb[1:0]),
-		      .z(en[1:0]));
+                      .b(maskb[1:0]),
+                      .z(en[1:0]));
 
    // synchronizers (2)
    la_dsync isync[1:0] (.clk({clk1,clk0}),
-			.in(en[1:0]),
-			.out(ensync[1:0]));
+                        .in(en[1:0]),
+                        .out(ensync[1:0]));
 
    // glith free clock gate (2)
    la_and2 igate[1:0] (.a({clk1,clk0}),
-		       .b(ensync[1:0]),
-		       .z(clkg[1:0]));
+                       .b(ensync[1:0]),
+                       .z(clkg[1:0]));
 
    // final clock or (1)
    la_or2 iorclk (.a(clkg[0]),
-		  .b(clkg[1]),
-		  .z(out));
+                  .b(clkg[1]),
+                  .z(out));
 
 endmodule // la_clkmux2
