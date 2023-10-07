@@ -30,10 +30,10 @@ module la_clkmux2
                       .z(en[1:0]));
 
    // synchronizers (2)
-   la_dsync_rst isync[1:0] (.clk({clk1,clk0}),
-                            .nreset({nreset,nreset}),
-                            .in(en[1:0]),
-                            .out(ensync[1:0]));
+   la_drsync isync[1:0] (.clk({clk1,clk0}),
+                         .nreset({nreset,nreset}),
+                         .in(en[1:0]),
+                         .out(ensync[1:0]));
 
    // glith free clock gate (2)
    la_and2 igate[1:0] (.a({clk1,clk0}),
