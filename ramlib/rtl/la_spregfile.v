@@ -34,7 +34,7 @@ module la_spregfile
     input [DW-1:0] 	wmask, //per bit write mask
     input [AW-1:0] 	addr,//write address
     input [DW-1:0] 	din, //write data
-    output reg [DW-1:0] dout,//read output data
+    output [DW-1:0]     dout,//read output data
     // Power signals
     input 		vss, // ground signal
     input 		vdd, // memory core array power
