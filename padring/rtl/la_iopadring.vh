@@ -16,3 +16,4 @@ localparam LA_VDDA   = 8'h0C;
 localparam LA_VSSA   = 8'h0D;
 localparam LA_POC    = 8'h0E;
 localparam LA_CUT    = 8'h0F;
+localparam LA_DUMMY  = 8'h07;
