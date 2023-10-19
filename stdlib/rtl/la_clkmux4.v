@@ -38,25 +38,26 @@ module la_clkmux4
 
    // clock enable (4)
    la_and2 isel[3:0] (.a({sel3,sel2,sel1,sel0}),
-		      .b(maskb[3:0]),
-		      .z(en[3:0]));
+                      .b(maskb[3:0]),
+                      .z(en[3:0]));
 
    // data synchronizer with reset (since clocks aren't guaranteed)
    la_drsync idrsync[3:0] (.clk({clk3,clk2,clk1,clk0}),
                            .nreset({4{nreset}}),
-			   .in(en[3:0]),
-			   .out(ensync[3:0]));
+                           .in(en[3:0]),
+                           .out(ensync[3:0]));
 
    // glith free clock gate (4)
-   la_and2 igate[3:0] (.a({clk3,clk2,clk1,clk0}),
-		       .b(ensync[3:0]),
-		       .z(clkg[3:0]));
+   la_clkicgand igate[3:0] (.clk({clk3,clk2,clk1,clk0}),
+                            .te(4'b0000),
+                            .en(ensync[3:0]),
+                            .eclk(clkg[3:0]));
 
    // final clock or (1)
-   la_or4 iorclk (.a(clkg[0]),
-		  .b(clkg[1]),
-		  .c(clkg[2]),
-		  .d(clkg[3]),
-		  .z(out));
+   la_clkor4 iorclk (.a(clkg[0]),
+                     .b(clkg[1]),
+                     .c(clkg[2]),
+                     .d(clkg[3]),
+                     .z(out));
 
 endmodule // la_clkmux4

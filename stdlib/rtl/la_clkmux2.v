@@ -36,13 +36,14 @@ module la_clkmux2
                          .out(ensync[1:0]));
 
    // glith free clock gate (2)
-   la_and2 igate[1:0] (.a({clk1,clk0}),
-                       .b(ensync[1:0]),
-                       .z(clkg[1:0]));
+   la_clkicgand igate[1:0] (.clk({clk1,clk0}),
+                            .te(2'b00),
+                            .en(ensync[1:0]),
+                            .eclk(clkg[1:0]));
 
    // final clock or (1)
-   la_or2 iorclk (.a(clkg[0]),
-                  .b(clkg[1]),
-                  .z(out));
+   la_clkor2 iorclk (.a(clkg[0]),
+                     .b(clkg[1]),
+                     .z(out));
 
 endmodule // la_clkmux2
