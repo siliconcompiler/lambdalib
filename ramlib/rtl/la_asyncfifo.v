@@ -126,9 +126,10 @@ module la_asyncfifo
    // Write --> Read clock synchronizer
    for (i=0;i<(AW+1);i=i+1)
      begin
-        la_dsync wrsync(.out(wr_grayptr_sync[i]),
-                        .clk(rd_clk),
-                        .in(wr_grayptr[i]));
+        la_drsync wrsync(.out(wr_grayptr_sync[i]),
+                         .clk(rd_clk),
+                         .nreset(rd_nreset),
+                         .in(wr_grayptr[i]));
      end
 
    //###########################
@@ -163,9 +164,10 @@ module la_asyncfifo
    // Read --> write clock synchronizer
    for (i=0;i<(AW+1);i=i+1)
      begin
-        la_dsync rdsync(.out(rd_grayptr_sync[i]),
-                        .clk(wr_clk),
-                        .in(rd_grayptr[i]));
+        la_drsync rdsync(.out(rd_grayptr_sync[i]),
+                         .clk(wr_clk),
+                         .nreset(wr_nreset),
+                         .in(rd_grayptr[i]));
      end
 
    //###########################
