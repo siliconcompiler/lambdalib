@@ -23,7 +23,9 @@ module la_clkmux4
    wire [3:0] mask;
    wire [3:0] maskb;
    wire [3:0] en;
+   wire       enb;
    wire [3:0] ensync;
+   wire       ensyncb;
    wire [3:0] clkg;
    wire [3:0] nreset_sync;
 
@@ -41,11 +43,15 @@ module la_clkmux4
                       .b(maskb[3:0]),
                       .z(en[3:0]));
 
+   la_inv ienb (.a(en[0]), .z(enb));
+
    // data synchronizer with reset (since clocks aren't guaranteed)
    la_drsync idrsync[3:0] (.clk({clk3,clk2,clk1,clk0}),
                            .nreset({4{nreset}}),
-                           .in(en[3:0]),
-                           .out(ensync[3:0]));
+                           .in({en[3:1],enb}),
+                           .out({ensync[3:1],ensyncb}));
+
+   la_inv iensync (.a(ensyncb), .z(ensync[0]));
 
    // glith free clock gate (4)
    la_clkicgand igate[3:0] (.clk({clk3,clk2,clk1,clk0}),
