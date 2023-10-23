@@ -18,7 +18,9 @@ module la_clkmux2
 
    wire [1:0] maskb;
    wire [1:0] en;
+   wire       enb;
    wire [1:0] ensync;
+   wire       ensyncb;
    wire [1:0] clkg;
 
    // invert mask (2)
@@ -29,11 +31,15 @@ module la_clkmux2
                       .b(maskb[1:0]),
                       .z(en[1:0]));
 
+   la_inv ienb (.a(en[0]), .z(enb));
+
    // synchronizers (2)
    la_drsync isync[1:0] (.clk({clk1,clk0}),
                          .nreset({nreset,nreset}),
-                         .in(en[1:0]),
-                         .out(ensync[1:0]));
+                         .in({en[1],enb}),
+                         .out({ensync[1],ensyncb}));
+
+   la_inv iensync (.a(ensyncb), .z(ensync[0]));
 
    // glith free clock gate (2)
    la_clkicgand igate[1:0] (.clk({clk1,clk0}),
