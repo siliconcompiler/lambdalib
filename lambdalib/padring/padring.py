@@ -1,10 +1,10 @@
 import siliconcompiler
 import os
 
+
 ########################
 # SiliconCompiler Setup
 ########################
-
 def setup(target=None):
     '''Lambdalib Padring Setup'''
 

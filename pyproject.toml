@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools >= 61.2",
+    "setuptools_scm[toml] >= 6.2"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = false
+packages = [
+    "lambdalib"
+]
+
+[project]
+name = "lambdalib"
+authors = [{name = "Zero ASIC"}]
+description = "Standardized ASIC design libraries"
+readme = "README.md"
+urls = {Homepage = "https://github.com/siliconcompiler/lambdalib"}
+requires-python = ">= 3.8"
+license = {file = "LICENSE"}
+dependencies = [
+    "siliconcompiler >= 0.17.0"
+]
+version = "0.1.0"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+timeout = "60"
+
+[project.optional-dependencies]
+# Dev dependencies.
+dev = [
+    "flake8 >= 5.0.0",
+    "pytest >= 6.2.4",
+    "pytest-timeout >= 2.1.0"
+]
