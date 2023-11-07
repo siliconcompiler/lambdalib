@@ -93,8 +93,8 @@ module la_asyncfifo
        end
 
    // Update binary pointer on write and not full
-   assign wr_binptr_mem_nxt[AW:0] = wr_binptr_mem[AW-1:0] + (wr_en && ~wr_full);
-   assign wr_binptr_nxt[AW:0]     = wr_binptr[AW:0] + (wr_en && ~wr_full);
+   assign wr_binptr_mem_nxt[AW:0] = wr_binptr_mem[AW-1:0] + {{(AW-1){1'b0}}, (wr_en && ~wr_full)};
+   assign wr_binptr_nxt[AW:0]     = wr_binptr[AW:0] + {{AW{1'b0}}, (wr_en && ~wr_full)};
 
    // Convert binary point to gray pointer for sync
    assign wr_grayptr_nxt[AW:0] =  wr_binptr_nxt[AW:0] ^ {1'b0, wr_binptr_nxt[AW:1]};
@@ -121,7 +121,7 @@ module la_asyncfifo
        wr_full <= 1'b0;
      else
        wr_full <= (wr_chaosfull & wr_chaosmode) |
-                  (fifo_used + (wr_en && ~wr_full)) == DEPTH;
+                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH;
 
    // Write --> Read clock synchronizer
    for (i=0;i<(AW+1);i=i+1)
@@ -150,8 +150,8 @@ module la_asyncfifo
           rd_grayptr[AW:0] <= rd_grayptr_nxt[AW:0];
        end
 
-   assign rd_binptr_mem_nxt[AW:0] = rd_binptr_mem[AW-1:0] + (rd_en && ~rd_empty);
-   assign rd_binptr_nxt[AW:0]     = rd_binptr[AW:0] + (rd_en && ~rd_empty);
+   assign rd_binptr_mem_nxt[AW:0] = rd_binptr_mem[AW-1:0] + {{(AW-1){1'b0}}, (rd_en && ~rd_empty)};
+   assign rd_binptr_nxt[AW:0]     = rd_binptr[AW:0] + {{AW{1'b0}}, (rd_en && ~rd_empty)};
    assign rd_grayptr_nxt[AW:0]    = rd_binptr_nxt[AW:0] ^ {1'b0, rd_binptr_nxt[AW:1]};
 
    // Full comparison (gray pointer based)
