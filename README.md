@@ -1,8 +1,6 @@
-# lambdalib
+# Lambdalib Introduction
 
-# Introduction
-
-Lambdalib is a modular a hardware abstraction layer that helps decouple hardware design from manufacturing technology and vendor proprietary IP interfaces. Lambdalib defines a set of standardized interfaces that are used to instantiate cells within a design. Technology specific modules that conform to the Lambdalib interfaces are linked at compiler time.
+Lambdalib is a modular hardware abstraction layer that helps decouple hardware design from manufacturing technology and proprietary IP. Lambdalib defines a set of standardized interfaces that are used to instantiate generic cells within a design. Technology specific modules that conform to the Lambdalib interfaces can then be linked at compiler time.
 
 Lambdalib includes the following hardware categories:
 
@@ -15,7 +13,9 @@ Lambdalib includes the following hardware categories:
 |[vectorlib](vectorlib/rtl) | Vectorized helper library (mux, isolation)
 |[syslib](syslib/rtl)       | Vendor agnostic peripheral interface(uart, i2c,...)
 
-The [lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the lambdalib interfaces across a number of open source process technologies.
+The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
+
+Lambdalib has successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
 
 # License
 
