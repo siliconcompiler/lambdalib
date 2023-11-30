@@ -1,6 +1,6 @@
 # Lambdalib Introduction
 
-Lambdalib is a modular hardware abstraction layer that helps decouple hardware design from manufacturing technology and proprietary IP. Lambdalib defines a set of standardized interfaces that are used to instantiate generic cells within a design. Technology specific modules that conform to the Lambdalib interfaces can then be linked at compiler time.
+Lambdalib is a modular hardware abstraction layer that helps decouple hardware design from manufacturing technology and proprietary IP. Lambdalib defines a set of technology independent generic functions that can be directly instantiated within the design. Technology specific implementations can be linked in at compile time.
 
 Lambdalib includes the following hardware categories:
 
