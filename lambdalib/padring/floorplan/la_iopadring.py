@@ -1,5 +1,4 @@
 import os
-import re
 import siliconcompiler
 
 
@@ -15,5 +14,5 @@ chip.add('option', 'ydir',  f'{root}/submodules/openpdks/pdks/sky130/libs/sky130
 chip.add('option', 'ydir',  f'{root}/submodules/openpdks/pdks/sky130/libs/sky130io/bb')
 chip.set('option', 'relax', True)
 chip.set('option', 'steplist', ['import', 'syn', 'floorplan'])
-chip.set('asic', 'diearea', [(0,0), (2000,2000)])
+chip.set('asic', 'diearea', [(0, 0), (2000, 2000)])
 chip.run()

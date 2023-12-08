@@ -6,12 +6,12 @@ Lambdalib includes the following hardware categories:
 
 | Category                  | Description|
 |---------------------------|------------|
-|[stdlib](stdlib/rtl)       | Standard cells (inv, nand, ff, ...)
-|[ramlib](ramlib/rtl)       | Memory (single port, dual port, fifo, ...)
-|[iolib](iolib/rtl)         | IO cells (bidir, vdd, clamp,...)
-|[padring](padring/rtl)     | Padring generator
-|[vectorlib](vectorlib/rtl) | Vectorized helper library (mux, isolation)
-|[syslib](syslib/rtl)       | Vendor agnostic peripheral interface(uart, i2c,...)
+|[stdlib](lambdalib/stdlib/rtl)       | Standard cells (inv, nand, ff, ...)
+|[ramlib](lambdalib/ramlib/rtl)       | Memory (single port, dual port, fifo, ...)
+|[iolib](lambdalib/iolib/rtl)         | IO cells (bidir, vdd, clamp,...)
+|[padring](lambdalib/padring/rtl)     | Padring generator
+|[vectorlib](lambdalib/vectorlib/rtl) | Vectorized helper library (mux, isolation)
+|[syslib](lambdalib/syslib/rtl)       | Vendor agnostic peripheral interface(uart, i2c,...)
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
 

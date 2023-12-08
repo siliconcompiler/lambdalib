@@ -1,22 +1,34 @@
-import siliconcompiler
-import os
+from lambdalib import register_data_source
+from siliconcompiler import Library
+
 
 ########################
 # SiliconCompiler Setup
 ########################
-
-def setup(target=None):
+def setup(chip):
     '''Lambdalib library setup script'''
 
-    # Create chip object
-    chip = siliconcompiler.Chip('lambdalib')
+    dependencies = {
+        'iolib': ['stdlib'],
+        'stdlib': [],
+        'ramlib': ['stdlib'],
+        'padring': ['stdlib'],
+        'syslib': ['stdlib'],
+        'vectorlib': ['stdlib']
+    }
 
     # Project sources
-    root = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+    register_data_source(chip)
 
+    libs = []
     # Iterate over all libs
-    for item in ['iolib', 'stdlib', 'ramlib', 'padring']:
-        chip.add('option', 'ydir', f"{root}/{item}/rtl")
-        chip.add('option', 'idir', f"{root}/{item}/rtl")
+    for name, dep in dependencies.items():
+        lib = Library(chip, f'la_{name}', package='lambdalib')
 
-    return chip
+        for path in [name, *dep]:
+            lib.add('option', 'ydir', f"lambdalib/{path}/rtl")
+            lib.add('option', 'idir', f"lambdalib/{path}/rtl")
+
+        libs.append(lib)
+
+    return libs
