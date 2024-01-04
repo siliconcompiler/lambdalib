@@ -9,12 +9,6 @@
  *
  ****************************************************************************/
 
-// The following is a hack to fix Surelog elaboration. It doesn't seem to
-// properly handle generate if-statements with multibit compare, so we use a
-// macro to break it down into multiple single-bit comparisons.
-// TODO: remove once Surelog is fixed.
-`define CELLMAP_COMPARE(CELL) CELLMAP[i*24] == CELL[0] && CELLMAP[i*24+1] == CELL[1] && CELLMAP[i*24+2] == CELL[2] && CELLMAP[i*24+3] == CELL[3]
-
 module la_ioside
   #(// per side parameters
     parameter SIDE       = "NO", // "NO", "SO", "EA", "WE"
@@ -59,7 +53,7 @@ module la_ioside
 	// BIDIR
 	// initial
 	// $display("cell=%d, pin=%d",i, CELLMAP[(i*24+8)+:8]);
-	if (`CELLMAP_COMPARE(LA_BIDIR))
+	if (CELLMAP[i*24+:4]==LA_BIDIR[3:0])
 	  begin: ila_iobidir
 	     la_iobidir #(.SIDE(SIDE),
 			  .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -82,7 +76,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// INPUT
-	else if (`CELLMAP_COMPARE(LA_INPUT))
+	else if (CELLMAP[i*24+:4]==LA_INPUT[3:0])
 	  begin: ila_ioinput
 	     la_ioinput #(.SIDE(SIDE),
 			  .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -103,7 +97,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// ANALOG
-	else if (`CELLMAP_COMPARE(LA_ANALOG))
+	else if (CELLMAP[i*24+:4]==LA_ANALOG[3:0])
 	  begin: ila_ioanalog
 	     la_ioanalog #(.SIDE(SIDE),
 			   .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -121,7 +115,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// XTAL
-	else if (`CELLMAP_COMPARE(LA_XTAL))
+	else if (CELLMAP[i*24+:4]==LA_XTAL[3:0])
 	    begin: ila_ioxtal
 	     la_ioxtal #(.SIDE(SIDE),
 			 .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -141,7 +135,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	    end
 	// POC
-	else if (`CELLMAP_COMPARE(LA_POC))
+	else if (CELLMAP[i*24+:4]==LA_POC[3:0])
 	  begin: ila_iopoc
 	     la_iopoc #(.SIDE(SIDE),
 			.TYPE(CELLMAP[(i*24+4)+:4]),
@@ -155,14 +149,14 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// CUT
-	else if (`CELLMAP_COMPARE(LA_CUT))
+	else if (CELLMAP[i*24+:4]==LA_CUT[3:0])
 	  begin: ila_iocut
 	     la_iocut #(.SIDE(SIDE),
 			.TYPE(CELLMAP[(i*24+4)+:4]),
 			.RINGW(RINGW))
 	     i0(.vss	(vss));
 	  end
-	else if (`CELLMAP_COMPARE(LA_VDDIO))
+	else if (CELLMAP[(i*24+8)+:4]==LA_VDDIO[3:0])
 	  begin: ila_iovddio
 	     la_iovddio #(.SIDE(SIDE),
 			  .TYPE(CELLMAP[((i*24+8)+4)+:4]),
@@ -176,7 +170,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSSIO
-	else if (`CELLMAP_COMPARE(LA_VSSIO))
+	else if (CELLMAP[i*24+:4]==LA_VSSIO[3:0])
 	  begin: ila_iovssio
 	     la_iovssio #(.SIDE(SIDE),
 			  .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -190,7 +184,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VDD
-	else if (`CELLMAP_COMPARE(LA_VDD))
+	else if (CELLMAP[i*24+:4]==LA_VDD[3:0])
 	  begin: ila_iovdd
 	     la_iovdd #(.SIDE(SIDE),
 			.TYPE(CELLMAP[(i*24+4)+:4]),
@@ -204,7 +198,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSS
-	else if (`CELLMAP_COMPARE(LA_VSS))
+	else if (CELLMAP[i*24+:4]==LA_VSS[3:0])
 	  begin: ila_iovss
 	     la_iovss #(.SIDE(SIDE),
 			.TYPE(CELLMAP[(i*24+4)+:4]),
@@ -218,7 +212,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VDDA
-	else if (`CELLMAP_COMPARE(LA_VDDA))
+	else if (CELLMAP[i*24+:4]==LA_VDDA[3:0])
 	  begin: ila_iovdda
 	     la_iovdda #(.SIDE(SIDE),
 			 .TYPE(CELLMAP[(i*24+4)+:4]),
@@ -232,7 +226,7 @@ module la_ioside
 		 .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW]));
 	  end
 	// VSSA
-	else if (`CELLMAP_COMPARE(LA_VSSA))
+	else if (CELLMAP[i*24+:4]==LA_VSSA[3:0])
 	  begin: ila_iovssa
 	     la_iovssa #(.SIDE(SIDE),
 			 .TYPE(CELLMAP[(i*24+4)+:4]),
