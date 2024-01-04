@@ -156,7 +156,7 @@ module la_ioside
 			.RINGW(RINGW))
 	     i0(.vss	(vss));
 	  end
-	else if (CELLMAP[(i*24+8)+:4]==LA_VDDIO[3:0])
+	else if (CELLMAP[i*24+:4]==LA_VDDIO[3:0])
 	  begin: ila_iovddio
 	     la_iovddio #(.SIDE(SIDE),
 			  .TYPE(CELLMAP[((i*24+8)+4)+:4]),
