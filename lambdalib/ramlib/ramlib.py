@@ -2,14 +2,14 @@ import glob
 import siliconcompiler
 from siliconcompiler.flows import lintflow
 
+
 def setup(chip, path=None):
 
-    # setup verilog
-    files = glob.glob(f'rtl/*.v')
+    files = glob.glob('rtl/*.v')
     for item in files:
         chip.input(item)
 
-###########################
+
 if __name__ == "__main__":
 
     design = "la_syncfifo"
