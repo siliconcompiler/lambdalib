@@ -22,15 +22,36 @@ def register_data_source(chip):
                                  ref=ref)
 
 
-def __get_lambdalib_dir():
+def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
     register_data_source(path_assert)
-    return sc_package(path_assert, 'lambdalib')
+    lambdalib_path = sc_package(path_assert, 'lambdalib')
+    return f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
+
+
+def check(outputpath, la_lib='stdlib'):
+    cells_dir = __get_lambdalib_dir(la_lib)
+
+    lambda_cells = set()
+    for cell in glob.glob(f'{cells_dir}/la_*.v'):
+        lambda_cells.add(os.path.basename(cell))
+
+    lib_cells = set()
+    for cell in glob.glob(f'{outputpath}/la_*.v'):
+        lib_cells.add(os.path.basename(cell))
+
+    if lambda_cells == lib_cells:
+        return True
+    return False
 
 
 def copy(outputpath, la_lib='stdlib', exclude=None):
-    lambdalib_path = __get_lambdalib_dir()
-    cells_dir = f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
+    cells_dir = __get_lambdalib_dir(la_lib)
+
+    if not exclude:
+        exclude = []
+
+    os.makedirs(outputpath, exist_ok=True)
 
     # Generate list of cells to produce
     for cell in glob.glob(f'{cells_dir}/la_*.v'):
@@ -59,8 +80,7 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
     full_exclude.extend(exclude_default)
 
     # Ensure files are loaded
-    lambdalib_path = __get_lambdalib_dir()
-    cells_dir = f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
+    cells_dir = __get_lambdalib_dir(la_lib)
 
     # Generate list of cells to produce
     org_cells = set()
