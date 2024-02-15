@@ -81,7 +81,9 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         'la_keeper',
         'la_footer',
         'la_header',
-        'la_antenna'
+        'la_antenna',
+        'la_clkmux2',
+        'la_clkmux4'
     )
 
     full_exclude = []
@@ -141,4 +143,11 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         chip.run()
 
         result = chip.find_result("vg", step="syn", index=0)
-        shutil.copy(result, os.path.join(outputpath, cell_file))
+
+        with open(os.path.join(outputpath, cell_file), 'w') as out:
+            with open(cell, 'r') as org:
+                for line in org:
+                    out.write(f'// {line}')
+                out.write(os.linesep)
+            with open(result, 'r') as res:
+                out.writelines(res.readlines())
