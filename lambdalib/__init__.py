@@ -113,7 +113,7 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         except FileNotFoundError:
             pass
 
-    os.makedirs(outputpath, exist_ok=True)
+    copy(outputpath, la_lib, exclude)
 
     if isinstance(target, str):
         target_name = target
@@ -134,12 +134,8 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         chip.set('option', 'resume', True)
         chip.set('option', 'jobname', f"{target_name}-{logiclib}")
 
-        chip.add('option', 'ydir', cells_dir)
+        chip.add('option', 'ydir', outputpath)
         chip.run()
 
         result = chip.find_result("vg", step="syn", index=0)
         shutil.copy(result, os.path.join(outputpath, cell_file))
-
-    if exclude:
-        org_cells.update(exclude)
-    copy(outputpath, la_lib, org_cells)
