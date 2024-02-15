@@ -120,7 +120,7 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
     else:
         target_name = target.__name__
 
-    for cell in cells:
+    for cell in sorted(cells):
         cell_file = os.path.basename(cell)
         cell_name, _ = os.path.splitext(cell_file)
 
