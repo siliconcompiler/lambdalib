@@ -104,8 +104,8 @@ module la_iopadring #(  // global settings
     //#####################
 
     /*la_ioside AUTO_TEMPLATE (//outputs
-    .vss	(vss),
-    .\(.*\)	(@"(substring vl-cell-name 1 3)"_\1),
+    .vss    (vss),
+    .\(.*\)    (@"(substring vl-cell-name 1 3)"_\1),
     );
     */
 
