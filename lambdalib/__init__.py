@@ -3,7 +3,7 @@ from siliconcompiler.package import path as sc_package
 import glob
 import os
 import shutil
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 def register_data_source(chip):
