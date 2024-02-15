@@ -13,6 +13,8 @@ FILES=$(mktemp /tmp/format-verilog.XXXXXX)
 find . \( \
     -name "*.v" \
     -or -name "*.vh" \
+\)  -not \( \
+    -path "./siliconcompiler/*" \
 \) >> $FILES
 
 verible-verilog-format \
