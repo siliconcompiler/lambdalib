@@ -9,25 +9,26 @@ def setup(chip):
     '''Lambdalib library setup script'''
 
     dependencies = {
-        'iolib': ['stdlib'],
+        'iolib': [],
         'stdlib': [],
         'ramlib': ['stdlib'],
-        'padring': ['stdlib'],
+        'padring': [],
         'syslib': ['stdlib'],
         'vectorlib': ['stdlib']
     }
-
-    # Project sources
-    register_data_source(chip)
+    add_idirs = ('padring',)
 
     libs = []
     # Iterate over all libs
     for name, dep in dependencies.items():
         lib = Library(chip, f'la_{name}', package='lambdalib')
+        register_data_source(lib)
 
         for path in [name, *dep]:
             lib.add('option', 'ydir', f"lambdalib/{path}/rtl")
-            lib.add('option', 'idir', f"lambdalib/{path}/rtl")
+
+            if path in add_idirs:
+                lib.add('option', 'idir', f"lambdalib/{path}/rtl")
 
         libs.append(lib)
 
