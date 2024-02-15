@@ -134,6 +134,9 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         chip.set('option', 'resume', True)
         chip.set('option', 'jobname', f"{target_name}-{logiclib}")
 
+        chip.set('tool', 'yosys', 'task', 'syn_asic', 'var', 'autoname', 'false')
+        chip.set('tool', 'yosys', 'task', 'syn_asic', 'var', 'add_buffers', 'false')
+
         chip.add('option', 'ydir', outputpath)
         chip.run()
 
