@@ -6,6 +6,7 @@ line-length=length:120
 
 # don't require generate blocks to have a label
 -generate-label
+-generate-label-prefix
 
 # allow "always @*", since "always_comb" is not part of plain Verilog
 -always-comb
@@ -15,6 +16,8 @@ line-length=length:120
 
 # for now, allow $random
 -invalid-system-task-function
+
+-unpacked-dimensions-range-ordering
 
 # allow localparams to be written in all caps with underscores,
 # in addition to using camelcase
