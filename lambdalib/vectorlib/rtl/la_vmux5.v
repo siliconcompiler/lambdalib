@@ -22,9 +22,9 @@ module la_vmux5 #(
 );
 
     assign out[N-1:0] = ({(N){sel0}} & in0[N-1:0] |
-			{(N){sel1}} & in1[N-1:0] |
-			{(N){sel2}} & in2[N-1:0] |
-			{(N){sel3}} & in3[N-1:0] |
-			{(N){sel4}} & in4[N-1:0]);
+            {(N){sel1}} & in1[N-1:0] |
+            {(N){sel2}} & in2[N-1:0] |
+            {(N){sel3}} & in3[N-1:0] |
+            {(N){sel4}} & in4[N-1:0]);
 
 endmodule

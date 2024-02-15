@@ -25,11 +25,11 @@ module la_dmux7 #(
 );
 
     assign out = (sel0 & in0) |
-		(sel1 & in1) |
-		(sel2 & in2) |
-		(sel3 & in3) |
-		(sel4 & in4) |
-		(sel5 & in5) |
-		(sel6 & in6);
+        (sel1 & in1) |
+        (sel2 & in2) |
+        (sel3 & in3) |
+        (sel4 & in4) |
+        (sel5 & in5) |
+        (sel6 & in6);
 
 endmodule
