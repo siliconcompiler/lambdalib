@@ -17,6 +17,6 @@ module la_mux4 #(parameter PROP = "DEFAULT")  (
    assign z = (d0 & ~s1 & ~s0) |
 	      (d1 & ~s1 &  s0) |
 	      (d2 &  s1 & ~s0) |
-	      (d2 &  s1 &  s0);
+	      (d3 &  s1 &  s0);
 
 endmodule
