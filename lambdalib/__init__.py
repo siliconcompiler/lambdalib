@@ -42,6 +42,17 @@ def check(outputpath, la_lib='stdlib'):
 
     if lambda_cells == lib_cells:
         return True
+
+    missing_cells = lambda_cells - lib_cells
+    extra_cells = lib_cells - lambda_cells
+
+    if missing_cells:
+        for cell in missing_cells:
+            print(f'Missing: {cell}')
+    if extra_cells:
+        for cell in extra_cells:
+            print(f'Excess cell: {cell}')
+
     return False
 
 
