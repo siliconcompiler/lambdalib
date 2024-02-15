@@ -28,7 +28,7 @@ def setup(chip):
         lib = Library(chip, f'la_{name}', package='lambdalib')
         register_data_source(lib)
 
-        for path in [name, *dep]:
+        for path in [name]:
             lib.add('option', 'ydir', f"lambdalib/{path}/rtl")
 
             if path in add_idirs:
