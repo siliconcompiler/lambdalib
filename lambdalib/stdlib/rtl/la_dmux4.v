@@ -4,10 +4,9 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_dmux4
-  #(parameter PROP = "DEFAULT"  // cell property
-    )
-   (
+module la_dmux4 #(
+    parameter PROP = "DEFAULT"  // cell property
+) (
     input  sel3,
     input  sel2,
     input  sel1,
@@ -17,11 +16,8 @@ module la_dmux4
     input  in1,
     input  in0,
     output out
-    );
+);
 
-   assign out = (sel0 & in0) |
-		(sel1 & in1) |
-		(sel2 & in2) |
-		(sel3 & in3);
+    assign out = (sel0 & in0) | (sel1 & in1) | (sel2 & in2) | (sel3 & in3);
 
 endmodule

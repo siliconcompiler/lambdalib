@@ -4,20 +4,19 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_pwrbuf #(parameter TARGET = "DEFAULT", // "SIM"
-		   parameter PROP   = "DEFAULT")
-   (
+module la_pwrbuf #(
+    parameter TARGET = "DEFAULT",  // "SIM"
+    parameter PROP   = "DEFAULT"
+) (
     input  vdd,
     input  vss,
     input  a,
     output z
-    );
+);
 
-   generate
-      if(TARGET=="SIM")
-	assign z = ((vdd===1'b1) && (vss===1'b0)) ? a: 1'bX;
-      else
-	assign z = a;
-   endgenerate
+    generate
+        if (TARGET == "SIM") assign z = ((vdd === 1'b1) && (vss === 1'b0)) ? a : 1'bX;
+        else assign z = a;
+    endgenerate
 
 endmodule

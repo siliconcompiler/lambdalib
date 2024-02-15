@@ -11,20 +11,22 @@
  * connection in RTL.
  *
  ****************************************************************************/
-module la_ioshort
-  (
-   inout a,
-   inout b,
-   input a2b
-   );
+module la_ioshort (
+    inout a,
+    inout b,
+    input a2b
+);
 
 `ifdef VERILATOR
-   // Using direction to break the loop
-   assign a = ~a2b ? b : 1'bz;
-   assign b = a2b  ? a : 1'bz;
+    // Using direction to break the loop
+    assign a = ~a2b ? b : 1'bz;
+    assign b = a2b ? a : 1'bz;
 `else
-   // single port pass through short/hack
-   la_pt la_pt(a,b);
+    // single port pass through short/hack
+    la_pt la_pt (
+        a,
+        b
+    );
 `endif
 
-endmodule // la_ioshort
+endmodule  // la_ioshort

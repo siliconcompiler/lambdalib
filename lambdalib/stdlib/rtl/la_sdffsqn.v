@@ -5,19 +5,19 @@
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
 
-module la_sdffsqn #(parameter PROP = "DEFAULT")   (
+module la_sdffsqn #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      si,
     input      se,
     input      clk,
     input      nset,
     output reg qn
-    );
+);
 
-   always @ (posedge clk or negedge nset)
-     if(!nset)
-       qn <= 1'b0;
-     else
-       qn <= se ? ~si : ~d;
+    always @(posedge clk or negedge nset)
+        if (!nset) qn <= 1'b0;
+        else qn <= se ? ~si : ~d;
 
 endmodule

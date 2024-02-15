@@ -5,15 +5,16 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_sdffq #(parameter PROP = "DEFAULT")   (
+module la_sdffq #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      si,
     input      se,
     input      clk,
     output reg q
-    );
+);
 
-   always @ (posedge clk)
-       q <= se ? si : d;
+    always @(posedge clk) q <= se ? si : d;
 
 endmodule

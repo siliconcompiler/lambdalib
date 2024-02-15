@@ -4,14 +4,14 @@
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
 
-module la_latnq #(parameter PROP = "DEFAULT")   (
+module la_latnq #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      clk,
     output reg q
-    );
+);
 
-   always @ (clk or d)
-     if(~clk)
-       q <= d;
+    always @(clk or d) if (~clk) q <= d;
 
 endmodule

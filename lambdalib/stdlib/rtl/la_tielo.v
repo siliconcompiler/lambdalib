@@ -4,10 +4,12 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_tielo #(parameter PROP = "DEFAULT")  (
-   output z
-   );
+module la_tielo #(
+    parameter PROP = "DEFAULT"
+) (
+    output z
+);
 
-   assign z = 1'b0;
+    assign z = 1'b0;
 
 endmodule

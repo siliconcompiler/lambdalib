@@ -3,6 +3,9 @@
 //link: 
 //https://groups.google.com/g/comp.lang.verilog/c/b3-6XMA8KA4
 //-PG 10/31/2022
-module la_pt(.io1(a),.io2(a));
-   inout wire a;
-endmodule // la_pt
+module la_pt (
+    .io1(a),
+    .io2(a)
+);
+    inout wire a;
+endmodule  // la_pt

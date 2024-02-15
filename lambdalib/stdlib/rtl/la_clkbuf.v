@@ -4,11 +4,13 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_clkbuf #(parameter PROP = "DEFAULT")   (
+module la_clkbuf #(
+    parameter PROP = "DEFAULT"
+) (
     input  a,
     output z
-    );
+);
 
-   assign z = a;
+    assign z = a;
 
 endmodule
