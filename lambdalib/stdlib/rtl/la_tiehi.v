@@ -4,10 +4,12 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_tiehi #(parameter PROP = "DEFAULT")   (
+module la_tiehi #(
+    parameter PROP = "DEFAULT"
+) (
     output z
-    );
+);
 
-   assign z = 1'b1;
+    assign z = 1'b1;
 
 endmodule

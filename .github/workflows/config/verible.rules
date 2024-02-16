@@ -1,0 +1,24 @@
+line-length=length:120
+
+# may want to revisit this at some point, but most parameters we're
+# using are untyped, so this would be a major change
+-explicit-parameter-storage-type
+
+# don't require generate blocks to have a label
+-generate-label
+-generate-label-prefix
+
+# allow "always @*", since "always_comb" is not part of plain Verilog
+-always-comb
+
+# allow Verilog filenames to not match module names
+-module-filename
+
+# for now, allow $random
+-invalid-system-task-function
+
+-unpacked-dimensions-range-ordering
+
+# allow localparams to be written in all caps with underscores,
+# in addition to using camelcase
+parameter-name-style=localparam_style:CamelCase|ALL_CAPS

@@ -31,3 +31,33 @@ jobs:
           pip install --upgrade pip
           pip install -e .[dev]
           pytest
+
+  lint_verilog:
+    name: Lint Verilog Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Check out siliconcompiler Git repository
+        uses: actions/checkout@v4
+        with:
+          repository: siliconcompiler/siliconcompiler
+          path: siliconcompiler
+
+      - name: Set up Verible
+        run: |
+          ./siliconcompiler/setup/install-verible.sh
+          echo /opt/verible/bin >> $GITHUB_PATH
+
+      - name: Check format
+        id: check-format
+        run: |
+          ./.github/workflows/bin/format_verilog.sh > files.txt
+          cat files.txt
+          git diff --exit-code
+
+      - name: Check lint
+        if: success() || steps.check-format.conclusion == 'failure'
+        run: |
+          verible-verilog-lint --rules_config ./.github/workflows/config/verible.rules `cat files.txt`

@@ -4,13 +4,14 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_dffq #(parameter PROP = "DEFAULT")   (
+module la_dffq #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      clk,
     output reg q
-    );
+);
 
-   always @ (posedge clk)
-     q <= d;
+    always @(posedge clk) q <= d;
 
 endmodule

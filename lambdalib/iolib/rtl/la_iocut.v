@@ -7,15 +7,13 @@
  *
  *
  ****************************************************************************/
-module la_iocut
-  #(
-    parameter TYPE  = "DEFAULT", // cell type
-    parameter SIDE  = "NO",      // "NO", "SO", "EA", "WE"
-    parameter RINGW =  8         // width of io ring
-    )
-   (
+module la_iocut #(
+    parameter TYPE  = "DEFAULT",  // cell type
+    parameter SIDE  = "NO",       // "NO", "SO", "EA", "WE"
+    parameter RINGW = 8           // width of io ring
+) (
     // ground never cut
-    inout 	      vss
-    );
+    inout vss
+);
 
 endmodule

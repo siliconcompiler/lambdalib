@@ -4,7 +4,9 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_oa33 #(parameter PROP = "DEFAULT")   (
+module la_oa33 #(
+    parameter PROP = "DEFAULT"
+) (
     input  a0,
     input  a1,
     input  a2,
@@ -12,8 +14,8 @@ module la_oa33 #(parameter PROP = "DEFAULT")   (
     input  b1,
     input  b2,
     output z
-    );
+);
 
-   assign z = (a0 | a1 | a2) & (b0 | b1 | b2);
+    assign z = (a0 | a1 | a2) & (b0 | b1 | b2);
 
 endmodule

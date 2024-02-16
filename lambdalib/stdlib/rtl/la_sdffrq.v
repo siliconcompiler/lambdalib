@@ -5,19 +5,19 @@
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
 
-module la_sdffrq #(parameter PROP = "DEFAULT")   (
+module la_sdffrq #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      si,
     input      se,
     input      clk,
     input      nreset,
     output reg q
-    );
+);
 
-   always @ (posedge clk or negedge nreset)
-     if(!nreset)
-       q <= 1'b0;
-     else
-       q <= se ? si : d;
+    always @(posedge clk or negedge nreset)
+        if (!nreset) q <= 1'b0;
+        else q <= se ? si : d;
 
 endmodule

@@ -4,12 +4,14 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_tbuf #(parameter PROP = "DEFAULT")  (
-   input  a,
-   input  oe,
-   output z
-   );
+module la_tbuf #(
+    parameter PROP = "DEFAULT"
+) (
+    input  a,
+    input  oe,
+    output z
+);
 
-   assign z = oe ? a : 1'bz;
+    assign z = oe ? a : 1'bz;
 
 endmodule

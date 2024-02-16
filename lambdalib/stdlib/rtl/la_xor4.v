@@ -4,14 +4,16 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_xor4 #(parameter PROP = "DEFAULT")   (
+module la_xor4 #(
+    parameter PROP = "DEFAULT"
+) (
     input  a,
     input  b,
     input  c,
     input  d,
     output z
-    );
+);
 
-   assign z =  a ^ b ^ c ^ d;
+    assign z = a ^ b ^ c ^ d;
 
 endmodule

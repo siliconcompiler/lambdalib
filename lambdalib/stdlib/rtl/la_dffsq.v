@@ -5,17 +5,17 @@
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
 
-module la_dffsq #(parameter PROP = "DEFAULT")   (
+module la_dffsq #(
+    parameter PROP = "DEFAULT"
+) (
     input      d,
     input      clk,
     input      nset,
     output reg q
-    );
+);
 
-   always @ (posedge clk or negedge nset)
-     if(!nset)
-       q <= 1'b1;
-     else
-       q <= d;
+    always @(posedge clk or negedge nset)
+        if (!nset) q <= 1'b1;
+        else q <= d;
 
 endmodule

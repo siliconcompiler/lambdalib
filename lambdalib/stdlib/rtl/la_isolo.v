@@ -4,14 +4,14 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_isolo
-  #(parameter PROP = "DEFAULT")
-   (
-    input  iso, // isolation signal
-    input  in, // input
-    output out  // out = ~iso & in
-    );
+module la_isolo #(
+    parameter PROP = "DEFAULT"
+) (
+    input  iso,  // isolation signal
+    input  in,   // input
+    output out   // out = ~iso & in
+);
 
-   assign out = ~iso & in;
+    assign out = ~iso & in;
 
 endmodule
