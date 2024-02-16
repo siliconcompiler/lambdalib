@@ -5,6 +5,15 @@ import os
 import shutil
 __version__ = "0.1.5"
 
+_libraries = (
+    'iolib',
+    'stdlib',
+    'ramlib',
+    'padring',
+    'syslib',
+    'vectorlib'
+)
+
 
 ########################
 # SiliconCompiler Setup
@@ -12,27 +21,18 @@ __version__ = "0.1.5"
 def setup(chip):
     '''Lambdalib library setup script'''
 
-    dependencies = {
-        'iolib': [],
-        'stdlib': [],
-        'ramlib': ['stdlib'],
-        'padring': [],
-        'syslib': ['stdlib'],
-        'vectorlib': ['stdlib']
-    }
     add_idirs = ('padring',)
 
     libs = []
     # Iterate over all libs
-    for name, dep in dependencies.items():
+    for name in _libraries:
         lib = Library(chip, f'la_{name}', package='lambdalib')
         register_data_source(lib)
 
-        for path in [name]:
-            lib.add('option', 'ydir', f"lambdalib/{path}/rtl")
+        lib.add('option', 'ydir', f"lambdalib/{name}/rtl")
 
-            if path in add_idirs:
-                lib.add('option', 'idir', f"lambdalib/{path}/rtl")
+        if name in add_idirs:
+            lib.add('option', 'idir', f"lambdalib/{name}/rtl")
 
         libs.append(lib)
 
