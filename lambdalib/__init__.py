@@ -1,5 +1,5 @@
 from siliconcompiler import Chip
-from siliconcompiler.package import path as sc_package
+import siliconcompiler.package as sc_package
 import glob
 import os
 import shutil
@@ -7,25 +7,19 @@ __version__ = "0.1.4"
 
 
 def register_data_source(chip):
-    # check if local
-    root_path = os.path.dirname(os.path.dirname(__file__))
-    test_path = os.path.join(root_path, 'lambdalib', 'iolib', 'rtl', 'la_ioanalog.v')
-    if os.path.exists(test_path):
-        path = root_path
-        ref = None
-    else:
-        path = 'git+https://github.com/siliconcompiler/lambdalib.git'
-        ref = f'v{__version__}'
-
-    chip.register_package_source(name='lambdalib',
-                                 path=path,
-                                 ref=ref)
+    sc_package.register_python_data_source(
+        chip,
+        "lambdalib",
+        "lambdalib",
+        "git+https://github.com/siliconcompiler/lambdalib.git",
+        alternative_ref=f"v{__version__}",
+        python_module_path_append="..")
 
 
 def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
     register_data_source(path_assert)
-    lambdalib_path = sc_package(path_assert, 'lambdalib')
+    lambdalib_path = sc_package.path(path_assert, 'lambdalib')
     return f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
 
 
