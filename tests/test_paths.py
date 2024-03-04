@@ -1,6 +1,6 @@
 from siliconcompiler import Chip
 
-from lambdalib import lambdalib
+import lambdalib
 
 
 def test_pdk_paths():

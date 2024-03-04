@@ -1,9 +1,42 @@
-from siliconcompiler import Chip
+from siliconcompiler import Chip, Library
 import siliconcompiler.package as sc_package
 import glob
 import os
 import shutil
 __version__ = "0.1.5"
+
+_libraries = (
+    'iolib',
+    'stdlib',
+    'ramlib',
+    'padring',
+    'syslib',
+    'vectorlib'
+)
+
+
+########################
+# SiliconCompiler Setup
+########################
+def setup(chip):
+    '''Lambdalib library setup script'''
+
+    add_idirs = ('padring',)
+
+    libs = []
+    # Iterate over all libs
+    for name in _libraries:
+        lib = Library(chip, f'lambdalib_{name}', package='lambdalib')
+        register_data_source(lib)
+
+        lib.add('option', 'ydir', f"lambdalib/{name}/rtl")
+
+        if name in add_idirs:
+            lib.add('option', 'idir', f"lambdalib/{name}/rtl")
+
+        libs.append(lib)
+
+    return libs
 
 
 def register_data_source(chip):

@@ -1,24 +1,32 @@
+import pytest
 from siliconcompiler import Chip
 
-from lambdalib import lambdalib
+import lambdalib
 
 
-def test_setup_without_depencency():
+@pytest.mark.parametrize('lib', lambdalib._libraries)
+def test_setup(lib):
     chip = Chip('<lib>')
     chip.use(lambdalib)
 
-    assert 'la_stdlib' in chip.getkeys('library')
+    lib_name = f'lambdalib_{lib}'
 
-    assert len(chip.get('library', 'la_stdlib', 'option', 'ydir')) == 1
+    assert lib_name in chip.getkeys('library')
+    assert len(chip.get('library', lib_name, 'option', 'ydir')) == 1
 
 
-def test_setup_with_depencency():
+@pytest.mark.parametrize(
+        'lib,has_idir',
+        [(lib, lib == 'padring') for lib in lambdalib._libraries])
+def test_setup_with_idir(lib, has_idir):
     chip = Chip('<lib>')
     chip.use(lambdalib)
 
-    assert 'la_stdlib' in chip.getkeys('library')
-    assert 'la_iolib' in chip.getkeys('library')
-    assert 'la_ramlib' in chip.getkeys('library')
+    lib_name = f'lambdalib_{lib}'
+    assert lib_name in chip.getkeys('library')
 
-    assert len(chip.get('library', 'la_iolib', 'option', 'ydir')) == 2
-    assert len(chip.get('library', 'la_ramlib', 'option', 'ydir')) == 2
+    excpect_idir = 0
+    if has_idir:
+        excpect_idir = 1
+
+    assert len(chip.get('library', lib_name, 'option', 'idir')) == excpect_idir
