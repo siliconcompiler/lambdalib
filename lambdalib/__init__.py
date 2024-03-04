@@ -26,7 +26,7 @@ def setup(chip):
     libs = []
     # Iterate over all libs
     for name in _libraries:
-        lib = Library(chip, f'la_{name}', package='lambdalib')
+        lib = Library(chip, f'lambdalib_{name}', package='lambdalib')
         register_data_source(lib)
 
         lib.add('option', 'ydir', f"lambdalib/{name}/rtl")

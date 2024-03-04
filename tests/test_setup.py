@@ -9,7 +9,7 @@ def test_setup(lib):
     chip = Chip('<lib>')
     chip.use(lambdalib)
 
-    lib_name = f'la_{lib}'
+    lib_name = f'lambdalib_{lib}'
 
     assert lib_name in chip.getkeys('library')
     assert len(chip.get('library', lib_name, 'option', 'ydir')) == 1
@@ -22,7 +22,7 @@ def test_setup_with_idir(lib, has_idir):
     chip = Chip('<lib>')
     chip.use(lambdalib)
 
-    lib_name = f'la_{lib}'
+    lib_name = f'lambdalib_{lib}'
     assert lib_name in chip.getkeys('library')
 
     excpect_idir = 0
