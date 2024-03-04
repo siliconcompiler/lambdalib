@@ -3,7 +3,7 @@ import siliconcompiler.package as sc_package
 import glob
 import os
 import shutil
-__version__ = "0.1.5"
+__version__ = "0.2.0"
 
 _libraries = (
     'iolib',
