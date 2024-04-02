@@ -47,7 +47,7 @@ jobs:
 
       - name: Set up Verible
         run: |
-          ./siliconcompiler/setup/install-verible.sh
+          ./siliconcompiler/setup/ubuntu22/install-verible.sh
           echo /opt/verible/bin >> $GITHUB_PATH
 
       - name: Check format
