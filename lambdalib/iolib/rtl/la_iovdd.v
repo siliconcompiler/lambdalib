@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Function: IO supply cell (vdd)
- * Copyright: Lambda Project Authors. ALl rights Reserved.
+ * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
  * Docs:
