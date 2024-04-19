@@ -15,6 +15,7 @@ find . \( \
     -or -name "*.vh" \
 \)  -not \( \
     -path "./siliconcompiler/*" \
+    -or -path "./lambdalib/utils/templates/*" \
 \) >> $FILES
 
 verible-verilog-format \
