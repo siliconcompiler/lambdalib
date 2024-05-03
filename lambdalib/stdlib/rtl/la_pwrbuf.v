@@ -5,18 +5,19 @@
 //#############################################################################
 
 module la_pwrbuf #(
-    parameter TARGET = "DEFAULT",  // "SIM"
-    parameter PROP   = "DEFAULT"
-) (
+                   parameter PROP = "DEFAULT"
+                   )
+   (
     input  vdd,
     input  vss,
     input  a,
     output z
-);
+    );
 
-    generate
-        if (TARGET == "SIM") assign z = ((vdd === 1'b1) && (vss === 1'b0)) ? a : 1'bX;
-        else assign z = a;
-    endgenerate
+`ifdef SIMULATION
+   assign z = ((vdd === 1'b1) && (vss === 1'b0)) ? a : 1'bX;
+`else
+   assign z = a;
+`endif
 
 endmodule
