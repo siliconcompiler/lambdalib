@@ -5,8 +5,8 @@
 //#############################################################################
 
 module la_dsync #(parameter PROP = "DEFAULT",
-                  parameter STAGES = 2,         // synchhronizer depth
-                  parameter RND = 1)            // randomize sync
+                  parameter STAGES = 2,       // synchhronizer depth
+                  parameter RND = 1)          // randomize simulation delay
    (
     input  clk, // clock
     input  in,  // input data
