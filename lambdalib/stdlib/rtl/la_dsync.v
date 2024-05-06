@@ -5,7 +5,7 @@
 //#############################################################################
 
 module la_dsync #(parameter PROP = "DEFAULT",
-                  parameter STAGES = 2,       // synchhronizer depth
+                  parameter STAGES = 2,       // synchronizer depth
                   parameter RND = 1)          // randomize simulation delay
    (
     input  clk, // clock
@@ -14,20 +14,16 @@ module la_dsync #(parameter PROP = "DEFAULT",
     );
 
    reg [STAGES:0] shiftreg;
-   integer        sync_delay;
-
-   always @(posedge clk) begin
+   always @(posedge clk)
       shiftreg[STAGES:0] <= {shiftreg[STAGES-1:0], in};
-`ifdef SIMULATION
-      sync_delay <= {$random} % 2;
-`endif
-   end
 
-`ifdef SIMULATION
+`ifdef SIM
+   integer        sync_delay;
+   sync_delay <= {$random} % 2;
    assign out = (|sync_delay & (|RND)) ? shiftreg[STAGES] : shiftreg[STAGES-1];
-
 `else
    assign out = shiftreg[STAGES-1];
 `endif
+
 
 endmodule

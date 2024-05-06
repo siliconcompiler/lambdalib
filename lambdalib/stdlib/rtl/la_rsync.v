@@ -24,7 +24,7 @@ module la_rsync #(parameter PROP = "DEFAULT",
      else
        sync_pipe[STAGES:0] <= {sync_pipe[STAGES-1:0], 1'b1};
 
-`ifdef SIMULATION
+`ifdef SIM
    always @(posedge clk)
      sync_delay <= {$random} % 2;
 

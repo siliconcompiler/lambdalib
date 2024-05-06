@@ -14,7 +14,7 @@ module la_pwrbuf #(
     output z
     );
 
-`ifdef SIMULATION
+`ifdef SIM
    assign z = ((vdd === 1'b1) && (vss === 1'b0)) ? a : 1'bX;
 `else
    assign z = a;
