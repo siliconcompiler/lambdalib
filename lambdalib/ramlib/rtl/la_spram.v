@@ -24,8 +24,8 @@ module la_spram #(
     parameter DW    = 32,         // Memory width
     parameter AW    = 10,         // Address width (derived)
     parameter TYPE  = "DEFAULT",  // Pass through variable for hard macro
-    parameter CTRLW = 128,        // Width of asic ctrl interface
-    parameter TESTW = 128         // Width of asic test interface
+    parameter CTRLW = 1,          // Width of asic ctrl interface
+    parameter TESTW = 1           // Width of asic test interface
 ) (  // Memory interface
     input clk,  // write clock
     input ce,  // chip enable
