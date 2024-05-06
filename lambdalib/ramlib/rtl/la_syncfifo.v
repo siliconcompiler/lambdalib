@@ -19,7 +19,7 @@ module la_syncfifo
     parameter TESTW = 1,         // width of asic test interface
     parameter TYPE  = "DEFAULT"  // Pass through variable for hard macro
     )
-   (// basic intterface
+   (// basic interface
     input             clk,
     input             nreset,//async reset
     input             clear, //clear fifo statemachine (sync)
@@ -28,11 +28,11 @@ module la_syncfifo
     input             chaosmode, // randomly assert fifo full when set
     input [CTRLW-1:0] ctrl, // pass through ASIC control interface
     input [TESTW-1:0] test, // pass through ASIC test interface
-    // write input
+    // write port
     input             wr_en, // write fifo
     input [DW-1:0]    wr_din, // data to write
     output            wr_full, // fifo full
-    // read output
+    // read port
     input             rd_en, // read fifo
     output [DW-1:0]   rd_dout, // output data
     output            rd_empty    // fifo is empty

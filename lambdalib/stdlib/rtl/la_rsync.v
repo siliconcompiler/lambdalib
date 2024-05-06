@@ -4,7 +4,7 @@
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
 module la_rsync #(parameter PROP = "DEFAULT",
-                  parameter STAGES = 2,       // synchhronizer depth
+                  parameter STAGES = 2,       // synchronizer depth
                   parameter RND = 1)          // randomize sync
 
    (
