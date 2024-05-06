@@ -3,7 +3,6 @@
 //# Copyright: Lambda Project Authors. All rights Reserved.                   #
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
-
 module la_dsync #(parameter PROP = "DEFAULT",
                   parameter STAGES = 2,       // synchronizer depth
                   parameter RND = 1)          // randomize simulation delay
@@ -24,6 +23,5 @@ module la_dsync #(parameter PROP = "DEFAULT",
 `else
    assign out = shiftreg[STAGES-1];
 `endif
-
 
 endmodule

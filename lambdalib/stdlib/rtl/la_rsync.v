@@ -3,7 +3,6 @@
 //# Copyright: Lambda Project Authors. All rights Reserved.                   #
 //# License:   MIT (see LICENSE file in Lambda repository)                    #
 //#############################################################################
-
 module la_rsync #(parameter PROP = "DEFAULT",
                   parameter STAGES = 2,       // synchhronizer depth
                   parameter RND = 1)          // randomize sync
