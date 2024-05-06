@@ -14,11 +14,12 @@ module la_dsync #(parameter PROP = "DEFAULT",
 
    reg [STAGES:0] shiftreg;
    always @(posedge clk)
-      shiftreg[STAGES:0] <= {shiftreg[STAGES-1:0], in};
+     shiftreg[STAGES:0] <= {shiftreg[STAGES-1:0], in};
 
 `ifdef SIM
    integer        sync_delay;
-   sync_delay <= {$random} % 2;
+   always @(posedge clk)
+     sync_delay <= {$random} % 2;
    assign out = (|sync_delay & (|RND)) ? shiftreg[STAGES] : shiftreg[STAGES-1];
 `else
    assign out = shiftreg[STAGES-1];
