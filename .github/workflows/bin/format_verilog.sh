@@ -18,10 +18,10 @@ find . \( \
     -or -path "./lambdalib/utils/templates/*" \
 \) >> $FILES
 
-verible-verilog-format \
-    --failsafe_success=false \
-    --indentation_spaces 4 \
-    --inplace `cat $FILES`
+#verible-verilog-format \
+#    --failsafe_success=false \
+#    --indentation_spaces 4 \
+#    --inplace `cat $FILES`
 
 cat $FILES
 rm $FILES
