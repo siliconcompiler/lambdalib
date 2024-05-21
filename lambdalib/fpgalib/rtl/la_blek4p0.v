@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Basic Logic Element (LUT4, Part0)
+ * Function: Basic Logic Element (LUT4, Part#0)
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *****************************************************************************
@@ -11,13 +11,13 @@
  *
  * Testing:
  *
- * >> iverilog la_ble4p0.v -DTB_LA_BLE4P0 -y . -y ../stdlib/rtl
+ * >> iverilog la_ble4p0.v -DTB_LA_BLEK4P0 -y . -y ../stdlib/rtl
  * >> ./a.out
  *
  *
  ****************************************************************************/
 
-module la_ble4p0
+module la_blek4p0
   #(parameter TYPE  = "DEFAULT" //  implementation selector
     )
    (
@@ -40,7 +40,7 @@ module la_ble4p0
 
 endmodule
 
-`ifdef TB_LA_BLE4P0
+`ifdef TB_LA_BLEK4P0
 
 module tb();
 

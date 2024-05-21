@@ -1,12 +1,10 @@
 /*****************************************************************************
- * Function: Configurable Logic Block (8 x BLEs(LUT4), Part0)
- * Copyright: Lambda Project Authors. All rights Reserved.
+ * Function: Configurable Logic Block (8 x blek4p0)
+ * Copyright: Lambda Project Authors. All rights Reserved
  * License:  MIT (see LICENSE file in Lambda repository)
  *****************************************************************************
  *
  * Documentation:
- *
- * Configurable logic block with 8 LUT4 based BLEs.
  *
  * Testing:
  *
@@ -16,25 +14,42 @@
  ****************************************************************************/
 
 module la_clbk4n8p0
-  #(parameter TYPE  = "DEFAULT" //  implementation selector
+  #(parameter PROP = "DEFAULT", //  implementation selector
+    parameter N = 8
     )
    (
-    input [3:0]  in,
-    input [15:0] lut,
-    input        sel, // 1 = with register, 0 = bypass register
-    input        clk,
-    input        nreset,
-    output       out
+    input [N*4-10]   in,
+    input [N*16-1:0] lut,
+    input [N-1:0]    sel, // 1 = with register, 0 = bypass register
+    input            clk,
+    input            nreset,
+    output [N-1:0]   out
     );
 
 
-   la_blek4p0 ble (/*AUTOINST*/);
+   wire [4*N-1:0] clbin;
 
+   //TODO: example local crossbar
+
+
+
+   genvar i;
+   for (i=0:i<N;i=i+1)
+     begin gble
+       la_blek4p0 i0 (// Outputs
+                      .out              (out[i]),
+                      // Inputs
+                      .in               (clbin[i*N+:N]),
+                      .lut              (lut[i*N+:N]),
+                      .sel              (sel[i]),
+                      .clk              (clk),
+                      .nreset           (nreset));
+     end
 
 
 endmodule
 
-`ifdef TB_LA_CLB4KN8P0
+`ifdef TB_LA_CLBK4N8P0
 
 module tb();
 
@@ -90,8 +105,16 @@ module tb();
        $display("lut=%h, sel=%b, in=%b, out=%b", lut, sel, in, out);
 
    // dut
-   la_ble4p0
-     la_ble (/*AUTOINST*/);
+   la_clbk4n8p0
+     la_clb (/*AUTOINST*/
+             // Outputs
+             .out               (out[N-1:0]),
+             // Inputs
+             .in                (in[N*4-10]),
+             .lut               (lut[N*16-1:0]),
+             .sel               (sel[N-1:0]),
+             .clk               (clk),
+             .nreset            (nreset));
 
 endmodule
 
