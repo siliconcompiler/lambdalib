@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Configurable Logic Block (8 x blek4p0)
+ * Function: Configurable Logic Block (N x blek4p0)
  * Copyright: Lambda Project Authors. All rights Reserved
  * License:  MIT (see LICENSE file in Lambda repository)
  *****************************************************************************
@@ -8,40 +8,46 @@
  *
  * Testing:
  *
- * >> iverilog la_clbk4n8p0.v -DTB_LA_CLBK4N8P0 -y . -y ../stdlib/rtl
+ * >> iverilog la_clbk4p0.v -DTB_LA_CLBK4P0 -y . -y ../stdlib/rtl
  * >> ./a.out
  * *
  ****************************************************************************/
 
-module la_clbk4n8p0
-  #(parameter PROP = "DEFAULT", //  implementation selector
-    parameter N = 8
+module la_clbk4p0
+  #(parameter PROP = "DEFAULT", // implementation selector
+    parameter N = 8,            // number of BLEs
+    parameter I = 8             // number of inputs
     )
-   (
-    input [N*4-10]   in,
-    input [N*16-1:0] lut,
-    input [N-1:0]    sel, // 1 = with register, 0 = bypass register
-    input            clk,
-    input            nreset,
-    output [N-1:0]   out
+   (// controls
+    input            clk,    // free running clock
+    input            nreset, // asynch active low reset
+    input [8*16-1:0] cfglut, // lut cfg
+    input [7:0]      cfgff,  // ble ff mux selector
+    input [7:0]      cfgcb  // ble ff mux selector
+    // data
+    input [8*4-10]   in,     // logical inputs
+    output [7:0]     out     // output
     );
 
 
-   wire [4*N-1:0] clbin;
+   wire [3:0] crossbar[7:0];
+   genvar     i,j;
 
    //TODO: example local crossbar
+   for (i=0;i<8;i=i+1)
+     for (j=0;j<4;j=j+1)
+       begin
 
+       end
 
-
-   genvar i;
-   for (i=0:i<N;i=i+1)
+   for (i=0;i<N;i=i+1)
      begin gble
        la_blek4p0 i0 (// Outputs
                       .out              (out[i]),
                       // Inputs
                       .in               (clbin[i*N+:N]),
                       .lut              (lut[i*N+:N]),
-                      .sel              (sel[i]),
+                      .sel              (cfg[i]),
                       .clk              (clk),
                       .nreset           (nreset));
      end
@@ -49,7 +55,7 @@ module la_clbk4n8p0
 
 endmodule
 
-`ifdef TB_LA_CLBK4N8P0
+`ifdef TB_LA_CLBK4P0
 
 module tb();
 
@@ -105,16 +111,17 @@ module tb();
        $display("lut=%h, sel=%b, in=%b, out=%b", lut, sel, in, out);
 
    // dut
-   la_clbk4n8p0
+   la_clbk4p0
      la_clb (/*AUTOINST*/
              // Outputs
-             .out               (out[N-1:0]),
+             .out               (out[7:0]),
              // Inputs
-             .in                (in[N*4-10]),
-             .lut               (lut[N*16-1:0]),
-             .sel               (sel[N-1:0]),
              .clk               (clk),
-             .nreset            (nreset));
+             .nreset            (nreset),
+             .cfglut            (cfglut[8*16-1:0]),
+             .cfgff             (cfgff[7:0]),
+             .cfgcb             (cfgcb[7:0]),
+             .in                (in[8*4-10]));
 
 endmodule
 
