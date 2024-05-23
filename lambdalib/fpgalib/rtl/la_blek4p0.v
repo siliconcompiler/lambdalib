@@ -11,7 +11,7 @@
  *
  * Testing:
  *
- * >> iverilog la_ble4p0.v -DTB_LA_BLEK4P0 -y . -y ../stdlib/rtl
+ * >> iverilog la_blek4p0.v -DTB_LA_BLEK4P0 -y . -y ../stdlib/rtl
  * >> ./a.out
  *
  *
@@ -22,8 +22,8 @@ module la_blek4p0
     )
    (
     input [3:0]  in,
-    input [15:0] lut,
-    input        sel, // 1 = with register, 0 = bypass register
+    input [15:0] cfglut,// lookup table
+    input        cfgff, // 1 = with register, 0 = bypass register
     input        clk,
     input        nreset,
     output       out
@@ -32,11 +32,11 @@ module la_blek4p0
    wire lutout;
    wire q;
 
-   la_lut4 ilut(.out(lutout), .in (in[3:0]), .lut(lut[15:0]));
+   la_lut4 ilut(.out(lutout), .in (in[3:0]), .lut(cfglut[15:0]));
 
    la_dffrq idff(.q(q), .d(lutout), .clk(clk), .nreset(nreset));
 
-   la_mux2 imux(.z (out), .d0(lutout), .d1(q), .s(sel));
+   la_mux2 imux(.z (out), .d0(lutout), .d1(q), .s(cfgff));
 
 endmodule
 
@@ -50,8 +50,8 @@ module tb();
    reg        clk;
    reg        nreset;
    reg [3:0]  in;
-   reg [15:0] lut;
-   reg        sel;
+   reg [15:0] cfglut;
+   reg        cfgff;
    wire       out;
 
    // control block
@@ -70,13 +70,13 @@ module tb();
 	#(1)
         nreset = 'b0;
         clk = 'b0;
-        sel = 1'b0;
+        cfgff = 1'b0;
         #(1)
         nreset = 'b1;
-	lut = 16'h8000; // 4 input and gate
+	cfglut = 16'h8000; // 4 input and gate
         #(PERIOD * 25)
-        sel = 1'b1;
-        lut = 16'hFFFE; // 4 input or gate
+        cfgff = 1'b1;
+        cfglut = 16'hFFFE; // 4 input or gate
      end
 
    // clk
@@ -93,17 +93,17 @@ module tb();
 
    always @ (posedge clk)
      if (nreset)
-       $display("lut=%h, sel=%b, in=%b, out=%b", lut, sel, in, out);
+       $display("lut=%h, sel=%b, in=%b, out=%b", cfglut, cfgff, in, out);
 
    // dut
-   la_ble4p0
+   la_blek4p0
      la_ble (/*AUTOINST*/
              // Outputs
              .out               (out),
              // Inputs
              .in                (in[3:0]),
-             .lut               (lut[15:0]),
-             .sel               (sel),
+             .cfglut            (cfglut[15:0]),
+             .cfgff             (cfgff),
              .clk               (clk),
              .nreset            (nreset));
 
