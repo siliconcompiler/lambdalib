@@ -83,8 +83,8 @@ endmodule
 
 module tb();
 
-   localparam TIMEOUT = 2*33;
    localparam PERIOD = 2;
+   localparam TIMEOUT = PERIOD  * 33;
 
    reg        clk;
    reg        nreset;
