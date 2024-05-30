@@ -6,30 +6,35 @@
  *
  * Documentation:
  *
-
- * i[3]	i[2]	i[1]	i[0]	out
- * -------------------------------------
- * 0	0	0	0	lut[0]
- * 0	0	0	1	lut[1]
- * 0	0	1	0	lut[2]
- * 0	0	1	1	lut[3]
- * 0	1	0	0	lut[4]
- * 0	1	0	1	lut[5]
- * 0	1	1	0	lut[6]
- * 0	1	1	1	lut[7]
- * 1	0	0	0	lut[8]
- * 1	0	0	1	lut[9]
- * 1	0	1	0	lut[10]
- * 1	0	1	1	lut[11]
- * 1	1	0	0	lut[12]
- * 1	1	0	1	lut[13]
- * 1	1	1	0	lut[14]
- * 1	1	1	1	lut[15]
+ * in[3:0] out
+ * ------------
+ * 0000	lut[0]
+ * 0001	lut[1]
+ * 0010	lut[2]
+ * 0011	lut[3]
+ * 0100	lut[4]
+ * 0101	lut[5]
+ * 0110	lut[6]
+ * 0111	lut[7]
+ * 1000	lut[8]
+ * 1001	lut[9]
+ * 1010	lut[10]
+ * 1011	lut[11]
+ * 1100	lut[12]
+ * 1101	lut[13]
+ * 1110	lut[14]
+ * 1111	lut[15]
  *
+ * input fanout stages
+ * ---------------------
+ * i[3]  1      1 (fastest)
+ * i[2]  2      2
+ * i[1]  4      3
+ * i[0]  8      4 (slowest)
  *
  * Testing:
  *
- * >> iverilog lat_lut4.v -DTB_LA_LUT4 -y . -y ../stdlib/rtl
+ * >> iverilog la_lut4.v -DTB_LA_LUT4 -y . -y ../../stdlib/rtl
  * >> ./a.out
  *
  *
@@ -78,7 +83,7 @@ endmodule
 
 module tb();
 
-   localparam TIMEOUT = 100;
+   localparam TIMEOUT = 2*33;
    localparam PERIOD = 2;
 
    reg        clk;
@@ -104,9 +109,11 @@ module tb();
         nreset = 'b0;
         clk = 'b0;
         #(1)
+        $display("---- AND GATE ----");
         nreset = 'b1;
 	lut = 16'h8000; // 4 input and gate
-        #(PERIOD * 25)
+        #(PERIOD * 16)
+        $display("---- OR GATE ----");
         lut = 16'hFFFE; // 4 input or gate
      end
 
