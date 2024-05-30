@@ -9,6 +9,7 @@ __version__ = "0.2.3"
 _libraries = (
     'iolib',
     'stdlib',
+    'auxlib',
     'ramlib',
     'padring',
     'syslib',
@@ -104,21 +105,9 @@ def copy(outputpath, la_lib='stdlib', exclude=None):
 
 
 def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
-    exclude_default = (
-        'la_decap',
-        'la_keeper',
-        'la_footer',
-        'la_header',
-        'la_antenna',
-        'la_clkmux2',
-        'la_clkmux4'
-    )
-
     full_exclude = []
     if exclude:
         full_exclude.extend(exclude)
-
-    full_exclude.extend(exclude_default)
 
     # Ensure files are loaded
     cells_dir = __get_lambdalib_dir(la_lib)

@@ -7,6 +7,7 @@ Lambdalib includes the following hardware categories:
 | Category                            | Description                           |
 |-------------------------------------|---------------------------------------|
 |[stdlib](lambdalib/stdlib/rtl)       | Standard cells (inv, nand, ff, ...)
+|[auxlib](lambdalib/auxlib/rtl)       | Aux cells can consist of multiple standard cells or physical only cells
 |[ramlib](lambdalib/ramlib/rtl)       | Memory (single port, dual port, fifo, ...)
 |[iolib](lambdalib/iolib/rtl)         | IO cells (bidir, vdd, clamp,...)
 |[padring](lambdalib/padring/rtl)     | Padring generator
