@@ -50,18 +50,18 @@ module la_clb4p0
     );
 
    // wires
-   wire [N-1:0]      q;
-   wire [N-1:0]      fb[N-1:0];
-   wire [K-1:0]      inmux[N-1:0];
-   wire [K-1:0]      fbmux[N-1:0];
-   wire [K-1:0]      lutmux[N-1:0];
-   genvar            i,j;
+   wire [N-1:0]               q;
+   wire [N-1:0]               fb[N-1:0];
+   wire [K-1:0]               inmux[N-1:0];
+   wire [K-1:0]               fbmux[N-1:0];
+   wire [K-1:0]               lutmux[N-1:0];
+   genvar                     i,j;
 
    // full crossbar from all clb inputs to all lut inputs
    for (i=0;i<N;i=i+1)
      for (j=0;j<K;j=j+1)
        begin: ginput
-            assign inmux[i][j] = in[cfgin[(i*K+j)*$clog2(I)+:$clog2(I)]];
+          assign inmux[i][j] = in[cfgin[(i*K+j)*$clog2(I)+:$clog2(I)]];
        end
 
    // feedback reg output for same lut (no loops!)
@@ -98,23 +98,18 @@ module la_clb4p0
    for (i=0;i<N;i=i+1)
      begin: gble
         la_ble4p0 i0 (// Outputs
-                       .out       (out[i]),
-                       .q         (q[i]),
-                       // config
-                       .cfglut    (cfglut[i*16+:16]),
-                       .cfgreg    (cfgreg[i]),
-                       // Inputs
-                       .in        (lutmux[i]),
-                       .clk       (clk),
-                       .nreset    (nreset));
+                      .out       (out[i]),
+                      .q         (q[i]),
+                      // config
+                      .cfglut    (cfglut[i*16+:16]),
+                      .cfgreg    (cfgreg[i]),
+                      // Inputs
+                      .in        (lutmux[i]),
+                      .clk       (clk),
+                      .nreset    (nreset));
      end
 
 endmodule
-
-/*******************************************************************************
- * Test Notes:
-
- *******************************************************************************/
 
 `ifdef TB_LA_CLB4P0
 module tb();
@@ -137,7 +132,7 @@ module tb();
 
    /*AUTOWIRE*/
    // Beginning of automatic wires (for undeclared instantiated-module outputs)
-   wire [N-1:0]         out;
+   wire [N-1:0]            out;
    // End of automatics
 
    // control block
@@ -150,7 +145,7 @@ module tb();
         $finish;
      end
 
-  // test programx
+   // test program
    initial
      begin
 	#(1)

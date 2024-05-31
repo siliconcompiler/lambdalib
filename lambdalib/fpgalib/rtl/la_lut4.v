@@ -48,9 +48,9 @@ module la_lut4
     output       out
     );
 
-   wire [7:0] int0;
-   wire [3:0] int1;
-   wire [1:0] int2;
+   wire [7:0]    int0;
+   wire [3:0]    int1;
+   wire [1:0]    int2;
 
    // 16:8
    la_mux2 m0_0 (.d0(lut[0]),  .d1(lut[1]),  .s(in[0]), .z(int0[0]));
@@ -102,7 +102,7 @@ module tb();
         $finish;
      end
 
-  // test program
+   // test program
    initial
      begin
 	#(1)

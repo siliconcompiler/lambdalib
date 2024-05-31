@@ -31,7 +31,7 @@ module la_ble4p0
     input        cfgreg // 1: output is registered
     );
 
-   wire lutout;
+   wire          lutout;
 
    la_lut4  ilut(.out(lutout), .in (in[3:0]), .lut(cfglut[15:0]));
    la_dffrq idff(.q(q), .d(lutout), .clk(clk), .nreset(nreset));
@@ -63,7 +63,7 @@ module tb();
         $finish;
      end
 
-  // test program
+   // test program
    initial
      begin
 	#(1)
@@ -89,7 +89,6 @@ module tb();
        in <= 'b0;
      else
        in <= in + 1'b1;
-
 
    always @ (posedge clk)
      if (nreset)
