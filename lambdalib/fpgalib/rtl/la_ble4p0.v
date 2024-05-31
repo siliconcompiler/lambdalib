@@ -59,21 +59,21 @@ module tb();
         $timeformat(-9, 0, " ns", 20);
         $dumpfile("dump.vcd");
         $dumpvars(0, tb);
-	#(TIMEOUT)
+        #(TIMEOUT)
         $finish;
      end
 
    // test program
    initial
      begin
-	#(1)
+        #(1)
         nreset = 'b0;
         clk = 'b0;
         cfgreg = 1'b0;
         #(1)
         $display("---- AND GATE ----");
         nreset = 'b1;
-	cfglut = 16'h8000; // 4 input and gate
+        cfglut = 16'h8000; // 4 input and gate
         #(PERIOD * 16)
         $display("---- OR GATE ----");
         cfglut = 16'hFFFE; // 4 input or gate

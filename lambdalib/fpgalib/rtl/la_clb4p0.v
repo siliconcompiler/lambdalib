@@ -141,21 +141,21 @@ module tb();
         $timeformat(-9, 0, " ns", 20);
         $dumpfile("dump.vcd");
         $dumpvars(0, tb);
-	#(TIMEOUT)
+        #(TIMEOUT)
         $finish;
      end
 
    // test program
    initial
      begin
-	#(1)
+        #(1)
         nreset = 'b0;
         clk = 'b0;
         cfgreg = 1'b0;
         #(1)
         nreset = 'b1;
         $display("----AND4, OR4 ----");
-	cfglut = 32'hFFFE_8000;                       // and/or
+        cfglut = 32'hFFFE_8000;                       // and/or
         cfgin  = 24'b111_110_101_100_011_010_001_000; // straight
         cfgfb  = 24'b000_000_000_000_000_000_000_000; // dont care
         cfgloc =  8'b0000_0000;

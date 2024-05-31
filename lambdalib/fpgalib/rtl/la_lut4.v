@@ -8,22 +8,22 @@
  *
  * in[3:0] out
  * ------------
- * 0000	lut[0]
- * 0001	lut[1]
- * 0010	lut[2]
- * 0011	lut[3]
- * 0100	lut[4]
- * 0101	lut[5]
- * 0110	lut[6]
- * 0111	lut[7]
- * 1000	lut[8]
- * 1001	lut[9]
- * 1010	lut[10]
- * 1011	lut[11]
- * 1100	lut[12]
- * 1101	lut[13]
- * 1110	lut[14]
- * 1111	lut[15]
+ * 0000 lut[0]
+ * 0001 lut[1]
+ * 0010 lut[2]
+ * 0011 lut[3]
+ * 0100 lut[4]
+ * 0101 lut[5]
+ * 0110 lut[6]
+ * 0111 lut[7]
+ * 1000 lut[8]
+ * 1001 lut[9]
+ * 1010 lut[10]
+ * 1011 lut[11]
+ * 1100 lut[12]
+ * 1101 lut[13]
+ * 1110 lut[14]
+ * 1111 lut[15]
  *
  * input fanout stages
  * ---------------------
@@ -75,7 +75,6 @@ module la_lut4
    // 2:1
    la_mux2 m3_1 (.d0(int2[0]), .d1(int2[1]),  .s(in[3]), .z(out));
 
-
 endmodule
 
 
@@ -98,20 +97,20 @@ module tb();
         $timeformat(-9, 0, " ns", 20);
         $dumpfile("dump.vcd");
         $dumpvars(0, tb);
-	#(TIMEOUT)
+        #(TIMEOUT)
         $finish;
      end
 
    // test program
    initial
      begin
-	#(1)
+        #(1)
         nreset = 'b0;
         clk = 'b0;
         #(1)
         $display("---- AND GATE ----");
         nreset = 'b1;
-	lut = 16'h8000; // 4 input and gate
+        lut = 16'h8000; // 4 input and gate
         #(PERIOD * 16)
         $display("---- OR GATE ----");
         lut = 16'hFFFE; // 4 input or gate
