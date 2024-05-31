@@ -11,34 +11,35 @@
  *
  * Testing:
  *
- * >> iverilog la_blek4p0.v -DTB_LA_BLEK4P0 -y . -y ../../stdlib/rtl
+ * >> iverilog la_ble4p0.v -DTB_LA_BLE4P0 -y . -y ../../stdlib/rtl
  * >> ./a.out
  *
  *
  ****************************************************************************/
 
-module la_blek4p0
+module la_ble4p0
   #(parameter TYPE  = "DEFAULT" //  implementation selector
     )
-   (
-    input        clk,   // clock
+   (// logic
+    input        clk, // clock
     input        nreset,// async active low reset
-    input [3:0]  in,    // input
+    input [3:0]  in, // input
+    output       q, // reg output
+    output       out, // mux output
+    //config
     input [15:0] cfglut,// lookup table
-    input        cfgff, // 1 = with register, 0 = without register
-    output       q,     // register output
-    output       out    // mux output
+    input        cfgreg // 1: output is registered
     );
 
    wire lutout;
 
    la_lut4  ilut(.out(lutout), .in (in[3:0]), .lut(cfglut[15:0]));
    la_dffrq idff(.q(q), .d(lutout), .clk(clk), .nreset(nreset));
-   la_mux2  imux(.z(out), .d0(lutout), .d1(q), .s(cfgff));
+   la_mux2  imux(.z(out), .d0(lutout), .d1(q), .s(cfgreg));
 
 endmodule
 
-`ifdef TB_LA_BLEK4P0
+`ifdef TB_LA_BLE4P0
 
 module tb();
 
@@ -49,7 +50,7 @@ module tb();
    reg        nreset;
    reg [3:0]  in;
    reg [15:0] cfglut;
-   reg        cfgff;
+   reg        cfgreg;
    wire       out;
 
    // control block
@@ -68,7 +69,7 @@ module tb();
 	#(1)
         nreset = 'b0;
         clk = 'b0;
-        cfgff = 1'b0;
+        cfgreg = 1'b0;
         #(1)
         $display("---- AND GATE ----");
         nreset = 'b1;
@@ -77,9 +78,6 @@ module tb();
         $display("---- OR GATE ----");
         cfglut = 16'hFFFE; // 4 input or gate
      end
-
-
-
 
    // clk
    always
@@ -95,10 +93,10 @@ module tb();
 
    always @ (posedge clk)
      if (nreset)
-       $display("lut=%h, sel=%b, in=%b, out=%b, q=%b", cfglut, cfgff, in, out, q);
+       $display("lut=%h, sel=%b, in=%b, out=%b, q=%b", cfglut, cfgreg, in, out, q);
 
    // dut
-   la_blek4p0
+   la_ble4p0
      la_ble (/*AUTOINST*/
              // Outputs
              .q                         (q),
@@ -108,7 +106,7 @@ module tb();
              .nreset                    (nreset),
              .in                        (in[3:0]),
              .cfglut                    (cfglut[15:0]),
-             .cfgff                     (cfgff));
+             .cfgreg                    (cfgreg));
 
 endmodule
 
