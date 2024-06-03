@@ -43,7 +43,7 @@ module la_clb4p0
     output [N-1:0]            out, // output
     // configuration bits
     input [N*(2**K)-1:0]      cfglut, // lut
-    input [N-1:0]             cfgreg, // register mux
+    input [N-1:0]             cfgbp, // bypass mux
     input [N*K*$clog2(I)-1:0] cfgin, // input mux
     input [N*K*$clog2(N)-1:0] cfgfb, // feedback mux
     input [N*K-1:0]           cfgloc // local select mux
@@ -102,7 +102,7 @@ module la_clb4p0
                       .q         (q[i]),
                       // config
                       .cfglut    (cfglut[i*16+:16]),
-                      .cfgreg    (cfgreg[i]),
+                      .cfgbp     (cfgbp[i]),
                       // Inputs
                       .in        (lutmux[i]),
                       .clk       (clk),
@@ -125,7 +125,7 @@ module tb();
    reg                     nreset;
    reg [I-1:0]             in;
    reg [N*(2**K)-1:0]      cfglut; // lut
-   reg [N-1:0]             cfgreg; // reg mux
+   reg [N-1:0]             cfgbp; // reg mux
    reg [N*K*$clog2(I)-1:0] cfgin; // input mux
    reg [N*K*$clog2(N)-1:0] cfgfb; // feedback mux
    reg [N*K-1:0]           cfgloc; // local select mux
@@ -151,7 +151,7 @@ module tb();
         #(1)
         nreset = 'b0;
         clk = 'b0;
-        cfgreg = 1'b0;
+        cfgbp = 2'b11;
         #(1)
         nreset = 'b1;
         $display("----AND4, OR4 ----");
@@ -181,7 +181,7 @@ module tb();
    always @ (posedge clk)
      if (nreset)
        if (out)
-         $display("lut=%h, sel=%b, in=%b, out=%b", cfglut, cfgreg, in, out);
+         $display("lut=%h, sel=%b, in=%b, out=%b", cfglut, cfgbp, in, out);
 
    // dut
    la_clb4p0 # (.I(I),.N(N), .K(K))
@@ -193,7 +193,7 @@ module tb();
            .nreset                      (nreset),
            .in                          (in[I-1:0]),
            .cfglut                      (cfglut[N*(2**K)-1:0]),
-           .cfgreg                      (cfgreg[N-1:0]),
+           .cfgbp                       (cfgbp[N-1:0]),
            .cfgin                       (cfgin[N*K*$clog2(I)-1:0]),
            .cfgfb                       (cfgfb[N*K*$clog2(N)-1:0]),
            .cfgloc                      (cfgloc[N*K-1:0]));

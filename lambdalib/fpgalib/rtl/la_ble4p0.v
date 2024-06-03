@@ -28,14 +28,14 @@ module la_ble4p0
     output       out, // mux output
     //config
     input [15:0] cfglut,// lookup table
-    input        cfgreg // 1: output is registered
+    input        cfgbp // 1: bypass register
     );
 
    wire          lutout;
 
    la_lut4  ilut(.out(lutout), .in (in[3:0]), .lut(cfglut[15:0]));
    la_dffrq idff(.q(q), .d(lutout), .clk(clk), .nreset(nreset));
-   la_mux2  imux(.z(out), .d0(lutout), .d1(q), .s(cfgreg));
+   la_mux2  imux(.z(out), .d0(q), .d1(lutout), .s(cfgbp));
 
 endmodule
 
@@ -50,7 +50,7 @@ module tb();
    reg        nreset;
    reg [3:0]  in;
    reg [15:0] cfglut;
-   reg        cfgreg;
+   reg        cfgbp;
    wire       out;
 
    // control block
@@ -69,7 +69,7 @@ module tb();
         #(1)
         nreset = 'b0;
         clk = 'b0;
-        cfgreg = 1'b0;
+        cfgbp = 1'b1;
         #(1)
         $display("---- AND GATE ----");
         nreset = 'b1;
@@ -92,20 +92,20 @@ module tb();
 
    always @ (posedge clk)
      if (nreset)
-       $display("lut=%h, sel=%b, in=%b, out=%b, q=%b", cfglut, cfgreg, in, out, q);
+       $display("lut=%h, sel=%b, in=%b, out=%b, q=%b", cfglut, cfgbp, in, out, q);
 
    // dut
    la_ble4p0
      la_ble (/*AUTOINST*/
              // Outputs
-             .q                         (q),
-             .out                       (out),
+             .q                 (q),
+             .out               (out),
              // Inputs
-             .clk                       (clk),
-             .nreset                    (nreset),
-             .in                        (in[3:0]),
-             .cfglut                    (cfglut[15:0]),
-             .cfgreg                    (cfgreg));
+             .clk               (clk),
+             .nreset            (nreset),
+             .in                (in[3:0]),
+             .cfglut            (cfglut[15:0]),
+             .cfgbp             (cfgbp));
 
 endmodule
 
