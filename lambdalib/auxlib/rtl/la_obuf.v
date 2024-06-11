@@ -1,24 +1,16 @@
 //#############################################################################
-//# Function: Differential Chip Input Buffer (with ESD protection)            #
+//# Function: Single Ended Chip Output Buffer (with ESD protection)           #
 //# Copyright: Lambda Project Authors. All rights Reserved.                   #
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_idiff
-  #(
-    parameter PROP = "DEFAULT",
-    parameter DIFF = 0         // differential buffer if value > 0
-    )
+module la_obuf
+  #(parameter PROP = "DEFAULT")
    (
     input  in, // positive input
-    input  inb, // negative input
     output z // output
     );
 
-   if(DIFF)
-     assign z = (in & ~inb)  | // for proper diff inputs
-                (~in & ~inb);  // fail on non diff input
-   else
-     assign z = in;
+   assign z = in;
 
 endmodule

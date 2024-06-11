@@ -1,5 +1,5 @@
 //#############################################################################
-//# Function: Differential Output Buffer                                      #
+//# Function: Differential Chip Output Buffer (with ESD protection)           #
 //# Copyright: Lambda Project Authors. All rights Reserved.                   #
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
