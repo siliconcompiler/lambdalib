@@ -13,7 +13,8 @@ _libraries = (
     'ramlib',
     'padring',
     'syslib',
-    'vectorlib'
+    'vectorlib',
+    'fpgalib'
 )
 
 
