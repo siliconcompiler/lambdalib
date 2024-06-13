@@ -4,7 +4,7 @@ import glob
 import os
 import shutil
 
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 _libraries = (
     'iolib',
