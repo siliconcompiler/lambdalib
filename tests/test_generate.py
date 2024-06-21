@@ -12,8 +12,20 @@ def test_check_missing_file():
     assert not lambdalib.check('./lambda')
 
 
+def test_check_extra_file():
+    lambdalib.copy('./lambda')
+    with open('./lambda/la_testing_cells.v', 'w') as f:
+        f.write('test')
+    assert not lambdalib.check('./lambda')
+
+
 def test_check_missing_file_auxlib():
     lambdalib.copy('./lambda', la_lib='auxlib', exclude=('la_clkmux4',))
+    assert lambdalib.check('./lambda', la_lib='auxlib')
+
+
+def test_check_all_files_auxlib():
+    lambdalib.copy('./lambda', la_lib='auxlib')
     assert lambdalib.check('./lambda', la_lib='auxlib')
 
 
