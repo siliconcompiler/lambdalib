@@ -83,6 +83,10 @@ def check(outputpath, la_lib='stdlib'):
         for cell in extra_cells:
             print(f'Excess cell: {cell}')
 
+    if la_lib == 'auxlib' and not extra_cells:
+        # allow auxlib to have missing cells
+        return True
+
     return False
 
 
