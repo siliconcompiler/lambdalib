@@ -11,13 +11,14 @@
 
 module la_syncfifo
   #(
-    parameter DW    = 32,        // Memory width
-    parameter DEPTH = 4,         // FIFO depth
-    parameter NS    = 1,         // Number of power supplies
-    parameter CHAOS = 1,         // generates random full logic when set
-    parameter CTRLW = 1,         // width of asic ctrl interface
-    parameter TESTW = 1,         // width of asic test interface
-    parameter TYPE  = "DEFAULT"  // Pass through variable for hard macro
+    parameter DW       = 32,        // Memory width
+    parameter DEPTH    = 4,         // FIFO depth
+    parameter NS       = 1,         // Number of power supplies
+    parameter CHAOS    = 1,         // generates random full logic when set
+    parameter CTRLW    = 1,         // width of asic ctrl interface
+    parameter TESTW    = 1,         // width of asic test interface
+    parameter PROGFULL = DEPTH,     // Programmable full signal
+    parameter TYPE     = "DEFAULT"  // Pass through variable for hard macro
     )
    (// basic interface
     input             clk,
@@ -40,10 +41,12 @@ module la_syncfifo
 
     // local params
     parameter AW = $clog2(DEPTH);
+    parameter FULL_OFFSET = (PROGFULL > DEPTH) ? {(AW+1){1'b0}} : (DEPTH[AW:0] - PROGFULL[AW:0]);
 
     // local wires
     reg  [AW:0] wr_addr;
     wire [AW:0] wr_addr_nxt;
+    wire [AW:0] wr_addr_plus_offset;
     reg  [AW:0] rd_addr;
     wire [AW:0] rd_addr_nxt;
     wire        fifo_read;
@@ -51,22 +54,35 @@ module la_syncfifo
     wire        chaosfull;
     wire        rd_wrap_around;
     wire        wr_wrap_around;
+    wire        wr_offset_wrap_around;
+    wire        wr_true_full;
 
     //############################
     // FIFO Empty/Full
     //############################
 
+    assign wr_offset_wrap_around = ({1'b0, wr_addr[AW-1:0]} >= PROGFULL[AW:0]);
+    assign wr_addr_plus_offset[AW]     = wr_offset_wrap_around ? ~wr_addr[AW] : wr_addr[AW];
+    assign wr_addr_plus_offset[AW-1:0] = wr_offset_wrap_around ?
+                                         (wr_addr[AW-1:0] + FULL_OFFSET[AW-1:0] - DEPTH[AW-1:0]):
+                                         (wr_addr[AW-1:0] + FULL_OFFSET[AW-1:0]);
+
     // support any fifo depth
+    // wr_full depends on PROGFULL
+    // wr_full will be asserted when the fifo contains DEPTH-PROGFULL entries
     assign wr_full = (chaosfull & chaosmode) |
-                     {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
+                     {~wr_addr_plus_offset[AW], wr_addr_plus_offset[AW-1:0]} == rd_addr[AW:0];
 
-
+    // While PROGFULL helps to assert an early full, fifo writes should still depend on the true
+    // number of available entries. wr_true_full allows the FIFO to write in that case
+    assign wr_true_full = (chaosfull & chaosmode) |
+                          {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
 
     assign rd_empty = wr_addr[AW:0] == rd_addr[AW:0];
 
     assign fifo_read = rd_en & ~rd_empty;
 
-    assign fifo_write = wr_en & ~wr_full;
+    assign fifo_write = wr_en & ~wr_true_full;
 
     //############################
     // FIFO Pointers - wrap around DEPTH-1
@@ -74,7 +90,7 @@ module la_syncfifo
     assign rd_wrap_around = rd_addr[AW-1:0] == (DEPTH[AW-1:0] - 1'b1);
     assign wr_wrap_around = wr_addr[AW-1:0] == (DEPTH[AW-1:0] - 1'b1);
 
-    assign rd_addr_nxt[AW] = rd_wrap_around ? ~rd_addr[AW] : rd_addr[AW];
+    assign rd_addr_nxt[AW]     = rd_wrap_around ? ~rd_addr[AW] : rd_addr[AW];
     assign rd_addr_nxt[AW-1:0] = rd_wrap_around ? 'b0 : (rd_addr[AW-1:0] + 1);
 
     assign wr_addr_nxt[AW]     = (wr_addr[AW-1:0] == (DEPTH[AW-1:0]-1'b1)) ? ~wr_addr[AW] : wr_addr[AW];
@@ -105,7 +121,7 @@ module la_syncfifo
     reg [DW-1:0] ram[DEPTH-1:0];
 
     // Write port (FIFO input)
-    always @(posedge clk) if (wr_en & ~wr_full) ram[wr_addr[AW-1:0]] <= wr_din[DW-1:0];
+    always @(posedge clk) if (wr_en & ~wr_true_full) ram[wr_addr[AW-1:0]] <= wr_din[DW-1:0];
 
     // Read port (FIFO output)
     assign rd_dout[DW-1:0] = ram[rd_addr[AW-1:0]];
