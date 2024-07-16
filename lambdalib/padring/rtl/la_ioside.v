@@ -156,7 +156,7 @@ module la_ioside #(  // per side parameters
             );
         end
         else if (CELLMAP[i*24+:4] == LA_TXDIFF[3:0]) begin : ila_txdiff
-            la_iorxdiff #(
+            la_iotxdiff #(
                 .SIDE (SIDE),
                 .TYPE (CELLMAP[(i*24+4)+:4]),
                 .RINGW(RINGW)
