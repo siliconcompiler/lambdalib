@@ -6,12 +6,12 @@
  * Docs:
  *
  * This is a generic cell that defines the standard interface of the lambda
- * bidrectional buffer cell. It is only suitable for FPGA synthesis.
+ * differential IO transmit cell.  It is not generally synthesizable.
  *
  * ASIC specific libraries will need to use the TYPE field to select an
  * appropriate hardcoded physical cell based on the the process constraints
  * and library composition. For example, modern nodes will usually have
- * different IP cells for the placing cells vvertically or horizontally.
+ * different IP cells for placing cells vertically or horizontally.
  *
  ****************************************************************************/
 module la_iotxdiff
@@ -22,8 +22,8 @@ module la_iotxdiff
     parameter RINGW = 8          // width of io ring
     )
    (// io pad signals
-    inout             pad_p, // differential pad output (positive)
-    inout             pad_n, // differential pad output (negative)
+    inout             padp, // differential pad output (positive)
+    inout             padn, // differential pad output (negative)
     inout             vdd, // core supply
     inout             vss, // core ground
     inout             vddio, // io supply
@@ -36,7 +36,7 @@ module la_iotxdiff
     );
 
    // output driver with tr
-   assign pad_p = oe ? a : 1'bz;
-   assign pad_n = oe ? ~a : 1'bz;
+   assign padp = oe ? a : 1'bz;
+   assign padn = oe ? ~a : 1'bz;
 
 endmodule
