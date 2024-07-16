@@ -20,8 +20,9 @@ module la_ioside #(  // per side parameters
 ) (  // io pad signals
     inout [NPINS-1:0]   pad, // pad
     //core facing signals
-    inout [NPINS*3-1:0]  aio, // analog inout
-    output [NPINS-1:0]   z, // output to core
+    inout [NPINS*3-1:0] aio, // analog inout
+    output [NPINS-1:0]  zp, // positive output to core
+    output [NPINS-1:0]  zn, // negative output to core
     input [NPINS-1:0]   a, // input from core
     input [NPINS-1:0]   ie, // input enable, 1 = active
     input [NPINS-1:0]   oe, // output enable, 1 = active
@@ -59,7 +60,7 @@ module la_ioside #(  // per side parameters
             ) i0 (  // pad
                 .pad(pad[CELLMAP[(i*24+8)+:8]]),
                 // core signalas
-                .z(z[CELLMAP[(i*24+8)+:8]]),
+                .z(zp[CELLMAP[(i*24+8)+:8]]),
                 .a(a[CELLMAP[(i*24+8)+:8]]),
                 .ie(ie[CELLMAP[(i*24+8)+:8]]),
                 .oe(oe[CELLMAP[(i*24+8)+:8]]),
@@ -82,7 +83,7 @@ module la_ioside #(  // per side parameters
             ) i0 (  // pad
                 .pad(pad[CELLMAP[(i*24+8)+:8]]),
                 // core signalas
-                .z(z[CELLMAP[(i*24+8)+:8]]),
+                .z(zp[CELLMAP[(i*24+8)+:8]]),
                 .ie(ie[CELLMAP[(i*24+8)+:8]]),
                 .cfg(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
                 // supplies
@@ -121,7 +122,50 @@ module la_ioside #(  // per side parameters
                 .padi(pad[CELLMAP[(i*24+8)+:8]]),
                 .pado(pad[i+1]),  //TODO: fix!
                 // core
-                .z(z[CELLMAP[(i*24+8)+:8]]),
+                .z(zp[CELLMAP[(i*24+8)+:8]]),
+                .cfg(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
+                // supplies
+                .vss(vss),
+                .vdd(vdd[CELLMAP[(i*24+16)+:8]]),
+                .vddio(vddio[CELLMAP[(i*24+16)+:8]]),
+                .vssio(vssio[CELLMAP[(i*24+16)+:8]]),
+                // ring
+                .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW])
+            );
+        end
+        else if (CELLMAP[i*24+:4] == LA_RXDIFF[3:0]) begin : ila_rxdiff
+            la_iorxdiff #(
+                .SIDE (SIDE),
+                .TYPE (CELLMAP[(i*24+4)+:4]),
+                .RINGW(RINGW)
+            ) i0 (  // pad
+                .padp(pad[CELLMAP[(i*24+8)+:8]]),
+                .padn(pad[i+1]),  //TODO: fix!
+                // core
+                .zp(zp[CELLMAP[(i*24+8)+:8]]),
+                .zn(zn[CELLMAP[(i*24+8)+:8]]),
+                .ie(ie[CELLMAP[(i*24+8)+:8]]),
+                .cfg(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
+                // supplies
+                .vss(vss),
+                .vdd(vdd[CELLMAP[(i*24+16)+:8]]),
+                .vddio(vddio[CELLMAP[(i*24+16)+:8]]),
+                .vssio(vssio[CELLMAP[(i*24+16)+:8]]),
+                // ring
+                .ioring(ioring[CELLMAP[(i*24+16)+:8]*RINGW+:RINGW])
+            );
+        end
+        else if (CELLMAP[i*24+:4] == LA_TXDIFF[3:0]) begin : ila_txdiff
+            la_iorxdiff #(
+                .SIDE (SIDE),
+                .TYPE (CELLMAP[(i*24+4)+:4]),
+                .RINGW(RINGW)
+            ) i0 (  // pad
+                .padp(pad[CELLMAP[(i*24+8)+:8]]),
+                .padn(pad[i+1]),  //TODO: fix!
+                // core
+                .a(a[CELLMAP[(i*24+8)+:8]]),
+                .oe(oe[CELLMAP[(i*24+8)+:8]]),
                 .cfg(cfg[CELLMAP[(i*24+8)+:8]*CFGW+:CFGW]),
                 // supplies
                 .vss(vss),
