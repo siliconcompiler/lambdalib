@@ -32,7 +32,7 @@ def write_la_spram(fout, memories, control_signals=None, la_type='ram'):
 
     selection_table = OrderedDict(sorted(selection_table.items(), reverse=True))
     for aw, items in selection_table.items():
-        selection_table[aw] = OrderedDict(sorted(items.items(), reverse=True))
+        selection_table[aw] = OrderedDict(sorted(items.items()))
     widths_table.sort()
     depths_table.sort()
 
