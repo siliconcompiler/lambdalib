@@ -28,7 +28,7 @@ def write_la_spram(fout, memories, control_signals=None, la_type='ram'):
         else:
             memory_inst_map[memory] = info["inst_name"]
 
-        selection_table.setdefault(info['AW'], {})[info['DW']] = memory
+        selection_table.setdefault(info['AW'], {})[int(info['DW'])] = memory
 
     selection_table = OrderedDict(sorted(selection_table.items(), reverse=True))
     for aw, items in selection_table.items():
