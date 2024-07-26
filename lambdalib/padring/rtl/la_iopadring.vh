@@ -1,21 +1,24 @@
 /*****************************************************************************
- * Function: Padframe Bitfield Definitions
+ * Function: Padcell Enumeration
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  ****************************************************************************/
 
-localparam LA_BIDIR = 8'h00;
-localparam LA_INPUT = 8'h01;
-localparam LA_ANALOG = 8'h02;
-localparam LA_XTAL = 8'h03;
-localparam LA_RXDIFF = 8'h04;
-localparam LA_TXDIFF = 8'h05;
-localparam LA_VDDIO = 8'h08;
-localparam LA_VSSIO = 8'h09;
-localparam LA_VDD = 8'h0A;
-localparam LA_VSS = 8'h0B;
-localparam LA_VDDA = 8'h0C;
-localparam LA_VSSA = 8'h0D;
-localparam LA_POC = 8'h0E;
-localparam LA_CUT = 8'h0F;
-localparam LA_DUMMY = 8'h07;
+// signal
+localparam [7:0] LA_BIDIR  = 8'h00;
+localparam [7:0] LA_INPUT  = 8'h01;
+localparam [7:0] LA_OUTPUT = 8'h02;
+localparam [7:0] LA_ANALOG = 8'h03;
+localparam [7:0] LA_XTAL   = 8'h04;
+localparam [7:0] LA_RXDIFF = 8'h05;
+localparam [7:0] LA_TXDIFF = 8'h06;
+localparam [7:0] LA_VDDIO  = 8'h10;
+localparam [7:0] LA_VSSIO  = 8'h11;
+// power
+localparam [7:0] LA_VDD    = 8'h12;
+localparam [7:0] LA_VSS    = 8'h13;
+localparam [7:0] LA_VDDA   = 8'h14;
+localparam [7:0] LA_VSSA   = 8'h15;
+localparam [7:0] LA_POC    = 8'h16;
+localparam [7:0] LA_CUT    = 8'h17;
+localparam [7:0] LA_NULL   = 8'hFF;
