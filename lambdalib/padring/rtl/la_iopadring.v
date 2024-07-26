@@ -5,23 +5,24 @@
  *
  * Documentation:
  *
- * - see "../README.md"
+ * - See "../README.md" for complete information
  *
- * - Cround (vss) is continuous around the while chip.
+ * PIN[7:0] = pin number connected to cell
  *
- * - Default is for ioring to be cut at corners, user must short rings
- *   at top level in RTl/netlist if abutted ring extends across corners.
+ * COMP[7:0] = pin number for negative pad for differential cells
  *
- * - CELLMAP = {SECTION#, PROP, CELL, PIN#}
+ * CELL[7:0] = cell type (see ./la_padring.vh)
  *
- * - SECTION specifies which power domain the pin belongs to
+ * SECTION[7:0] = padring power section number connected to cell
  *
- * - PIN maps the cell to the pin number
+ * PROP[7:0] = property passed to technology specific iolib implementation
  *
- * - CELLTYPE[3:0] specifies the cell type (see la_iopadring.vh)
+ * Cell Map Example:
  *
- * - CELLTYPE[7:4] is used by inside lambda cells for selection
+ * CELLMAP[79:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
+ *                  {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
  *
+
  * Testing:
  *
  * >> iverilog la_iopadring.v -DTB_LA_IOPADRING -y . -y ../../iolib/rtl
@@ -32,24 +33,24 @@
 
 module la_iopadring
   #(
-    parameter CFGW = 8,         // width of config bus
-    parameter RINGW = 8,        // width of io ring
-    parameter NO_NPINS = 1,     // IO pins per side
-    parameter NO_NCELLS = 1,    // cells per side
-    parameter NO_NSECTIONS = 1, // sections per side
-    parameter NO_CELLMAP = 0,   // cell configuration (see above)
-    parameter EA_NPINS = 1,
-    parameter EA_NCELLS = 1,
-    parameter EA_NSECTIONS = 1,
-    parameter EA_CELLMAP = 0,
-    parameter SO_NPINS = 1,
-    parameter SO_NCELLS = 1,
-    parameter SO_NSECTIONS = 1,
-    parameter SO_CELLMAP = 0,
-    parameter WE_NPINS = 1,
-    parameter WE_NCELLS = 1,
-    parameter WE_NSECTIONS = 1,
-    parameter WE_CELLMAP = 0
+    parameter                    CFGW = 8,         // config width
+    parameter                    RINGW = 8,        // ioring width
+    parameter                    NO_NPINS = 1,     // pins per side
+    parameter                    NO_NCELLS = 1,    // cells per side
+    parameter                    NO_NSECTIONS = 1, // sections per side
+    parameter [NO_NCELLS*40-1:0] NO_CELLMAP = 0,   // see ../README.md
+    parameter                    EA_NPINS = 1,
+    parameter                    EA_NCELLS = 1,
+    parameter                    EA_NSECTIONS = 1,
+    parameter [EA_NCELLS*40-1:0] EA_CELLMAP = 0,
+    parameter                    SO_NPINS = 1,
+    parameter                    SO_NCELLS = 1,
+    parameter                    SO_NSECTIONS = 1,
+    parameter [SO_NCELLS*40-1:0] SO_CELLMAP = 0,
+    parameter                    WE_NPINS = 1,
+    parameter                    WE_NCELLS = 1,
+    parameter                    WE_NSECTIONS = 1,
+    parameter [WE_NCELLS*40-1:0] WE_CELLMAP = 0
     )
    (// CONTINUOUS GROUND
     inout                          vss,
@@ -136,12 +137,12 @@ module la_iopadring
 
    // EAST
    la_ioside #(.SIDE("EA"),
-                .NPINS(EA_NPINS),
-                .NCELLS(EA_NCELLS),
-                .NSECTIONS(EA_NSECTIONS),
-                .CELLMAP(EA_CELLMAP),
-                .RINGW(RINGW),
-                .CFGW(CFGW))
+               .NPINS(EA_NPINS),
+               .NCELLS(EA_NCELLS),
+               .NSECTIONS(EA_NSECTIONS),
+               .CELLMAP(EA_CELLMAP),
+               .RINGW(RINGW),
+               .CFGW(CFGW))
    ieast (// Outputs
           .zp     (ea_zp),
           .zn     (ea_zn),
@@ -212,15 +213,45 @@ module la_iopadring
 endmodule
 
 //#####################################################################
-// A SIMPLE TESTBENCH (FOR ELABORATION)
+// A SIMPLE TESTBENCH
 //#####################################################################
 
 
-`ifdef TB_LA_IOPDADRING
+`ifdef TB_LA_IOPADRING
 module tb();
 
-   localparam PERIOD = 2;
-   localparam TIMEOUT = PERIOD  * 33;
+ `include "la_iopadring.vh"
+
+   parameter PERIOD = 2;
+   parameter TIMEOUT = PERIOD  * 50;
+
+   // config
+   localparam CFGW = 8;
+   localparam RINGW = 8;
+   localparam NPINS = 4;
+   localparam NCELLS = 8;
+   localparam NSECTIONS = 1;
+
+   // pinmap
+   localparam [7:0] PIN_IO0  = 8'h00;
+   localparam [7:0] PIN_AN0  = 8'h01;
+   localparam [7:0] PIN_RXP  = 8'h02;
+   localparam [7:0] PIN_RXN  = 8'h03;
+   localparam       NULL     = 8'h0;
+
+   localparam [40*NPINS-1:0] CELLMAP =
+                             {{NULL,  NULL,  LA_VSS,     NULL,    NULL},
+                              {NULL,  NULL,  LA_BIDIR,   NULL,    PIN_IO0},
+                              {NULL,  NULL,  LA_ANALOG,  NULL,    PIN_AN0},
+                              {NULL,  NULL,  LA_VDDIO,   NULL,    NULL},
+                              {NULL,  NULL,  LA_RXDIFF,  PIN_RXN, PIN_RXP},
+                              {NULL,  NULL,  LA_VSS,     NULL,    NULL},
+                              {NULL,  NULL,  LA_VSS,     NULL,    NULL},
+                              {NULL,  NULL,  LA_VSS,     NULL,    NULL}};
+
+
+   reg [NPINS-1:0]           stimulus;
+   wire [NPINS-1:0]          driver;
 
    // control block
    initial
@@ -232,92 +263,120 @@ module tb();
         $finish;
      end
 
-   // test program
    initial
      begin
         #(1)
-        nreset = 'b0;
-        clk = 'b0;
-        #(1)
-        $display("---- AND GATE ----");
-        nreset = 'b1;
-        lut = 16'h8000; // 4 input and gate
-        #(PERIOD * 16)
-        $display("---- OR GATE ----");
-        lut = 16'hFFFE; // 4 input or gate
+        stimulus = 'b0;
+        #(PERIOD * 25)
+        stimulus = {NPINS{1'b1}};
      end
 
-   // clk
-   always
-     #(PERIOD/2) clk = ~clk;
+   assign driver = stimulus;
 
-   // counter to cycle through stimulus
-   always @ (posedge clk or negedge nreset)
-     if (~nreset)
-       in <= 'b0;
-     else
-       in <= in + 1'b1;
+   /*AUTOWIRE*/
+   // Beginning of automatic wires (for undeclared instantiated-module outputs)
+   wire [NSECTIONS*RINGW-1:0] ea_ioring;
+   wire [NSECTIONS-1:0] ea_vdd;
+   wire [NSECTIONS-1:0] ea_vddio;
+   wire [NSECTIONS-1:0] ea_vssio;
+   wire [NSECTIONS*RINGW-1:0] no_ioring;
+   wire [NSECTIONS-1:0] no_vdd;
+   wire [NSECTIONS-1:0] no_vddio;
+   wire [NSECTIONS-1:0] no_vssio;
+   wire [NSECTIONS*RINGW-1:0] so_ioring;
+   wire [NSECTIONS-1:0] so_vdd;
+   wire [NSECTIONS-1:0] so_vddio;
+   wire [NSECTIONS-1:0] so_vssio;
+   wire                 vss;
+   wire [NSECTIONS*RINGW-1:0] we_ioring;
+   wire [NSECTIONS-1:0] we_vdd;
+   wire [NSECTIONS-1:0] we_vddio;
+   wire [NSECTIONS-1:0] we_vssio;
+   // End of automatics
 
-   always @ (posedge clk)
-     if (nreset)
-       $display("lut=%h, in=%b, out=%b", lut, in, out);
-
+   /*la_iopadring  AUTO_TEMPLATE (
+    .\(.*\)_a           ({NPINS{1'b0}}),
+    .\(.*\)_ie          ({NPINS{1'b1}}),
+    .\(.*\)_oe          ({NPINS{1'b0}}),
+    .\(.*\)_cfg         ({CFGW*NPINS{1'b0}}),
+    .\(.*\)_vdd         (\1_vdd[NSECTIONS-1:0]),
+    .\(.*\)_vddio       (\1_vddio[NSECTIONS-1:0]),
+    .\(.*\)_vssio       (\1_vssio[NSECTIONS-1:0]),
+    .\(.*\)_ioring      (\1_ioring[NSECTIONS*RINGW-1:0]),
+    .\(.*\)_z\(.*\)     (),
+    .\(.*\)_aio\(.*\)   (),
+    .\(.*\)_pad         (driver[NPINS-1:0]),
+    );
+    */
 
    // dut
-   la_iopadring
-     la_iopadring (/*AUTOINST*/
-                   // Outputs
-                   .no_zp               (no_zp[NO_NPINS-1:0]),
-                   .no_zn               (no_zn[NO_NPINS-1:0]),
-                   .ea_zp               (ea_zp[EA_NPINS-1:0]),
-                   .ea_zn               (ea_zn[EA_NPINS-1:0]),
-                   .so_zp               (so_zp[SO_NPINS-1:0]),
-                   .so_zn               (so_zn[SO_NPINS-1:0]),
-                   .we_zp               (we_zp[WE_NPINS-1:0]),
-                   .we_zn               (we_zn[WE_NPINS-1:0]),
-                   // Inouts
-                   .vss                 (vss),
-                   .no_pad              (no_pad[NO_NPINS-1:0]),
-                   .no_aio              (no_aio[NO_NPINS*3-1:0]),
-                   .no_vdd              (no_vdd[NO_NSECTIONS-1:0]),
-                   .no_vddio            (no_vddio[NO_NSECTIONS-1:0]),
-                   .no_vssio            (no_vssio[NO_NSECTIONS-1:0]),
-                   .no_ioring           (no_ioring[NO_NSECTIONS*RINGW-1:0]),
-                   .ea_pad              (ea_pad[EA_NPINS-1:0]),
-                   .ea_aio              (ea_aio[EA_NPINS*3-1:0]),
-                   .ea_vdd              (ea_vdd[EA_NSECTIONS-1:0]),
-                   .ea_vddio            (ea_vddio[EA_NSECTIONS-1:0]),
-                   .ea_vssio            (ea_vssio[EA_NSECTIONS-1:0]),
-                   .ea_ioring           (ea_ioring[EA_NSECTIONS*RINGW-1:0]),
-                   .so_pad              (so_pad[SO_NPINS-1:0]),
-                   .so_aio              (so_aio[SO_NPINS*3-1:0]),
-                   .so_vdd              (so_vdd[SO_NSECTIONS-1:0]),
-                   .so_vddio            (so_vddio[SO_NSECTIONS-1:0]),
-                   .so_vssio            (so_vssio[SO_NSECTIONS-1:0]),
-                   .so_ioring           (so_ioring[SO_NSECTIONS*RINGW-1:0]),
-                   .we_pad              (we_pad[WE_NPINS-1:0]),
-                   .we_aio              (we_aio[WE_NPINS*3-1:0]),
-                   .we_vdd              (we_vdd[WE_NSECTIONS-1:0]),
-                   .we_vddio            (we_vddio[WE_NSECTIONS-1:0]),
-                   .we_vssio            (we_vssio[WE_NSECTIONS-1:0]),
-                   .we_ioring           (we_ioring[WE_NSECTIONS*RINGW-1:0]),
-                   // Inputs
-                   .no_a                (no_a[NO_NPINS-1:0]),
-                   .no_ie               (no_ie[NO_NPINS-1:0]),
-                   .no_oe               (no_oe[NO_NPINS-1:0]),
-                   .no_cfg              (no_cfg[NO_NPINS*CFGW-1:0]),
-                   .ea_a                (ea_a[EA_NPINS-1:0]),
-                   .ea_ie               (ea_ie[EA_NPINS-1:0]),
-                   .ea_oe               (ea_oe[EA_NPINS-1:0]),
-                   .ea_cfg              (ea_cfg[EA_NPINS*CFGW-1:0]),
-                   .so_a                (so_a[SO_NPINS-1:0]),
-                   .so_ie               (so_ie[SO_NPINS-1:0]),
-                   .so_oe               (so_oe[SO_NPINS-1:0]),
-                   .so_cfg              (so_cfg[SO_NPINS*CFGW-1:0]),
-                   .we_a                (we_a[WE_NPINS-1:0]),
-                   .we_ie               (we_ie[WE_NPINS-1:0]),
-                   .we_oe               (we_oe[WE_NPINS-1:0]),
-                   .we_cfg              (we_cfg[WE_NPINS*CFGW-1:0]));
+   la_iopadring #(.CFGW(CFGW),
+                  .RINGW(RINGW),
+                  .NO_NPINS(NPINS),
+                  .EA_NPINS(NPINS),
+                  .WE_NPINS(NPINS),
+                  .SO_NPINS(NPINS),
+                  .NO_NCELLS(NCELLS),
+                  .EA_NCELLS(NCELLS),
+                  .WE_NCELLS(NCELLS),
+                  .SO_NCELLS(NCELLS),
+                  .NO_CELLMAP(CELLMAP),
+                  .EA_CELLMAP(CELLMAP),
+                  .WE_CELLMAP(CELLMAP),
+                  .SO_CELLMAP(CELLMAP))
+   la_iopadring (/*AUTOINST*/
+                 // Outputs
+                 .no_zp                 (),                      // Templated
+                 .no_zn                 (),                      // Templated
+                 .ea_zp                 (),                      // Templated
+                 .ea_zn                 (),                      // Templated
+                 .so_zp                 (),                      // Templated
+                 .so_zn                 (),                      // Templated
+                 .we_zp                 (),                      // Templated
+                 .we_zn                 (),                      // Templated
+                 // Inouts
+                 .vss                   (vss),
+                 .no_pad                (driver[NPINS-1:0]),     // Templated
+                 .no_aio                (),                      // Templated
+                 .no_vdd                (no_vdd[NSECTIONS-1:0]), // Templated
+                 .no_vddio              (no_vddio[NSECTIONS-1:0]), // Templated
+                 .no_vssio              (no_vssio[NSECTIONS-1:0]), // Templated
+                 .no_ioring             (no_ioring[NSECTIONS*RINGW-1:0]), // Templated
+                 .ea_pad                (driver[NPINS-1:0]),     // Templated
+                 .ea_aio                (),                      // Templated
+                 .ea_vdd                (ea_vdd[NSECTIONS-1:0]), // Templated
+                 .ea_vddio              (ea_vddio[NSECTIONS-1:0]), // Templated
+                 .ea_vssio              (ea_vssio[NSECTIONS-1:0]), // Templated
+                 .ea_ioring             (ea_ioring[NSECTIONS*RINGW-1:0]), // Templated
+                 .so_pad                (driver[NPINS-1:0]),     // Templated
+                 .so_aio                (),                      // Templated
+                 .so_vdd                (so_vdd[NSECTIONS-1:0]), // Templated
+                 .so_vddio              (so_vddio[NSECTIONS-1:0]), // Templated
+                 .so_vssio              (so_vssio[NSECTIONS-1:0]), // Templated
+                 .so_ioring             (so_ioring[NSECTIONS*RINGW-1:0]), // Templated
+                 .we_pad                (driver[NPINS-1:0]),     // Templated
+                 .we_aio                (),                      // Templated
+                 .we_vdd                (we_vdd[NSECTIONS-1:0]), // Templated
+                 .we_vddio              (we_vddio[NSECTIONS-1:0]), // Templated
+                 .we_vssio              (we_vssio[NSECTIONS-1:0]), // Templated
+                 .we_ioring             (we_ioring[NSECTIONS*RINGW-1:0]), // Templated
+                 // Inputs
+                 .no_a                  ({NPINS{1'b0}}),         // Templated
+                 .no_ie                 ({NPINS{1'b1}}),         // Templated
+                 .no_oe                 ({NPINS{1'b0}}),         // Templated
+                 .no_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
+                 .ea_a                  ({NPINS{1'b0}}),         // Templated
+                 .ea_ie                 ({NPINS{1'b1}}),         // Templated
+                 .ea_oe                 ({NPINS{1'b0}}),         // Templated
+                 .ea_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
+                 .so_a                  ({NPINS{1'b0}}),         // Templated
+                 .so_ie                 ({NPINS{1'b1}}),         // Templated
+                 .so_oe                 ({NPINS{1'b0}}),         // Templated
+                 .so_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
+                 .we_a                  ({NPINS{1'b0}}),         // Templated
+                 .we_ie                 ({NPINS{1'b1}}),         // Templated
+                 .we_oe                 ({NPINS{1'b0}}),         // Templated
+                 .we_cfg                ({CFGW*NPINS{1'b0}}));   // Templated
 
 endmodule
 // Local Variables:
