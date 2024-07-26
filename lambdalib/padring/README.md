@@ -18,11 +18,13 @@ Specifies the total number of power sections within one side of the padring. The
 ### {NO,EA,WE,SO}CELLMAP
 Specifies the type of cells, pin connections, properties, and power connections of all cells in the padring with the exception of filler cells. The physical placement of the cells within the padring shall be done in the order dictated by `CELLMAP`. The CELLMAP is a vector of size NCELLS * 40, with the 40bit vector split into the following fields:
 
-  * CELLMAP[7:0] = pin number connected to cell
-  * CELLMAP[15:8] = pin number for complementary pad for differential cells
-  * CELLMAP[23:16] = cell type (see ./la_padring.vh)
-  * SECTION[31:24] = padring power section number connected to cell
-  * PROP[39:32] = property passed to technology specific iolib implementation
+  * PIN[7:0]     = CELLMAP[7:0]   = pin number connected to cell
+  * COMP[7:0]    = CELLMAP[15:8]  = pin number for complementary pad for differential cells
+  * TYPE[7:0]    = CELLMAP[23:16] = cell type (see ./la_padring.vh)
+  * SECTION[7:0] = CELLMAP[31:24] = padring power section number connected to cell
+  * PROP[7:0]    = CELLMAP[39:32] = property passed to technology specific iolib implementation
+
+The header file [la_iopadring.vh](./rtl/la_iopadring.vh) enumerates the cells recognized by the padring generator. `NULL` is a reserved keyword used to specify an empty `CELLMAP` field.
 
 ### CFGW
 Specifies the width of the configuration bus of the io cell. For a description of uses of `CFGW`, see [IOLIB](../../iolib/README.md).
@@ -88,10 +90,9 @@ la_iopadring  #(.CFGW(CFGW),
                 .NO_CELLMAP(CELLMAP),
                 .EA_CELLMAP(CELLMAP),
                 .WE_CELLMAP(CELLMAP),
-                .SO_CELLMAP(CELLMAP)) 
+                .SO_CELLMAP(CELLMAP))
 la_iopadring(...)
 
 
 
 ```
-
