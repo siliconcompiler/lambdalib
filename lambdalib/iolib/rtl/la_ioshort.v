@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Shorting two wires together
+ * Function: Inout Port Short
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -11,11 +11,10 @@
  * connection in RTL.
  *
  ****************************************************************************/
-module la_ioshort (
-    inout a,
-    inout b,
-    input a2b
-);
+module la_ioshort (inout a,
+                   inout b,
+                   input a2b
+                   );
 
 `ifdef VERILATOR
     // Using direction to break the loop
@@ -31,4 +30,4 @@ module la_ioshort (
     // verilog_lint: waive-end module-port
 `endif
 
-endmodule  // la_ioshort
+endmodule

@@ -1,9 +1,11 @@
 /*****************************************************************************
- * Function: IO analog pass-through cell
+ * Function: Analog Passthrough IO cell
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
  * Docs:
+ *
+ * ../README.md
  *
  * aio[0] = pass through from pad (with esd clamp)
  * aio[1] = small series resistance
@@ -22,9 +24,9 @@ module la_ioanalog
     inout             vss,    // core ground
     inout             vddio,  // io supply
     inout             vssio,  // io ground
-    inout [RINGW-1:0] ioring, // generic io ring
+    inout [RINGW-1:0] ioring, // generic ioring
     // core interface
-    inout [2:0]       aio     // analog core signal
+    inout [2:0]       aio     // analog core signals
     );
 
 `ifdef VERILATOR

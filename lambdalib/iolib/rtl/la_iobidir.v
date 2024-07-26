@@ -1,5 +1,5 @@
 /**************************************************************************
- * Function: IO digital bidirectional buffer
+ * Function: Digital Bidirectional IO Buffer
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
