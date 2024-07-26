@@ -10,24 +10,25 @@
  * aio[2] = big series resistance
  *
  ****************************************************************************/
-module la_ioanalog #(
-    parameter TYPE  = "DEFAULT",  // cell type
-    parameter SIDE  = "NO",       // "NO", "SO", "EA", "WE"
-    parameter RINGW = 8           // width of io ring
-) (  // io pad signals
-    inout             pad,     // bidirectional pad signal
-    inout             vdd,     // core supply
-    inout             vss,     // core ground
-    inout             vddio,   // io supply
-    inout             vssio,   // io ground
-    inout [RINGW-1:0] ioring,  // generic io-ring interface
+module la_ioanalog
+  #(
+    parameter PROP = "DEFAULT", // cell property
+    parameter SIDE = "NO",      // "NO", "SO", "EA", "WE"
+    parameter RINGW = 8         // width of io ring
+    )
+   (// io pad signals
+    inout             pad,    // bidirectional pad signal
+    inout             vdd,    // core supply
+    inout             vss,    // core ground
+    inout             vddio,  // io supply
+    inout             vssio,  // io ground
+    inout [RINGW-1:0] ioring, // generic io ring
     // core interface
-    inout [      2:0] aio      // analog core signal
-);
-
+    inout [2:0]       aio     // analog core signal
+    );
 
 `ifdef VERILATOR
-    // TODO!: input only for verilator bases simulation
+    // TODO!: input only for verilator based simulation
     assign aio[0] = pad;
     assign aio[1] = pad;
     assign aio[2] = pad;
