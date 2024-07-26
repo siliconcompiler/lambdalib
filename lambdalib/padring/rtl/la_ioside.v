@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Padring Single Side Module
+ * Function: Padring Side Module
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -63,8 +63,9 @@ module la_ioside
 
    for (i = 0; i < NCELLS; i = i + 1)
      begin : ipad
+        // LA_BIDIR
         if (CELLMAP[(i*40+16)+:8] == LA_BIDIR)
-          begin : g0
+          begin : gbidir
              la_iobidir #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
                           .CFGW(CFGW),
@@ -85,8 +86,9 @@ module la_ioside
                  // ring
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_INPUT)
-          begin : g0
+        // LA_INPUT
+        if (CELLMAP[(i*40+16)+:8] == LA_INPUT)
+          begin : ginput
              la_ioinput #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
                           .CFGW(CFGW),
@@ -105,8 +107,9 @@ module la_ioside
                  // ring
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_ANALOG)
-          begin : g0
+        // LA_ANALOG
+        if (CELLMAP[(i*40+16)+:8] == LA_ANALOG)
+          begin : ganalog
              la_ioanalog #(.SIDE(SIDE),
                            .PROP(CELLMAP[(i*40+32)+:8]),
                            .RINGW(RINGW))
@@ -122,8 +125,9 @@ module la_ioside
                  // ring
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_XTAL)
-          begin : g0
+        // LA_XTAL
+        if (CELLMAP[(i*40+16)+:8] == LA_XTAL)
+          begin : gxtal
              la_ioxtal #(.SIDE(SIDE),
                          .PROP(CELLMAP[(i*40+32)+:8]),
                          .CFGW(CFGW),
@@ -142,8 +146,9 @@ module la_ioside
                  // ring
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_RXDIFF)
-          begin : g0
+        // LA_RXDIFF
+        if (CELLMAP[(i*40+16)+:8] == LA_RXDIFF)
+          begin : grxdiff
              la_iorxdiff #(.SIDE(SIDE),
                            .PROP(CELLMAP[(i*40+32)+:8]),
                            .CFGW(CFGW),
@@ -164,8 +169,9 @@ module la_ioside
                  // ring
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_TXDIFF)
-          begin : g0
+        // LA_TXDIFF
+        if (CELLMAP[(i*40+16)+:8] == LA_TXDIFF)
+          begin : gtxdiff
              la_iotxdiff #(.SIDE(SIDE),
                            .PROP(CELLMAP[(i*40+32)+:8]),
                            .CFGW(CFGW),
@@ -184,8 +190,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_POC)
-          begin : g0
+        // LA_POC
+        if (CELLMAP[(i*40+16)+:8] == LA_POC)
+          begin : gpoc
              la_iopoc #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
@@ -195,15 +202,16 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_CUT)
-          begin : ila_iocut
+        // LA_CUT
+        if (CELLMAP[(i*40+16)+:8] == LA_CUT)
+          begin : icut
              la_iocut #(.SIDE (SIDE),
                         .PROP (CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
              i0 (.vss(vss));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VDDIO)
-          begin : g0
+        if (CELLMAP[(i*40+16)+:8] == LA_VDDIO)
+          begin : gvddio
              la_iovddio #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
                           .RINGW(RINGW))
@@ -214,8 +222,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VSSIO)
-          begin : g0
+        // LA_VSSIO
+        if (CELLMAP[(i*40+16)+:8] == LA_VSSIO)
+          begin : gvssio
              la_iovssio #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
                           .RINGW(RINGW))
@@ -225,8 +234,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VDD)
-          begin : g0
+        // LA_VDD
+        if (CELLMAP[(i*40+16)+:8] == LA_VDD)
+          begin : gvdd
              la_iovdd #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
@@ -236,8 +246,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VSS)
-          begin : g0
+        // LA_VSS
+        if (CELLMAP[(i*40+16)+:8] == LA_VSS)
+          begin : gvss
             la_iovss #(.SIDE(SIDE),
                        .PROP(CELLMAP[(i*40+32)+:8]),
                        .RINGW(RINGW))
@@ -247,8 +258,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VDDA)
-          begin : g0
+        // LA_VDDA
+        if (CELLMAP[(i*40+16)+:8] == LA_VDDA)
+          begin : gvdda
             la_iovdda #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
@@ -258,8 +270,9 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
-        else if (CELLMAP[(i*40+16)+:8] == LA_VSSA)
-          begin : g0
+        // LA_VSSA
+        if (CELLMAP[(i*40+16)+:8] == LA_VSSA)
+          begin : gvssa
             la_iovssa #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))

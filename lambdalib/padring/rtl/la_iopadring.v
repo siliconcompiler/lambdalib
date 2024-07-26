@@ -237,6 +237,7 @@ module tb();
    localparam [7:0] PIN_AN0  = 8'h01;
    localparam [7:0] PIN_RXP  = 8'h02;
    localparam [7:0] PIN_RXN  = 8'h03;
+
    localparam       NULL     = 8'h0;
 
    localparam [40*NPINS-1:0] CELLMAP =
