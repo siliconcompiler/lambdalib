@@ -1,4 +1,4 @@
-# PADRING GENERATOR
+q# PADRING GENERATOR
 
 ## Introduction
 
@@ -18,8 +18,8 @@ Specifies the total number of power sections within one side of the padring. The
 ### {NO,EA,WE,SO}CELLMAP
 Specifies the type of cells, pin connections, properties, and power connections of all cells in the padring with the exception of filler cells. The physical placement of the cells within the padring shall be done in the order dictated by `CELLMAP`. The CELLMAP is a vector of size NCELLS * 40, with the 40bit vector split into the following fields:
 
-  * PIN[7:0]     = CELLMAP[7:0]   = pin number connected to cell
-  * COMP[7:0]    = CELLMAP[15:8]  = pin number for complementary pad for differential cells
+  * PIN[7:0]     = CELLMAP[7:0]   = pin number connected to cell. Positive signal in case of differential pairs.
+  * COMP[7:0]    = CELLMAP[15:8]  = pin number of complementary (negative) pad to `PIN`. Used for differential IO cells.
   * TYPE[7:0]    = CELLMAP[23:16] = cell type (see ./la_padring.vh)
   * SECTION[7:0] = CELLMAP[31:24] = padring power section number connected to cell
   * PROP[7:0]    = CELLMAP[39:32] = property passed to technology specific iolib implementation

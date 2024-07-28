@@ -24,7 +24,7 @@
 ## PARAMETERS
 
 ### CFGW
-The `CFGW` parameter defines the width of the configuration bus of the io cell. IO cells generally include a set of configuration inputs for things like drive strength and operating modes. Setting `CFGW` to a large value (eg. 16/32) should have zero impact on the design as the extra bus bits get optimized away during implementation.
+The `CFGW` parameter defines the width of the configuration bus of the io cell. IO cells generally include a set of configuration inputs for things like drive strength and operating modes. Setting `CFGW` to a large value (eg. 16/32) should have zero impact on the design as the extra bus bits get optimized away during implementation. The connection between the generic `CFG` bus and the technology specific IO cell is done within the techology specific cell wrapper library.
 
 For la_bidir, the first 8 bits of the configuration bus are reserved for the functionality shown in the table below.
 
