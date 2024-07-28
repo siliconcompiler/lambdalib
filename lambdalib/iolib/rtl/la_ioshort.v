@@ -1,14 +1,16 @@
 /*****************************************************************************
- * Function: Inout Port Short
+ * Function: Simulation Friendly IO Alias Module
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
  * Docs:
  *
- * Workaround for unsupported tran, alias, and port aliasing in Verilator.
+ * Instantiates the la_pt inout alias module and adds a loop breaking
+ * logic for some tools that don's support tran, alias,and port aliasing.
  *
- * Useful for making connections between ports without hard coding the
- * connection in RTL.
+ * WARNING: The port list alias features is in the verilog standard,
+ * but not well supported by open source tools. Not recommended for
+ * portable designs.
  *
  ****************************************************************************/
 module la_ioshort (inout a,
@@ -17,16 +19,12 @@ module la_ioshort (inout a,
                    );
 
 `ifdef VERILATOR
-    // Using direction to break the loop
-    assign a = ~a2b ? b : 1'bz;
-    assign b = a2b ? a : 1'bz;
+   // Using direction to break the loop
+   assign a = ~a2b ? b : 1'bz;
+   assign b = a2b ? a : 1'bz;
 `else
-    // single port pass through short/hack
     // verilog_lint: waive-start module-port
-    la_pt la_pt (
-        a,
-        b
-    );
+    la_pt la_pt (a,b);
     // verilog_lint: waive-end module-port
 `endif
 
