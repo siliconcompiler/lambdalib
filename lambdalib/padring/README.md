@@ -30,7 +30,7 @@ The header file [la_iopadring.vh](./rtl/la_iopadring.vh) enumerates the cells re
 Specifies the width of the configuration bus of the io cell. For a description of uses of `CFGW`, see [IOLIB](../../iolib/README.md).
 
 #### RINGW
-The `RINGW` parameter specifies the number of signals within the power bus that connects all of the io cells together within the padring.
+The `RINGW` parameter specifies the number of signals within the power bus that connects all of the io cells together within the padring. For a description of uses of `RINGW`, see [IOLIB](../../iolib/README.md).
 
 
 ## Using the Generator
