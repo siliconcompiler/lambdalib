@@ -1,6 +1,6 @@
 
 /**************************************************************************
- * Function: IO Alias Module
+ * Function: IO Alias Utility Module
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -17,8 +17,8 @@
  *
  *************************************************************************/
 
-module la_pt (.io1(a),
-              .io2(a));
+module la_ioalias (.io1(a),
+                   .io2(a));
 
    inout wire a;
 
