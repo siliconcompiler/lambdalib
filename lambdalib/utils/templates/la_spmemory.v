@@ -7,7 +7,7 @@
  *
  * This is a wrapper for selecting from a set of hardened memory macros.
  *
- * A synthesizable reference model is used when the TYPE is DEFAULT. The
+ * A synthesizable reference model is used when the PROP is DEFAULT. The
  * synthesizable model does not implement the cfg and test interface and should
  * only be used for basic testing and for synthesizing for FPGA devices.
  * Advanced ASIC development should rely on complete functional models
@@ -15,7 +15,7 @@
  *
  * Technologoy specific implementations of "la_sp{{ type }}" would generally include
  * one ore more hardcoded instantiations of {{ type }} modules with a generate
- * statement relying on the "TYPE" to select between the list of modules
+ * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *
  ****************************************************************************/
@@ -23,7 +23,7 @@
 module la_sp{{ type }}
   #(parameter DW     = 32,          // Memory width
     parameter AW     = 10,          // Address width (derived)
-    parameter TYPE   = "DEFAULT",   // Pass through variable for hard macro
+    parameter PROP   = "DEFAULT",   // Pass through variable for hard macro
     parameter CTRLW  = 128,         // Width of asic ctrl interface
     parameter TESTW  = 128          // Width of asic test interface
     )
@@ -45,15 +45,15 @@ module la_sp{{ type }}
     );
 
     // Determine which memory to select
-    localparam MEM_TYPE = (TYPE != "DEFAULT") ? TYPE :{% for aw, dw_select in selection_table.items() %}
+    localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW {% if loop.previtem is defined %}=={% else %}>={% endif %} {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
-      (MEM_TYPE == "{{ memory }}") ? {{ width }} :{% endfor %}
+      (MEM_PROP == "{{ memory }}") ? {{ width }} :{% endfor %}
       0;
  
     localparam MEM_DEPTH = {% for memory, depth in depth_table %}
-      (MEM_TYPE == "{{ memory }}") ? {{ depth }} :{% endfor %}
+      (MEM_PROP == "{{ memory }}") ? {{ depth }} :{% endfor %}
       0;
 
     // Create memories
@@ -106,10 +106,11 @@ module la_sp{{ type }}
           assign ce_in = ce && selected;
           assign we_in = we && selected;
           {% for memory, inst_name in inst_map.items() %}
-          {% if loop.previtem is defined %}else {% endif %}if (MEM_TYPE == "{{ memory }}")
+          if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
             {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
               .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
-            );{% endfor %}
+            );
+          end{% endfor %}
         end
       end
     endgenerate

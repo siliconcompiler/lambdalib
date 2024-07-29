@@ -41,7 +41,7 @@
  ****************************************************************************/
 
 module la_lut4
-  #(parameter TYPE  = "DEFAULT" //  implementation selector
+  #(parameter PROP  = "DEFAULT" //  implementation selector
     )
    (input [3:0]  in,
     input [15:0] lut,
