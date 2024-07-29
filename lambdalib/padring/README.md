@@ -1,4 +1,4 @@
-q# PADRING GENERATOR
+# PADRING GENERATOR
 
 ## Introduction
 
