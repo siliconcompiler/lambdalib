@@ -5,7 +5,7 @@
  *
  * Docs:
  *
- * 1. Statically configurable as host/device by TYPE.
+ * 1. Statically configurable as host/device by PROP.
 
  ****************************************************************************/
 module la_qspi #(

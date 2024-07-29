@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 module la_ble4p0
-  #(parameter TYPE  = "DEFAULT" //  implementation selector
+  #(parameter PROP  = "DEFAULT" //  implementation selector
     )
    (// logic
     input        clk, // clock
