@@ -13,6 +13,6 @@ def setup(chip):
     lib = Library(chip, 'lambdalib_fpgalib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
-    lib.add('option', 'ydir', "lambdalib/fpgalib/rtl")
+    lib.add('option', 'ydir', "fpgalib/rtl")
 
     return lib

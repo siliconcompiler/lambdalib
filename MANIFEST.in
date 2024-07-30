@@ -5,5 +5,3 @@ prune .github
 prune scripts
 prune docs
 prune tests
-prune lambdalib/padring/
-prune lambdalib/*lib/

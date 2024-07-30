@@ -14,7 +14,7 @@ def setup(chip):
     lib = Library(chip, 'lambdalib_ramlib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
-    lib.add('option', 'ydir', "lambdalib/ramlib/rtl")
+    lib.add('option', 'ydir', "ramlib/rtl")
 
     lib.use(auxlib)
 

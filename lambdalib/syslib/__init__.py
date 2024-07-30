@@ -13,6 +13,6 @@ def setup(chip):
     lib = Library(chip, 'lambdalib_syslib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
-    lib.add('option', 'ydir', "lambdalib/syslib/rtl")
+    lib.add('option', 'ydir', "syslib/rtl")
 
     return lib
