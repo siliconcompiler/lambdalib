@@ -43,7 +43,7 @@ def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
     _common.register_data_source(path_assert)
     lambdalib_path = sc_package.path(path_assert, 'lambdalib')
-    return f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
+    return f'{lambdalib_path}/{la_lib}/rtl'
 
 
 def check(outputpath, la_lib='stdlib'):
