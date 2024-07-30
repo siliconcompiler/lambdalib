@@ -1,60 +1,47 @@
-from siliconcompiler import Chip, Library
+from siliconcompiler import Chip
 import siliconcompiler.package as sc_package
 import glob
 import os
 import shutil
 
-__version__ = "0.2.7"
+from lambdalib import _common
+from lambdalib import \
+    auxlib, \
+    fpgalib, \
+    iolib, \
+    padring, \
+    ramlib, \
+    stdlib, \
+    syslib, \
+    vectorlib
 
-_libraries = (
-    'iolib',
-    'stdlib',
-    'auxlib',
-    'ramlib',
-    'padring',
-    'syslib',
-    'vectorlib',
-    'fpgalib'
-)
+
+__version__ = _common._version
 
 
 ########################
 # SiliconCompiler Setup
 ########################
 def setup(chip):
-    '''Lambdalib library setup script'''
+    '''
+    Lambdalib library setup script
+    '''
 
-    add_idirs = ('padring',)
-
-    libs = []
-    # Iterate over all libs
-    for name in _libraries:
-        lib = Library(chip, f'lambdalib_{name}', package='lambdalib')
-        register_data_source(lib)
-
-        lib.add('option', 'ydir', f"lambdalib/{name}/rtl")
-
-        if name in add_idirs:
-            lib.add('option', 'idir', f"lambdalib/{name}/rtl")
-
-        libs.append(lib)
-
-    return libs
-
-
-def register_data_source(chip):
-    sc_package.register_python_data_source(
-        chip,
-        "lambdalib",
-        "lambdalib",
-        "git+https://github.com/siliconcompiler/lambdalib.git",
-        alternative_ref=f"v{__version__}",
-        python_module_path_append="..")
+    return [
+        auxlib.setup(chip),
+        fpgalib.setup(chip),
+        iolib.setup(chip),
+        padring.setup(chip),
+        ramlib.setup(chip),
+        stdlib.setup(chip),
+        syslib.setup(chip),
+        vectorlib.setup(chip)
+    ]
 
 
 def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
-    register_data_source(path_assert)
+    _common.register_data_source(path_assert)
     lambdalib_path = sc_package.path(path_assert, 'lambdalib')
     return f'{lambdalib_path}/lambdalib/{la_lib}/rtl'
 

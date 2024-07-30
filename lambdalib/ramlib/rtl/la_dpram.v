@@ -14,7 +14,7 @@
  * supplied on a per macro basis.
  *
  * Technologoy specific implementations of "la_dpram" would generally include
- * one ore more hardcoded instantiations of RAM modules with a generate
+ * one or more hardcoded instantiations of RAM modules with a generate
  * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *
