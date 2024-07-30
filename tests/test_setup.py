@@ -2,14 +2,33 @@ import pytest
 from siliconcompiler import Chip
 
 import lambdalib
+from lambdalib import \
+    auxlib, \
+    fpgalib, \
+    iolib, \
+    padring, \
+    ramlib, \
+    stdlib, \
+    syslib, \
+    vectorlib
+libraries = [
+    auxlib,
+    fpgalib,
+    iolib,
+    padring,
+    ramlib,
+    stdlib,
+    syslib,
+    vectorlib
+]
 
 
-@pytest.mark.parametrize('lib', lambdalib._libraries)
+@pytest.mark.parametrize('lib', libraries)
 def test_setup(lib):
     chip = Chip('<lib>')
-    chip.use(lambdalib)
+    chip.use(lib)
 
-    lib_name = f'lambdalib_{lib}'
+    lib_name = lib.__name__.replace('.', '_')
 
     assert lib_name in chip.getkeys('library')
     assert len(chip.get('library', lib_name, 'option', 'ydir')) == 1
@@ -17,12 +36,13 @@ def test_setup(lib):
 
 @pytest.mark.parametrize(
         'lib,has_idir',
-        [(lib, lib == 'padring') for lib in lambdalib._libraries])
+        [(lib, lib == padring) for lib in libraries])
 def test_setup_with_idir(lib, has_idir):
     chip = Chip('<lib>')
-    chip.use(lambdalib)
+    chip.use(lib)
 
-    lib_name = f'lambdalib_{lib}'
+    lib_name = lib.__name__.replace('.', '_')
+
     assert lib_name in chip.getkeys('library')
 
     excpect_idir = 0
