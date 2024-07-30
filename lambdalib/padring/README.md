@@ -7,7 +7,7 @@ The lamdbdalib `padring` library is an automated "pure verilog" padring generato
 ## PARAMETERS
 
 ### {NO,EA,WE,SO}NCELLS
-Specifies the total number of placed cells within one side of the padring, includig supply and clamp cells.
+Specifies the total number of placed cells within one side of the padring, including supply and clamp cells.
 
 ### {NO,EA,WE,SO}NPINS
 Specifies the total number of logical device pins (pads) connected to one side of the padring, not including supply pins. The `CELLMAP` parameter specifies which one of the pins should be connected to a cell.

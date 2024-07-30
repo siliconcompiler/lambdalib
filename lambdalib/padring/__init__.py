@@ -8,7 +8,7 @@ from lambdalib import iolib
 ########################
 def setup(chip):
     '''
-    Lambdalib pandring
+    Lambdalib padring
     '''
 
     lib = Library(chip, 'lambdalib_padring', package='lambdalib', auto_enable=True)

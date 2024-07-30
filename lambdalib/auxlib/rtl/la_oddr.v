@@ -17,7 +17,7 @@ module la_oddr #(
     reg in1_sh;
     always @(clk or in1) if (~clk) in1_sh <= in1;
 
-    //Using clock as data selctor
+    //Using clock as data selector
     assign out = clk ? in1_sh : in0;
 
 endmodule

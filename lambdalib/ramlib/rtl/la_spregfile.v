@@ -14,7 +14,7 @@
  * supplied on a per macro basis.
  *
  * Technologoy specific implementations of "la_spregfile" would generally
- * include one ore more hardcoded instantiations of RF modules with a generate
+ * include one or more hardcoded instantiations of RF modules with a generate
  * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *

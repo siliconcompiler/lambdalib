@@ -25,7 +25,7 @@
  *
  * 1. N=2, I=4
  * 2. test1: CLB configured as separate and4, or4 gates
- * 3. test2" LB confiugred as combined and7 (in[7]=ignored)
+ * 3. test2" LB configured as combined and7 (in[7]=ignored)
  *
  ******************************************************************************/
 
