@@ -1,7 +1,6 @@
 import pytest
 from siliconcompiler import Chip
 
-import lambdalib
 from lambdalib import \
     auxlib, \
     fpgalib, \
