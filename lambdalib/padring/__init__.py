@@ -14,8 +14,8 @@ def setup(chip):
     lib = Library(chip, 'lambdalib_padring', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
-    lib.add('option', 'idir', "lambdalib/padring/rtl")
-    lib.add('option', 'ydir', "lambdalib/padring/rtl")
+    lib.add('option', 'idir', "padring/rtl")
+    lib.add('option', 'ydir', "padring/rtl")
 
     lib.use(iolib)
 

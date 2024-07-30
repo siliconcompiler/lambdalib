@@ -14,7 +14,7 @@ def setup(chip):
     lib = Library(chip, 'lambdalib_vectorlib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
-    lib.add('option', 'ydir', "lambdalib/vectorlib/rtl")
+    lib.add('option', 'ydir', "vectorlib/rtl")
 
     lib.use(stdlib)
 
