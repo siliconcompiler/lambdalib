@@ -142,7 +142,6 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
         chip.set('option', 'flow', 'asicflow')
         chip.set('option', 'to', 'syn')
         chip.set('option', 'quiet', True)
-        chip.set('option', 'resume', True)
         chip.set('option', 'jobname', f"{target_name}-{logiclib}")
 
         chip.set('tool', 'yosys', 'task', 'syn_asic', 'var', 'autoname', 'false')
