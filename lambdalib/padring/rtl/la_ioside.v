@@ -195,8 +195,10 @@ module la_ioside
           begin : gpoc
              la_iopoc #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
+                        .CFGW(CFGW),
                         .RINGW(RINGW))
-             i0 (.vss(vss),
+             i0 (.cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW])
+                 .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
                  .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
