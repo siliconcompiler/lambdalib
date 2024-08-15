@@ -282,6 +282,19 @@ module la_ioside
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
                  .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
           end
+        // LA_CLAMP
+        if (CELLMAP[(i*40+16)+:8] == LA_CLAMP)
+          begin : gclamp
+            la_iovssa #(.SIDE(SIDE),
+                        .PROP(CELLMAP[(i*40+32)+:8]),
+                        .RINGW(RINGW))
+             i0 (.pad(.pad(pad[CELLMAP[(i*40)+:8]])),
+                 .vss(vss),
+                 .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
+                 .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
+                 .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
+                 .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
+          end
      end
 
 endmodule

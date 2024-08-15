@@ -15,6 +15,7 @@ module la_ioclamp
     parameter RINGW = 8         // width of io ring
     )
    (// io pad signals
+    inout             pad,    // clamp supply
     inout             vdd,   // core supply
     inout             vss,   // core ground
     inout             vddio, // io supply

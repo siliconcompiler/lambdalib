@@ -25,3 +25,4 @@ localparam [7:0] LA_VDDA   = 8'h14;
 localparam [7:0] LA_VSSA   = 8'h15;
 localparam [7:0] LA_POC    = 8'h16;
 localparam [7:0] LA_CUT    = 8'h17;
+localparam [7:0] LA_CLAMP  = 8'h18;
