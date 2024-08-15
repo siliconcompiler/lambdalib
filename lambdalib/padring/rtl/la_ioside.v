@@ -197,7 +197,7 @@ module la_ioside
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .CFGW(CFGW),
                         .RINGW(RINGW))
-             i0 (.cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW])
+             i0 (.cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
                  .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
@@ -291,7 +291,7 @@ module la_ioside
             la_iovssa #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
-             i0 (.pad(.pad(pad[CELLMAP[(i*40)+:8]])),
+             i0 (.pad(pad[CELLMAP[(i*40)+:8]]),
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
                  .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
