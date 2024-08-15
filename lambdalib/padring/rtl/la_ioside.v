@@ -212,6 +212,7 @@ module la_ioside
                         .RINGW(RINGW))
              i0 (.vss(vss));
           end
+        // LA_VDDIO
         if (CELLMAP[(i*40+16)+:8] == LA_VDDIO)
           begin : gvddio
              la_iovddio #(.SIDE(SIDE),
