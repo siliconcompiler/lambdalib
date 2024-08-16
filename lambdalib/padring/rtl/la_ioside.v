@@ -195,8 +195,10 @@ module la_ioside
           begin : gpoc
              la_iopoc #(.SIDE(SIDE),
                         .PROP(CELLMAP[(i*40+32)+:8]),
+                        .CFGW(CFGW),
                         .RINGW(RINGW))
-             i0 (.vss(vss),
+             i0 (.cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
+                 .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
                  .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
@@ -210,6 +212,7 @@ module la_ioside
                         .RINGW(RINGW))
              i0 (.vss(vss));
           end
+        // LA_VDDIO
         if (CELLMAP[(i*40+16)+:8] == LA_VDDIO)
           begin : gvddio
              la_iovddio #(.SIDE(SIDE),
@@ -277,6 +280,19 @@ module la_ioside
                         .PROP(CELLMAP[(i*40+32)+:8]),
                         .RINGW(RINGW))
              i0 (.vss(vss),
+                 .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
+                 .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
+                 .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
+                 .ioring(ioring[CELLMAP[(i*40+24)+:8]*RINGW+:RINGW]));
+          end
+        // LA_CLAMP
+        if (CELLMAP[(i*40+16)+:8] == LA_CLAMP)
+          begin : gclamp
+            la_iovssa #(.SIDE(SIDE),
+                        .PROP(CELLMAP[(i*40+32)+:8]),
+                        .RINGW(RINGW))
+             i0 (.pad(pad[CELLMAP[(i*40)+:8]]),
+                 .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
                  .vddio(vddio[CELLMAP[(i*40+24)+:8]]),
                  .vssio(vssio[CELLMAP[(i*40+24)+:8]]),
