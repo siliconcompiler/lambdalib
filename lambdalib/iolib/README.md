@@ -4,7 +4,7 @@
 
 | Cell                             | Type    | Description                 |
 | ---------------------------------|---------|-----------------------------|
-[[la_iobidir](./rtl/la_iobidir.v)  | Digital | Bidirectional
+[la_iobidir](./rtl/la_iobidir.v)   | Digital | Bidirectional
 [la_ioinput](./rtl/la_ioinput.v)   | Digital | Input
 [la_ioxtal](./rtl/la_ioxtal.v)     | Digital | Xtal transceiver
 [la_iorxdiff](./rtl/la_iorxdiff.v) | Digital | Differential input

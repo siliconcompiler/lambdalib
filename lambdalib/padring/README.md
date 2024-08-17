@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The lamdbdalib `padring` library is an automated "pure verilog" padring generator with support for cells within the [IOLIB](../../iolib/README.md) io cell library.
+The lamdbdalib `padring` library is an automated "pure verilog" padring generator with support for cells within the [IOLIB](../iolib/README.md) io cell library.
 
 ## PARAMETERS
 
@@ -20,17 +20,17 @@ Specifies the type of cells, pin connections, properties, and power connections 
 
   * PIN[7:0]     = CELLMAP[7:0]   = pin number connected to cell. Positive signal in case of differential pairs.
   * COMP[7:0]    = CELLMAP[15:8]  = pin number of complementary (negative) pad to `PIN`. Used for differential IO cells.
-  * TYPE[7:0]    = CELLMAP[23:16] = cell type (see ./la_padring.vh)
+  * TYPE[7:0]    = CELLMAP[23:16] = cell type (see [la_iopadring.vh](rtl/la_iopadring.vh))
   * SECTION[7:0] = CELLMAP[31:24] = padring power section number connected to cell
   * PROP[7:0]    = CELLMAP[39:32] = property passed to technology specific iolib implementation
 
-The header file [la_iopadring.vh](./rtl/la_iopadring.vh) enumerates the cells recognized by the padring generator. `NULL` is a reserved keyword used to specify an empty `CELLMAP` field.
+The header file [la_iopadring.vh](rtl/la_iopadring.vh) enumerates the cells recognized by the padring generator. `NULL` is a reserved keyword used to specify an empty `CELLMAP` field.
 
 ### CFGW
-Specifies the width of the configuration bus of the io cell. For a description of uses of `CFGW`, see [IOLIB](../../iolib/README.md).
+Specifies the width of the configuration bus of the io cell. For a description of uses of `CFGW`, see [IOLIB](../iolib/README.md).
 
 #### RINGW
-The `RINGW` parameter specifies the number of signals within the power bus that connects all of the io cells together within the padring. For a description of uses of `RINGW`, see [IOLIB](../../iolib/README.md).
+The `RINGW` parameter specifies the number of signals within the power bus that connects all of the io cells together within the padring. For a description of uses of `RINGW`, see [IOLIB](../iolib/README.md).
 
 
 ## Using the Generator
@@ -50,7 +50,6 @@ The following excerpt from the testbench illustrate the use of the `CELLMAP`, `N
 
 ```verilog
 
-
  // Setting up your parameters
 
    localparam CFGW = 8;
@@ -65,16 +64,16 @@ The following excerpt from the testbench illustrate the use of the `CELLMAP`, `N
    localparam [7:0] PIN_RXP  = 8'h02;
    localparam [7:0] PIN_RXN  = 8'h03;
 
-   localparam       NULL     = 8'h0;
+   localparam [7:0] NULL     = 8'h0;
 
    localparam CELLMAP = {{NULL,  NULL,  LA_VSS,     NULL,    NULL},
-                        {NULL,  NULL,  LA_BIDIR,   NULL,    PIN_IO0},
-                        {NULL,  NULL,  LA_ANALOG,  NULL,    PIN_AN0},
-                        {NULL,  NULL,  LA_VDDIO,   NULL,    NULL},
-                        {NULL,  NULL,  LA_RXDIFF,  PIN_RXN, PIN_RXP},
-                        {NULL,  NULL,  LA_VSS,     NULL,    NULL},
-                        {NULL,  NULL,  LA_VSS,     NULL,    NULL},
-                        {NULL,  NULL,  LA_VSS,     NULL,    NULL}};
+                         {NULL,  NULL,  LA_BIDIR,   NULL,    PIN_IO0},
+                         {NULL,  NULL,  LA_ANALOG,  NULL,    PIN_AN0},
+                         {NULL,  NULL,  LA_VDDIO,   NULL,    NULL},
+                         {NULL,  NULL,  LA_RXDIFF,  PIN_RXN, PIN_RXP},
+                         {NULL,  NULL,  LA_VSS,     NULL,    NULL},
+                         {NULL,  NULL,  LA_VSS,     NULL,    NULL},
+                         {NULL,  NULL,  LA_VSS,     NULL,    NULL}};
 
 // Instantiating the padring in your design
 la_iopadring  #(.CFGW(CFGW),
@@ -92,7 +91,4 @@ la_iopadring  #(.CFGW(CFGW),
                 .WE_CELLMAP(CELLMAP),
                 .SO_CELLMAP(CELLMAP))
 la_iopadring(...)
-
-
-
 ```
