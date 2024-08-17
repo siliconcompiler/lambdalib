@@ -6,6 +6,7 @@
 tmp*
 a.out
 *.vcd
+.venv/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
