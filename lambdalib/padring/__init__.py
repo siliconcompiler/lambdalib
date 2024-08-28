@@ -6,12 +6,12 @@ from lambdalib import iolib
 ########################
 # SiliconCompiler Setup
 ########################
-def setup(chip):
+def setup():
     '''
     Lambdalib padring
     '''
 
-    lib = Library(chip, 'lambdalib_padring', package='lambdalib', auto_enable=True)
+    lib = Library('lambdalib_padring', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
     lib.add('option', 'idir', "padring/rtl")

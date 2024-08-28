@@ -22,20 +22,20 @@ __version__ = _common._version
 ########################
 # SiliconCompiler Setup
 ########################
-def setup(chip):
+def setup():
     '''
     Lambdalib library setup script
     '''
 
     return [
-        auxlib.setup(chip),
-        fpgalib.setup(chip),
-        iolib.setup(chip),
-        padring.setup(chip),
-        ramlib.setup(chip),
-        stdlib.setup(chip),
-        syslib.setup(chip),
-        vectorlib.setup(chip)
+        auxlib.setup(),
+        fpgalib.setup(),
+        iolib.setup(),
+        padring.setup(),
+        ramlib.setup(),
+        stdlib.setup(),
+        syslib.setup(),
+        vectorlib.setup()
     ]
 
 

@@ -6,12 +6,12 @@ from lambdalib import stdlib
 ########################
 # SiliconCompiler Setup
 ########################
-def setup(chip):
+def setup():
     '''
     Lambdalib auxlib
     '''
 
-    lib = Library(chip, 'lambdalib_auxlib', package='lambdalib', auto_enable=True)
+    lib = Library('lambdalib_auxlib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
 
     lib.add('option', 'ydir', "auxlib/rtl")
