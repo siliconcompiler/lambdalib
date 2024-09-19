@@ -127,9 +127,9 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
     copy(outputpath, la_lib, exclude)
 
     if isinstance(target, str):
-        target_name = target
-    else:
-        target_name = target.__name__
+        target = Chip("module")._load_module(target)
+
+    target_name = target.__name__
 
     for cell in sorted(cells):
         cell_file = os.path.basename(cell)
@@ -137,7 +137,7 @@ def generate(target, logiclib, outputpath, la_lib='stdlib', exclude=None):
 
         chip = Chip(cell_name)
         chip.input(cell)
-        chip.load_target(target)
+        chip.use(target)
         chip.set('asic', 'logiclib', logiclib)
         chip.set('option', 'flow', 'asicflow')
         chip.set('option', 'to', 'syn')
