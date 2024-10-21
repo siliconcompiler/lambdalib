@@ -12,7 +12,6 @@ from lambdalib import \
     padring, \
     ramlib, \
     stdlib, \
-    syslib, \
     vectorlib
 
 
@@ -34,7 +33,6 @@ def setup():
         padring.setup(),
         ramlib.setup(),
         stdlib.setup(),
-        syslib.setup(),
         vectorlib.setup()
     ]
 

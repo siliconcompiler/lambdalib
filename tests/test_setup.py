@@ -8,7 +8,6 @@ from lambdalib import \
     padring, \
     ramlib, \
     stdlib, \
-    syslib, \
     vectorlib
 libraries = [
     auxlib,
@@ -17,7 +16,6 @@ libraries = [
     padring,
     ramlib,
     stdlib,
-    syslib,
     vectorlib
 ]
 
