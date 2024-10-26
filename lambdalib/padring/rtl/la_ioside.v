@@ -95,13 +95,11 @@ module la_ioside
           begin : ginput
              la_ioinput #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
-                          .CFGW(CFGW),
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
                  // core signalas
                  .z(zp[CELLMAP[(i*40)+:8]]),
-                 .cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
