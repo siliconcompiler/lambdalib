@@ -62,6 +62,8 @@ module la_iopadring
     input [NO_NPINS-1:0]           no_a,      // input from core
     input [NO_NPINS-1:0]           no_ie,     // input enable, 1 = active
     input [NO_NPINS-1:0]           no_oe,     // output enable, 1 = active
+    input [NO_NPINS-1:0]           no_pe,     // pull enable, 1 = enable
+    input [NO_NPINS-1:0]           no_ps,     // pull select, 1 = pullup
     input [NO_NPINS*CFGW-1:0]      no_cfg,    // generic config interface
     inout [NO_NSECTIONS-1:0]       no_vdd,    // core supply
     inout [NO_NSECTIONS-1:0]       no_vddio,  // io/analog supply
@@ -75,6 +77,8 @@ module la_iopadring
     input [EA_NPINS-1:0]           ea_a,
     input [EA_NPINS-1:0]           ea_ie,
     input [EA_NPINS-1:0]           ea_oe,
+    input [EA_NPINS-1:0]           ea_pe,
+    input [EA_NPINS-1:0]           ea_ps,
     input [EA_NPINS*CFGW-1:0]      ea_cfg,
     inout [EA_NSECTIONS-1:0]       ea_vdd,
     inout [EA_NSECTIONS-1:0]       ea_vddio,
@@ -88,6 +92,8 @@ module la_iopadring
     input [SO_NPINS-1:0]           so_a,
     input [SO_NPINS-1:0]           so_ie,
     input [SO_NPINS-1:0]           so_oe,
+    input [SO_NPINS-1:0]           so_pe,
+    input [SO_NPINS-1:0]           so_ps,
     input [SO_NPINS*CFGW-1:0]      so_cfg,
     inout [SO_NSECTIONS-1:0]       so_vdd,
     inout [SO_NSECTIONS-1:0]       so_vddio,
@@ -101,6 +107,8 @@ module la_iopadring
     input [WE_NPINS-1:0]           we_a,
     input [WE_NPINS-1:0]           we_ie,
     input [WE_NPINS-1:0]           we_oe,
+    input [WE_NPINS-1:0]           we_pe,
+    input [WE_NPINS-1:0]           we_ps,
     input [WE_NPINS*CFGW-1:0]      we_cfg,
     inout [WE_NSECTIONS-1:0]       we_vdd,
     inout [WE_NSECTIONS-1:0]       we_vddio,
@@ -133,6 +141,8 @@ module la_iopadring
            .a      (no_a),
            .ie     (no_ie),
            .oe     (no_oe),
+           .pe     (no_pe),
+           .ps     (no_ps),
            .cfg    (no_cfg));
 
    // EAST
@@ -158,6 +168,8 @@ module la_iopadring
           .a      (ea_a),
           .ie     (ea_ie),
           .oe     (ea_oe),
+          .pe     (ea_pe),
+          .ps     (ea_ps),
           .cfg    (ea_cfg));
 
    // WEST
@@ -183,6 +195,8 @@ module la_iopadring
           .a      (we_a),
           .ie     (we_ie),
           .oe     (we_oe),
+          .pe     (we_pe),
+          .ps     (we_ps),
           .cfg    (we_cfg));
 
    // SOUTH
@@ -208,6 +222,8 @@ module la_iopadring
            .a      (so_a),
            .ie     (so_ie),
            .oe     (so_oe),
+           .pe     (so_pe),
+           .ps     (so_ps),
            .cfg    (so_cfg));
 
 endmodule
@@ -298,6 +314,8 @@ module tb();
     .\(.*\)_a           ({NPINS{1'b0}}),
     .\(.*\)_ie          ({NPINS{1'b1}}),
     .\(.*\)_oe          ({NPINS{1'b0}}),
+    .\(.*\)_ps          ({NPINS{1'b0}}),
+    .\(.*\)_pe          ({NPINS{1'b1}}),
     .\(.*\)_cfg         ({CFGW*NPINS{1'b0}}),
     .\(.*\)_vdd         (\1_vdd[NSECTIONS-1:0]),
     .\(.*\)_vddio       (\1_vddio[NSECTIONS-1:0]),
@@ -364,18 +382,26 @@ module tb();
                  .no_a                  ({NPINS{1'b0}}),         // Templated
                  .no_ie                 ({NPINS{1'b1}}),         // Templated
                  .no_oe                 ({NPINS{1'b0}}),         // Templated
+                 .no_pe                 ({NPINS{1'b1}}),         // Templated
+                 .no_ps                 ({NPINS{1'b0}}),         // Templated
                  .no_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
                  .ea_a                  ({NPINS{1'b0}}),         // Templated
                  .ea_ie                 ({NPINS{1'b1}}),         // Templated
                  .ea_oe                 ({NPINS{1'b0}}),         // Templated
+                 .ea_pe                 ({NPINS{1'b1}}),         // Templated
+                 .ea_ps                 ({NPINS{1'b0}}),         // Templated
                  .ea_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
                  .so_a                  ({NPINS{1'b0}}),         // Templated
                  .so_ie                 ({NPINS{1'b1}}),         // Templated
                  .so_oe                 ({NPINS{1'b0}}),         // Templated
+                 .so_pe                 ({NPINS{1'b1}}),         // Templated
+                 .so_ps                 ({NPINS{1'b0}}),         // Templated
                  .so_cfg                ({CFGW*NPINS{1'b0}}),    // Templated
                  .we_a                  ({NPINS{1'b0}}),         // Templated
                  .we_ie                 ({NPINS{1'b1}}),         // Templated
                  .we_oe                 ({NPINS{1'b0}}),         // Templated
+                 .we_pe                 ({NPINS{1'b1}}),         // Templated
+                 .we_ps                 ({NPINS{1'b0}}),         // Templated
                  .we_cfg                ({CFGW*NPINS{1'b0}}));   // Templated
 
 endmodule
