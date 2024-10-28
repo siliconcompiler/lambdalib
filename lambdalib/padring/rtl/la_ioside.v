@@ -100,6 +100,9 @@ module la_ioside
                  .pad(pad[CELLMAP[(i*40)+:8]]),
                  // core signalas
                  .z(zp[CELLMAP[(i*40)+:8]]),
+                 .pe(pe[CELLMAP[(i*40)+:8]]),
+                 .ps(ps[CELLMAP[(i*40)+:8]]),
+                 .cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
