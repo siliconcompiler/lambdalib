@@ -95,6 +95,7 @@ module la_ioside
           begin : ginput
              la_ioinput #(.SIDE(SIDE),
                           .PROP(CELLMAP[(i*40+32)+:8]),
+                          .CFGW(CFGW),
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
