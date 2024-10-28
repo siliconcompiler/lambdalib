@@ -1,4 +1,4 @@
-/*****************************************************************************
+/**************************************************************************
  * Function: Padring Side Module
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
@@ -7,7 +7,7 @@
  *
  * See "../README.md" for complete information
  *
- * -------------------------------------------------------------------------
+ * -----------------------------------------------------------------------
  *
  *
  * CELLMAP[39:0] = {PROP[7:0],SECTION[7:0],CELL[7:0],COMP[7:0],PIN[7:0]}
@@ -27,7 +27,7 @@
  * CELLMAP[79:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
  *                  {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
  *
- ****************************************************************************/
+ *************************************************************************/
 
 module la_ioside
   #(// per side parameters
@@ -48,6 +48,8 @@ module la_ioside
     input [NPINS-1:0]           a,     // input from core
     input [NPINS-1:0]           ie,    // input enable, 1 = active
     input [NPINS-1:0]           oe,    // output enable, 1 = active
+    input [NPINS-1:0]           pe,    // pull enable, 1 = enable
+    input [NPINS-1:0]           ps,    // pull select, 1 = pullup
     input [NPINS*CFGW-1:0]      cfg,   // generic config interface
     // supplies/ring (per cell)
     inout                       vss,   // common ground
@@ -72,11 +74,13 @@ module la_ioside
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .z(zp[CELLMAP[(i*40)+:8]]),
                  .a(a[CELLMAP[(i*40)+:8]]),
                  .ie(ie[CELLMAP[(i*40)+:8]]),
                  .oe(oe[CELLMAP[(i*40)+:8]]),
+                 .pe(pe[CELLMAP[(i*40)+:8]]),
+                 .ps(ps[CELLMAP[(i*40)+:8]]),
                  .cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
@@ -95,9 +99,11 @@ module la_ioside
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .z(zp[CELLMAP[(i*40)+:8]]),
                  .ie(ie[CELLMAP[(i*40)+:8]]),
+                 .pe(pe[CELLMAP[(i*40)+:8]]),
+                 .ps(ps[CELLMAP[(i*40)+:8]]),
                  .cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
@@ -115,7 +121,7 @@ module la_ioside
                            .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .aio(aio[CELLMAP[(i*40)+:8]*3+:3]),
                  // supplies
                  .vss(vss),
