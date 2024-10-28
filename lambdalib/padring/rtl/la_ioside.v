@@ -74,7 +74,7 @@ module la_ioside
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .z(zp[CELLMAP[(i*40)+:8]]),
                  .a(a[CELLMAP[(i*40)+:8]]),
                  .ie(ie[CELLMAP[(i*40)+:8]]),
@@ -99,8 +99,9 @@ module la_ioside
                           .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .z(zp[CELLMAP[(i*40)+:8]]),
+                 .ie(ie[CELLMAP[(i*40)+:8]]),
                  .pe(pe[CELLMAP[(i*40)+:8]]),
                  .ps(ps[CELLMAP[(i*40)+:8]]),
                  .cfg(cfg[CELLMAP[(i*40)+:8]*CFGW+:CFGW]),
@@ -120,7 +121,7 @@ module la_ioside
                            .RINGW(RINGW))
              i0 (// pad
                  .pad(pad[CELLMAP[(i*40)+:8]]),
-                 // core signalas
+                 // core signals
                  .aio(aio[CELLMAP[(i*40)+:8]*3+:3]),
                  // supplies
                  .vss(vss),

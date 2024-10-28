@@ -23,6 +23,7 @@ module la_ioinput
     inout             vssio, // io ground
     // core facing signals
     output            z,     // output to core
+    input             ie,    // input enable, 1 = active
     input             pe,    // pull enable, 1=enable
     input             ps,    // pull select, 1=pullup, 0=pulldown
     input [CFGW-1:0]  cfg,   // generic config interface
@@ -30,7 +31,7 @@ module la_ioinput
     inout [RINGW-1:0] ioring // generic ioring interface
     );
 
-   assign z = pad;
+   assign z = ie ? pad : 1'b0;
 
 `ifndef VERILATOR
    if(PROP!="FIXED") begin
