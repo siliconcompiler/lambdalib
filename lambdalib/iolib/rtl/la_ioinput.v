@@ -10,8 +10,9 @@
  *************************************************************************/
 module la_ioinput
   #(
-    parameter PROP = "DEFAULT", // cell property
+    parameter PROP = "DEFAULT", // "FIXED" ignores all ctrl inputs
     parameter SIDE = "NO",      // "NO", "SO", "EA", "WE"
+    parameter CFGW = 16,        // width of config bus
     parameter RINGW = 8         // width of io ring
     )
    (// io pad signals
@@ -22,13 +23,20 @@ module la_ioinput
     inout             vssio, // io ground
     // core facing signals
     output            z,     // output to core
+    input             pe,    // pull enable, 1=enable
+    input             ps,    // pull select, 1=pullup, 0=pulldown
+    input [CFGW-1:0]  cfg,   // generic config interface
+    // io ring
     inout [RINGW-1:0] ioring // generic ioring interface
     );
 
    assign z = pad;
 
 `ifndef VERILATOR
-   rnmos #1 (pad, vssio, 1'b1); // weak pulldown
+   if(PROP!="FIXED") begin
+      rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown
+      rnmos #1 (pad, vddio, pe & ps); // weak pullup
+   end
 `endif
 
 endmodule
