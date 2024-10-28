@@ -12,7 +12,6 @@ Lambdalib includes the following hardware categories:
 |[iolib](lambdalib/iolib)             | IO cells (bidir, vdd, clamp,...)
 |[padring](lambdalib/padring)         | Padring generator
 |[vectorlib](lambdalib/vectorlib/rtl) | Vectorized library (mux, isolation)
-|[syslib](lambdalib/syslib/rtl)       | Vendor agnostic peripheral interface (uart, i2c,...)
 |[fpgalib](lambdalib/fpgalib/rtl)     | FPGA cells (lut4, ble, clb)
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
