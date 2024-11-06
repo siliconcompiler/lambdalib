@@ -20,7 +20,7 @@
  *
  ****************************************************************************/
 
-module la_spram #(
+module la_spram_impl #(
     parameter DW    = 32,         // Memory width
     parameter AW    = 10,         // Address width (derived)
     parameter PROP  = "DEFAULT",  // Pass through variable for hard macro
@@ -43,27 +43,22 @@ module la_spram #(
     input [TESTW-1:0] test  // pass through ASIC test interface
 );
 
-    la_spram_impl #(
-        .DW     (DW),
-        .AW     (AW),
-        .PROP   (PROP),
-        .CTRLW  (CTRLW),
-        .TESTW  (TESTW),
-    ) ram (
-        .clk    (clk),
-        .ce     (ce),
-        .we     (we),
-        .wmask  (wmask),
-        .addr   (addr),
-        .din    (din),
-        .dout   (dout),
+    // Generic RTL RAM
+    reg     [DW-1:0] ram[(2**AW)-1:0];
+    integer          i;
 
-        .vss    (vss),
-        .vdd    (vdd),
-        .vddio  (vddio),
+    // Write port
+    //   always @(posedge clk)
+    //     for (i=0;i<DW;i=i+1)
+    //       if (ce & we & wmask[i])
+    //         ram[addr[AW-1:0]][i] <= din[i];
 
-        .ctrl   (ctrl),
-        .test   (test)
-    );
+    // Re-writing as a mux for verilator
+    always @(posedge clk)
+        if (ce & we)
+            ram[addr[AW-1:0]] <= din[DW-1:0] & wmask[DW-1:0] | ram[addr[AW-1:0]] & ~wmask[DW-1:0];
+
+    // Read Port
+    always @(posedge clk) if (ce) dout[DW-1:0] <= ram[addr[AW-1:0]];
 
 endmodule
