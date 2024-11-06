@@ -48,7 +48,7 @@ module la_spram #(
         .AW     (AW),
         .PROP   (PROP),
         .CTRLW  (CTRLW),
-        .TESTW  (TESTW),
+        .TESTW  (TESTW)
     ) ram (
         .clk    (clk),
         .ce     (ce),
