@@ -1,9 +1,10 @@
 from jinja2 import Template
 import os
+import math
 from collections import OrderedDict
 
 
-def write_la_spram(fout, memories, control_signals=None, la_type='ram'):
+def write_la_spram(fout, memories, control_signals=None, la_type='ram', minbits=None):
     template_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                  'templates',
                                                  'la_spmemory.v'))
@@ -33,6 +34,13 @@ def write_la_spram(fout, memories, control_signals=None, la_type='ram'):
     selection_table = OrderedDict(sorted(selection_table.items(), reverse=True))
     for aw, items in selection_table.items():
         selection_table[aw] = OrderedDict(sorted(items.items(), reverse=True))
+
+        if minbits is not None:
+            depth = 2**aw
+            dw = int(math.floor(minbits / depth))
+            if dw > 0:
+                selection_table[aw][dw] = "SOFT"
+    selection_table[min(selection_table.keys()) - 1] = {0: "SOFT"}
     widths_table.sort()
     depths_table.sort()
 
