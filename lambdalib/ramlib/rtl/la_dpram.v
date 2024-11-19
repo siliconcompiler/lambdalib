@@ -53,7 +53,7 @@ module la_dpram #(
         .PROP       (PROP),
         .CTRLW      (CTRLW),
         .TESTW      (TESTW)
-    ) ram (
+    ) memory (
         .wr_clk     (wr_clk),
         .wr_ce      (wr_ce),
         .wr_we      (wr_we),
