@@ -1,4 +1,4 @@
-_version = "0.3.1"
+_version = "0.3.2"
 
 
 def register_data_source(chip):
