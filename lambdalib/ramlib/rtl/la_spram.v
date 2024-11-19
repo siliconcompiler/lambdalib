@@ -49,7 +49,7 @@ module la_spram #(
         .PROP   (PROP),
         .CTRLW  (CTRLW),
         .TESTW  (TESTW)
-    ) ram (
+    ) spram (
         .clk    (clk),
         .ce     (ce),
         .we     (we),
