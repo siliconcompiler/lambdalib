@@ -338,9 +338,9 @@ module la_ioside
         // LA_CLAMP
         if (CELLMAP[(i*40+16)+:8] == LA_CLAMP)
           begin : gclamp
-            la_iovssa #(.SIDE(SIDE),
-                        .PROP(CELLMAP[(i*40+32)+:8]),
-                        .RINGW(RINGW))
+            la_ioclamp #(.SIDE(SIDE),
+                         .PROP(CELLMAP[(i*40+32)+:8]),
+                         .RINGW(RINGW))
              i0 (.pad(pad[CELLMAP[(i*40)+:8]]),
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*40+24)+:8]]),
