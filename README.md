@@ -16,7 +16,7 @@ Lambdalib includes the following hardware categories:
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
 
-Lambdalib was successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
+Lambdalib has been successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
 
 # License
 
