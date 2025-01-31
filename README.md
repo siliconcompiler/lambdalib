@@ -1,6 +1,6 @@
 # Lambdalib Introduction
 
-Lambdalib is a modular hardware abstraction library decouples design from the underlying manufacturing target. Lambdalib defines a set of generic functions that get resolved during the target technology mapping stage.
+Lambdalib is a modular hardware abstraction library which decouples design from the underlying manufacturing target. Lambdalib defines a set of generic functions that get resolved during the target technology mapping stage.
 
 Lambdalib includes the following hardware categories:
 
@@ -16,7 +16,7 @@ Lambdalib includes the following hardware categories:
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
 
-Lambdalib has successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
+Lambdalib was successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
 
 # License
 
