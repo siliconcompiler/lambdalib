@@ -6,8 +6,7 @@
 
 module la_idiff
   #(
-    parameter PROP = "DEFAULT",
-    parameter DIFF = 0         // differential buffer if value > 0
+    parameter PROP = "DEFAULT"
     )
    (
     input  in, // positive input
@@ -15,10 +14,7 @@ module la_idiff
     output z // output
     );
 
-   if(DIFF)
-     assign z = (in & ~inb)  | // for proper diff inputs
-                (~in & ~inb);  // fail on non diff input
-   else
-     assign z = in;
+   assign z = (in & ~inb)  | // for proper diff inputs
+              (~in & ~inb);  // fail on non diff input
 
 endmodule
