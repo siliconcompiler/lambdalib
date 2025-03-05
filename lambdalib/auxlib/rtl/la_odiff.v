@@ -6,8 +6,7 @@
 
 module la_odiff
   #(
-    parameter PROP = "DEFAULT",
-    parameter DIFF = 0         // differential buffer if value > 0
+    parameter PROP = "DEFAULT"
     )
    (
     input  in, // input
@@ -15,14 +14,7 @@ module la_odiff
     output zb // inverted output
     );
 
-   if(DIFF)
-     begin
-        assign z = in;
-        assign zb = ~in;
-     end
-   else
-     begin
-        assign z = in;
-        assign zb = 1'b0;
-     end
+   assign z = in;
+   assign zb = ~in;
+
 endmodule
