@@ -21,32 +21,34 @@
  ****************************************************************************/
 
 module la_asyncfifo #(
-    parameter DW    = 32,        // Memory width
-    parameter DEPTH = 4,         // FIFO depth
-    parameter NS    = 1,         // Number of power supplies
-    parameter CTRLW = 1,         // width of asic ctrl interface
-    parameter TESTW = 1,         // width of asic teset interface
-    parameter CHAOS = 0,         // generates random full logic when set
-    parameter PROP  = "DEFAULT"  // Pass through variable for hard macro
+    parameter DW    = 32,                  // Memory width
+    parameter DEPTH = 4,                   // FIFO depth
+    parameter ALMOST_FULL_LEVEL = DEPTH-1, // FIFO depth
+    parameter NS    = 1,                   // Number of power supplies
+    parameter CTRLW = 1,                   // width of asic ctrl interface
+    parameter TESTW = 1,                   // width of asic teset interface
+    parameter CHAOS = 0,                   // generates random full logic when set
+    parameter PROP  = "DEFAULT"            // Pass through variable for hard macro
 ) (  // write port
     input                  wr_clk,
     input                  wr_nreset,
-    input      [   DW-1:0] wr_din,        // data to write
-    input                  wr_en,         // write fifo
-    input                  wr_chaosmode,  // randomly assert fifo full when set
-    output reg             wr_full,       // fifo full
+    input      [   DW-1:0] wr_din,         // data to write
+    input                  wr_en,          // write fifo
+    input                  wr_chaosmode,   // randomly assert fifo full when set
+    output reg             wr_full,        // fifo full
+    output reg             wr_almost_full, // fifo almost full
     // read port
     input                  rd_clk,
     input                  rd_nreset,
-    output     [   DW-1:0] rd_dout,       // output data (next cycle)
-    input                  rd_en,         // read fifo
-    output reg             rd_empty,      // fifo is empty
+    output     [   DW-1:0] rd_dout,        // output data (next cycle)
+    input                  rd_en,          // read fifo
+    output reg             rd_empty,       // fifo is empty
     // Power signals
-    input                  vss,           // ground signal
-    input      [   NS-1:0] vdd,           // supplies
+    input                  vss,            // ground signal
+    input      [   NS-1:0] vdd,            // supplies
     // Generic interfaces
-    input      [CTRLW-1:0] ctrl,          // pass through ASIC control interface
-    input      [TESTW-1:0] test           // pass through ASIC test interface
+    input      [CTRLW-1:0] ctrl,           // pass through ASIC control interface
+    input      [TESTW-1:0] test            // pass through ASIC test interface
 );
 
     // local params
@@ -115,6 +117,12 @@ module la_asyncfifo #(
         else
             wr_full <= (wr_chaosfull & wr_chaosmode) |
                   (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH;
+
+    always @(posedge wr_clk or negedge wr_nreset)
+        if (~wr_nreset) wr_almost_full <= 1'b0;
+        else
+            wr_almost_full <=
+                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) > (ALMOST_FULL_LEVEL-1);
 
     // Write --> Read clock synchronizer
     for (i = 0; i < (AW + 1); i = i + 1) begin

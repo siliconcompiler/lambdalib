@@ -1,6 +1,7 @@
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
 from lambdalib import auxlib
+from lambdalib.ramlib import tests
 
 
 ########################
