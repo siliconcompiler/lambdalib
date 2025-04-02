@@ -5,8 +5,6 @@ import lambdalib.ramlib.tests.common as common
 
 
 def test_la_asyncfifo():
-    # Note: Clink phy should also work at an IOW of 128, 256, 512, and 1024
-    # however those are omitted due to long test runtime
     chip = siliconcompiler.Chip("la_asyncfifo")
 
     chip.input("rtl/la_asyncfifo.v")
