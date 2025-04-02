@@ -4,6 +4,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, Timer, Combine
 from cocotb.regression import TestFactory
+from cocotb import utils
 
 from lambdalib.ramlib.tests.common import (
     drive_reset,
@@ -16,6 +17,14 @@ from lambdalib.ramlib.tests.la_asyncfifo import (
     LaAsyncFifoSource,
     LaAsyncFifoSink
 )
+
+
+def bursty_en_gen(burst_len=20):
+    while True:
+        en_state = (random.randint(0, 1) == 1)
+        for _ in range(0, burst_len):
+            yield en_state
+
 
 @cocotb.test()
 async def test_almost_full(dut):
@@ -120,17 +129,23 @@ async def fifo_test(
     await ClockCycles(dut.wr_clk, 10)
 
 
-def bursty_en_gen(burst_len=20):
-    while True:
-        en_state = (random.randint(0, 1) == 1)
-        for _ in range(0, burst_len):
-            yield en_state
-
-
 # Generate sets of tests based on the different permutations of the possible arguments to fifo_test
+MAX_PERIOD_NS = 10.0
+MIN_PERIOD_NS = 1.0
+# Generate random clk period to test between min and max
+RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [utils.get_time_from_sim_steps(
+    # Time step must be even for cocotb clock driver
+    steps=utils.get_sim_steps(
+        time=MIN_PERIOD_NS + ((MAX_PERIOD_NS - MIN_PERIOD_NS) * random.random()),
+        units="ns",
+        round_mode="round"
+    ) & ~1,
+    units="ns"
+) for _ in range(0, 2)]
+
 tf = TestFactory(fifo_test)
-tf.add_option('wr_clk_period_ns', [1.0, 3.14, 10.0])
-tf.add_option('rd_clk_period_ns', [1.0, 3.14, 10.0])
+tf.add_option('wr_clk_period_ns', [MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS])
+tf.add_option('rd_clk_period_ns', [MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS])
 tf.add_option('wr_en_generator', [None, random_bool_generator, bursty_en_gen])
 tf.add_option('rd_en_generator', [None, random_bool_generator, bursty_en_gen])
 tf.generate_tests()

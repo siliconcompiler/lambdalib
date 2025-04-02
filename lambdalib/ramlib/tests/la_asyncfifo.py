@@ -54,6 +54,7 @@ class LaAsyncFifoRdBus(Bus):
 
 
 class LaAsyncFifoSource:
+    """Driver for write side of lambdalib async fifo"""
 
     def __init__(self, bus: LaAsyncFifoWrBus, clock, reset=None):
         self.bus = bus
@@ -106,6 +107,7 @@ class LaAsyncFifoSource:
 
 
 class LaAsyncFifoSink:
+    """Driver for read side of lambdalib async fifo"""
 
     def __init__(self, bus: LaAsyncFifoRdBus, clock, reset=None):
         self.bus = bus
@@ -137,7 +139,6 @@ class LaAsyncFifoSink:
         return await self.queue.get()
 
     async def _run(self):
-
         clock_edge_event = RisingEdge(self.clock)
 
         while True:
