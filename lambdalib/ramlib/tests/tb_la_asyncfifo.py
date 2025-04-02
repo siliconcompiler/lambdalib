@@ -81,7 +81,7 @@ async def test_almost_full(dut):
     assert dut.wr_almost_full.value == 0
 
 
-async def fifo_test(
+async def fifo_rd_wr_test(
     dut,
     wr_clk_period_ns=10.0,
     rd_clk_period_ns=10.0,
@@ -143,7 +143,7 @@ RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [utils.get_time_from_sim_steps(
     units="ns"
 ) for _ in range(0, 2)]
 
-tf = TestFactory(fifo_test)
+tf = TestFactory(fifo_rd_wr_test)
 tf.add_option('wr_clk_period_ns', [MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS])
 tf.add_option('rd_clk_period_ns', [MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS])
 tf.add_option('wr_en_generator', [None, random_bool_generator, bursty_en_gen])
