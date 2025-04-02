@@ -7,7 +7,7 @@ from cocotb.triggers import Timer
 from cocotb.runner import get_runner, get_results
 
 import siliconcompiler
-from siliconcompiler.tools.surelog import parse
+from siliconcompiler.tools.slang import elaborate
 
 
 def run_cocotb(
@@ -18,29 +18,26 @@ def run_cocotb(
         timescale=None,
         parameters=None):
 
-    print(f"test module name = {test_module_name}")
-
     # Use surelog to pickle Verilog sources
     flow = "cocotb_flow"
-    chip.node(flow, "import", parse)
+    chip.node(flow, "import", elaborate)
     chip.set("option", "flow", flow)
-    chip.run()
+    assert chip.run()
 
     pickled_verilog = chip.find_result("v", "import")
-    if not pickled_verilog:
-        assert False, "Could not locate pickled verilog"
+    assert pickled_verilog, "Could not locate pickled verilog"
 
     if output_dir_name is None:
         output_dir_name = test_module_name
 
-    pytest_current_test = os.getenv("PYTEST_CURRENT_TEST", None)
-
-    top_level_dir = Path(chip.getbuilddir()).parent.parent
+    top_level_dir = os.getcwd()
     build_dir = Path(chip.getbuilddir()) / output_dir_name
     test_dir = None
 
     results_xml = None
-    if not pytest_current_test:
+    # Need to check if we are running inside of pytest. See link below.
+    # https://github.com/cocotb/cocotb/blob/d883ce914063c3601455d10a40f459fffa22d8f2/cocotb/runner.py#L313 
+    if not os.getenv("PYTEST_CURRENT_TEST", None):
         results_xml = build_dir / "results.xml"
         test_dir = top_level_dir
 
@@ -56,7 +53,7 @@ def run_cocotb(
     )
     # Run test
     _, tests_failed = get_results(runner.test(
-        hdl_toplevel=chip.design,
+        hdl_toplevel=chip.top(),
         test_module=test_module_name,
         test_dir=test_dir,
         results_xml=results_xml,

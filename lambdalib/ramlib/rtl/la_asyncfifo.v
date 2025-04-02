@@ -21,14 +21,14 @@
  ****************************************************************************/
 
 module la_asyncfifo #(
-    parameter DW    = 32,                  // Memory width
-    parameter DEPTH = 4,                   // FIFO depth
-    parameter ALMOST_FULL_LEVEL = DEPTH-1, // FIFO depth
-    parameter NS    = 1,                   // Number of power supplies
-    parameter CTRLW = 1,                   // width of asic ctrl interface
-    parameter TESTW = 1,                   // width of asic teset interface
-    parameter CHAOS = 0,                   // generates random full logic when set
-    parameter PROP  = "DEFAULT"            // Pass through variable for hard macro
+    parameter DW                = 32,       // Memory width
+    parameter DEPTH             = 4,        // FIFO depth
+    parameter ALMOST_FULL_LEVEL = DEPTH-1,  // FIFO depth
+    parameter NS                = 1,        // Number of power supplies
+    parameter CTRLW             = 1,        // width of asic ctrl interface
+    parameter TESTW             = 1,        // width of asic teset interface
+    parameter CHAOS             = 0,        // generates random full logic when set
+    parameter PROP              = "DEFAULT" // Pass through variable for hard macro
 ) (  // write port
     input                  wr_clk,
     input                  wr_nreset,

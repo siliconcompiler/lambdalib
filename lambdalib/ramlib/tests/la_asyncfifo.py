@@ -1,5 +1,3 @@
-import logging
-
 import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb_bus.bus import Bus
@@ -8,6 +6,7 @@ from cocotb.binary import BinaryValue
 
 
 class LaAsyncFifoWrBus(Bus):
+    """Cocotb bus for lambdalib async FIFO WR interface"""
 
     _signals = ["wr_din", "wr_en", "wr_full"]
     _optional_signals = ["wr_almost_full", "wr_chaosmode"]
@@ -31,6 +30,7 @@ class LaAsyncFifoWrBus(Bus):
 
 
 class LaAsyncFifoRdBus(Bus):
+    """Cocotb bus for lambdalib async FIFO RD interface"""
 
     _signals = ["rd_dout", "rd_en", "rd_empty"]
     _optional_signals = []
@@ -60,7 +60,6 @@ class LaAsyncFifoSource:
         self.bus = bus
         self.clock = clock
         self.reset = reset
-        self.log = logging.getLogger(f"cocotb.{bus._entity._name}.{bus._name}")
 
         self.queue = Queue()
         self.width = len(self.bus.wr_din)
@@ -113,7 +112,6 @@ class LaAsyncFifoSink:
         self.bus = bus
         self.clock = clock
         self.reset = reset
-        self.log = logging.getLogger(f"cocotb.{bus._entity._name}.{bus._name}")
 
         self.queue = Queue()
         self.width = len(self.bus.rd_dout)
@@ -145,12 +143,13 @@ class LaAsyncFifoSink:
             await clock_edge_event
 
             fifo_empty = self.bus.rd_empty.value
-            if self.rd_en_generator:
-                self.bus.rd_en.value = next(self.rd_en_generator)
-            elif not self._pause:
-                self.bus.rd_en.value = 1
-            else:
+
+            if self._pause:
                 self.bus.rd_en.value = 0
+            elif self.rd_en_generator:
+                self.bus.rd_en.value = next(self.rd_en_generator)
+            else:
+                self.bus.rd_en.value = 1
 
             if self.bus.rd_en.value and not fifo_empty:
                 self.queue.put_nowait(self.bus.rd_dout.value)
