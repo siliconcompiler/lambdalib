@@ -16,7 +16,7 @@ def run_cocotb(
         output_dir_name=None,
         simulator_name="icarus",
         timescale=None,
-        parameters=None):
+        parameters={}):
 
     # Use surelog to pickle Verilog sources
     flow = "cocotb_flow"
