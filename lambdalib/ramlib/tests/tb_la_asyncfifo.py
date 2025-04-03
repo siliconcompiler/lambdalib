@@ -67,7 +67,7 @@ async def test_almost_full(dut):
     # Almost full should be low before writing to FIFO
     assert dut.wr_almost_full.value == 0
 
-    # Write to FIFO    
+    # Write to FIFO
     for i in range(0, almost_full_level):
         await fifo_source.send(i)
 
@@ -165,9 +165,7 @@ tf.generate_tests()
 def test_la_asyncfifo():
     chip = siliconcompiler.Chip("la_asyncfifo")
 
-    # TODO: Ask Peter how to set la_asyncfifo path
-    # such that it can be found by pytest and when run locally
-    chip.input("../rtl/la_asyncfifo.v")
+    chip.input("ramlib/rtl/la_asyncfifo.v", package='lambdalib')
     chip.use(ramlib)
 
     for depth in [2, 4, 8]:

@@ -36,7 +36,7 @@ def run_cocotb(
 
     results_xml = None
     # Need to check if we are running inside of pytest. See link below.
-    # https://github.com/cocotb/cocotb/blob/d883ce914063c3601455d10a40f459fffa22d8f2/cocotb/runner.py#L313 
+    # https://github.com/cocotb/cocotb/blob/d883ce914063c3601455d10a40f459fffa22d8f2/cocotb/runner.py#L313
     if not os.getenv("PYTEST_CURRENT_TEST", None):
         results_xml = build_dir / "results.xml"
         test_dir = top_level_dir
@@ -58,6 +58,7 @@ def run_cocotb(
         test_dir=test_dir,
         results_xml=results_xml,
         build_dir=build_dir,
+        timescale=timescale,
         waves=True
     ))
 
