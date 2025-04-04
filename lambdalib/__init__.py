@@ -4,15 +4,7 @@ import glob
 import os
 import shutil
 
-from lambdalib import _common
-from lambdalib import \
-    auxlib, \
-    fpgalib, \
-    iolib, \
-    padring, \
-    ramlib, \
-    stdlib, \
-    vectorlib
+from . import _common
 
 
 __version__ = _common._version
@@ -25,6 +17,14 @@ def setup():
     '''
     Lambdalib library setup script
     '''
+    from lambdalib import \
+        auxlib, \
+        fpgalib, \
+        iolib, \
+        padring, \
+        ramlib, \
+        stdlib, \
+        vectorlib
 
     return [
         auxlib.setup(),
