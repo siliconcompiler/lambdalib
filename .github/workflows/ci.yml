@@ -79,7 +79,7 @@ jobs:
   eda_ci:
     name: Run EDA
     runs-on: ubuntu-latest
-    container: ghcr.io/siliconcompiler/sc_runner:latest
+    container: ghcr.io/siliconcompiler/sc_tools:latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
