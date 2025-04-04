@@ -26,8 +26,8 @@ jobs:
           pip install .[dev]
           flake8 --statistics .
 
-  check_paths:
-    name: Run CI
+  python_ci:
+    name: Run Python Only
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
@@ -44,7 +44,7 @@ jobs:
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE
+          pytest $GITHUB_WORKSPACE -m "not eda"
 
   lint_verilog:
     name: Lint Verilog Code
@@ -75,3 +75,24 @@ jobs:
         if: success() || steps.check-format.conclusion == 'failure'
         run: |
           verible-verilog-lint --rules_config ./.github/workflows/config/verible.rules `cat files.txt`
+
+  eda_ci:
+    name: Run EDA
+    runs-on: ubuntu-latest
+    container: ghcr.io/siliconcompiler/sc_runner:latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: Run tests
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+
+          pip install --upgrade pip
+          pip install .[dev]
+
+          # change running directory
+          mkdir testrun
+          cd testrun
+
+          pytest $GITHUB_WORKSPACE -m "eda"
