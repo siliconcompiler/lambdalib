@@ -1,22 +1,22 @@
 import pytest
 from siliconcompiler import Chip
 
-from lambdalib import \
-    auxlib, \
-    fpgalib, \
-    iolib, \
-    padring, \
-    ramlib, \
-    stdlib, \
-    vectorlib
+import lambdalib.auxlib
+import lambdalib.fpgalib
+import lambdalib.iolib
+import lambdalib.padring
+import lambdalib.ramlib
+import lambdalib.stdlib
+import lambdalib.vectorlib
+
 libraries = [
-    auxlib,
-    fpgalib,
-    iolib,
-    padring,
-    ramlib,
-    stdlib,
-    vectorlib
+    lambdalib.auxlib,
+    lambdalib.fpgalib,
+    lambdalib.iolib,
+    lambdalib.padring,
+    lambdalib.ramlib,
+    lambdalib.stdlib,
+    lambdalib.vectorlib
 ]
 
 
@@ -33,7 +33,7 @@ def test_setup(lib):
 
 @pytest.mark.parametrize(
         'lib,has_idir',
-        [(lib, lib == padring) for lib in libraries])
+        [(lib, lib == lambdalib.padring) for lib in libraries])
 def test_setup_with_idir(lib, has_idir):
     chip = Chip('<lib>')
     chip.use(lib)

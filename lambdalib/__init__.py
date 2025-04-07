@@ -4,18 +4,17 @@ import glob
 import os
 import shutil
 
-from lambdalib import _common
-from lambdalib import \
-    auxlib, \
-    fpgalib, \
-    iolib, \
-    padring, \
-    ramlib, \
-    stdlib, \
-    vectorlib
+import lambdalib._common
+import lambdalib.auxlib
+import lambdalib.fpgalib
+import lambdalib.iolib
+import lambdalib.padring
+import lambdalib.ramlib
+import lambdalib.stdlib
+import lambdalib.vectorlib
 
 
-__version__ = _common._version
+__version__ = lambdalib._common._version
 
 
 ########################
@@ -27,19 +26,19 @@ def setup():
     '''
 
     return [
-        auxlib.setup(),
-        fpgalib.setup(),
-        iolib.setup(),
-        padring.setup(),
-        ramlib.setup(),
-        stdlib.setup(),
-        vectorlib.setup()
+        lambdalib.auxlib.setup(),
+        lambdalib.fpgalib.setup(),
+        lambdalib.iolib.setup(),
+        lambdalib.padring.setup(),
+        lambdalib.ramlib.setup(),
+        lambdalib.stdlib.setup(),
+        lambdalib.vectorlib.setup()
     ]
 
 
 def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
-    _common.register_data_source(path_assert)
+    lambdalib._common.register_data_source(path_assert)
     lambdalib_path = sc_package.path(path_assert, 'lambdalib')
     return f'{lambdalib_path}/{la_lib}/rtl'
 
