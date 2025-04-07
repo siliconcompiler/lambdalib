@@ -1,5 +1,5 @@
 from siliconcompiler import Library
-import lambdalib._common.register_data_source
+import lambdalib._common
 
 
 ########################

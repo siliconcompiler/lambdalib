@@ -1,5 +1,5 @@
 from siliconcompiler import Chip
-import lambdalib._common.register_data_source
+import lambdalib._common
 
 
 def test_local_install_detection():
