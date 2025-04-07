@@ -10,14 +10,8 @@ from cocotb.regression import TestFactory
 from cocotb import utils
 
 import lambdalib.ramlib
-import lambdalib.utils._tb_common.run_cocotb
-import lambdalib.utils._tb_common.drive_reset
-import lambdalib.utils._tb_common.random_bool_generator
-
-import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoWrBus
-import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoRdBus
-import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSource
-import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSink
+import lambdalib.utils._tb_common
+import lambdalib.ramlib.tests.la_asyncfifo
 
 
 def bursty_en_gen(burst_len=20):
