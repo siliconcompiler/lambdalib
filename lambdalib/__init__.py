@@ -5,13 +5,13 @@ import os
 import shutil
 
 import lambdalib._common
-import lambdalib.auxlib
+import lambdalib.stdlib
 import lambdalib.fpgalib
 import lambdalib.iolib
 import lambdalib.padring
-import lambdalib.ramlib
-import lambdalib.stdlib
+import lambdalib.auxlib
 import lambdalib.vectorlib
+import lambdalib.ramlib
 
 
 __version__ = lambdalib._common._version
