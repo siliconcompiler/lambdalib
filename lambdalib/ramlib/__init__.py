@@ -1,5 +1,5 @@
 from siliconcompiler import Library
-from lambdalib._common import register_data_source
+import lambdalib._common.register_data_source
 import lambdalib.auxlib
 
 
@@ -12,7 +12,7 @@ def setup():
     '''
 
     lib = Library('lambdalib_ramlib', package='lambdalib', auto_enable=True)
-    register_data_source(lib)
+    lambdalib._common.register_data_source(lib)
 
     lib.add('option', 'ydir', "ramlib/rtl")
 

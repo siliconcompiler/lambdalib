@@ -10,17 +10,14 @@ from cocotb.regression import TestFactory
 from cocotb import utils
 
 import lambdalib.ramlib
-from lambdalib.utils._tb_common import (
-    run_cocotb,
-    drive_reset,
-    random_bool_generator
-)
-from lambdalib.ramlib.tests.la_asyncfifo import (
-    LaAsyncFifoWrBus,
-    LaAsyncFifoRdBus,
-    LaAsyncFifoSource,
-    LaAsyncFifoSink
-)
+import lambdalib.utils._tb_common.run_cocotb
+import lambdalib.utils._tb_common.drive_reset
+import lambdalib.utils._tb_common.random_bool_generator
+
+import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoWrBus
+import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoRdBus
+import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSource
+import lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSink
 
 
 def bursty_en_gen(burst_len=20):
@@ -36,14 +33,14 @@ async def test_almost_full(dut):
     wr_clk_period_ns = 10.0
     rd_clk_period_ns = 10.0
 
-    fifo_source = LaAsyncFifoSource(
-        bus=LaAsyncFifoWrBus.from_prefix(dut, ""),
+    fifo_source = lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSource(
+        bus=lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoWrBus.from_prefix(dut, ""),
         clock=dut.wr_clk,
         reset=dut.wr_nreset
     )
 
-    fifo_sink = LaAsyncFifoSink(
-        bus=LaAsyncFifoRdBus.from_prefix(dut, ""),
+    fifo_sink = lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSink(
+        bus=lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoRdBus.from_prefix(dut, ""),
         clock=dut.rd_clk,
         reset=dut.rd_nreset
     )
@@ -51,8 +48,8 @@ async def test_almost_full(dut):
 
     # Reset DUT
     await Combine(
-        cocotb.start_soon(drive_reset(dut.wr_nreset)),
-        cocotb.start_soon(drive_reset(dut.rd_nreset))
+        cocotb.start_soon(lambdalib.utils._tb_common.drive_reset(dut.wr_nreset)),
+        cocotb.start_soon(lambdalib.utils._tb_common.drive_reset(dut.rd_nreset))
     )
 
     await cocotb.start(Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start())
@@ -93,24 +90,24 @@ async def fifo_rd_wr_test(
     rd_en_generator=None
 ):
 
-    fifo_source = LaAsyncFifoSource(
-        bus=LaAsyncFifoWrBus.from_prefix(dut, ""),
+    fifo_source = lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSource(
+        bus=lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoWrBus.from_prefix(dut, ""),
         clock=dut.wr_clk,
         reset=dut.wr_nreset
     )
-    fifo_source.set_wr_en_generator(random_bool_generator())
+    fifo_source.set_wr_en_generator(lambdalib.utils._tb_common.random_bool_generator())
 
-    fifo_sink = LaAsyncFifoSink(
-        bus=LaAsyncFifoRdBus.from_prefix(dut, ""),
+    fifo_sink = lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoSink(
+        bus=lambdalib.ramlib.tests.la_asyncfifo.LaAsyncFifoRdBus.from_prefix(dut, ""),
         clock=dut.rd_clk,
         reset=dut.rd_nreset
     )
-    fifo_sink.set_rd_en_generator(random_bool_generator())
+    fifo_sink.set_rd_en_generator(lambdalib.utils._tb_common.random_bool_generator())
 
     # Reset DUT
     await Combine(
-        cocotb.start_soon(drive_reset(dut.wr_nreset)),
-        cocotb.start_soon(drive_reset(dut.rd_nreset))
+        cocotb.start_soon(lambdalib.utils._tb_common.drive_reset(dut.wr_nreset)),
+        cocotb.start_soon(lambdalib.utils._tb_common.drive_reset(dut.rd_nreset))
     )
 
     await cocotb.start(Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start())
@@ -157,8 +154,10 @@ utils.get_sim_steps(Decimal("8.104"), "ns")
 tf = TestFactory(fifo_rd_wr_test)
 tf.add_option('wr_clk_period_ns', [MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS])
 tf.add_option('rd_clk_period_ns', [MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS])
-tf.add_option('wr_en_generator', [None, random_bool_generator, bursty_en_gen])
-tf.add_option('rd_en_generator', [None, random_bool_generator, bursty_en_gen])
+tf.add_option('wr_en_generator', [None, lambdalib.utils._tb_common.random_bool_generator,
+                                  bursty_en_gen])
+tf.add_option('rd_en_generator', [None, lambdalib.utils._tb_common.random_bool_generator,
+                                  bursty_en_gen])
 tf.generate_tests()
 
 
@@ -171,7 +170,7 @@ def test_la_asyncfifo():
     for depth in [2, 4, 8]:
         test_module_name = "lambdalib.ramlib.tests.tb_la_asyncfifo"
         test_name = f"{test_module_name}_depth_{depth}"
-        tests_failed = run_cocotb(
+        tests_failed = lambdalib.utils._tb_common.run_cocotb(
             chip=chip,
             test_module_name=test_module_name,
             timescale=("1ns", "1ps"),
