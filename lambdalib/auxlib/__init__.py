@@ -1,6 +1,6 @@
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
-from lambdalib import stdlib
+import lambdalib.stdlib
 
 
 ########################
@@ -16,6 +16,6 @@ def setup():
 
     lib.add('option', 'ydir', "auxlib/rtl")
 
-    lib.use(stdlib)
+    lib.use(lambdalib.stdlib)
 
     return lib

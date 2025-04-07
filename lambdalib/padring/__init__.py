@@ -1,6 +1,6 @@
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
-from lambdalib import iolib
+import lambdalib.iolib
 
 
 ########################
@@ -17,6 +17,6 @@ def setup():
     lib.add('option', 'idir', "padring/rtl")
     lib.add('option', 'ydir', "padring/rtl")
 
-    lib.use(iolib)
+    lib.use(lambdalib.iolib)
 
     return lib

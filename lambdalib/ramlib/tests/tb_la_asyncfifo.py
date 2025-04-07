@@ -9,7 +9,7 @@ from cocotb.triggers import ClockCycles, Timer, Combine
 from cocotb.regression import TestFactory
 from cocotb import utils
 
-from lambdalib import ramlib
+import lambdalib.ramlib
 from lambdalib.utils._tb_common import (
     run_cocotb,
     drive_reset,
@@ -166,7 +166,7 @@ def test_la_asyncfifo():
     chip = siliconcompiler.Chip("la_asyncfifo")
 
     chip.input("ramlib/rtl/la_asyncfifo.v", package='lambdalib')
-    chip.use(ramlib)
+    chip.use(lambdalib.ramlib)
 
     for depth in [2, 4, 8]:
         test_module_name = "lambdalib.ramlib.tests.tb_la_asyncfifo"
