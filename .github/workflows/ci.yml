@@ -37,14 +37,14 @@ jobs:
           python3 -m venv .venv
           . .venv/bin/activate
 
-          pip install --upgrade pip
-          pip install .[dev]
+          python3 -m pip install --upgrade pip
+          python3 -m pip install .[dev]
 
           # change running directory
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE -m "not eda"
+          python3 -m pytest $GITHUB_WORKSPACE -m "not eda"
 
   lint_verilog:
     name: Lint Verilog Code
@@ -88,11 +88,11 @@ jobs:
           python3 -m venv .venv
           . .venv/bin/activate
 
-          pip install --upgrade pip
-          pip install .[dev]
+          python3 -m pip install --upgrade pip
+          python3 -m pip install .[dev]
 
           # change running directory
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE -m "eda"
+          python3 -m pytest $GITHUB_WORKSPACE -m "eda"
