@@ -49,8 +49,11 @@ module {{ type }}
     input [TESTW-1:0] test // pass through ASIC test interface
     );
 
+    // Total number of bits
+    localparam TOTAL_BITS = (2 ** AW) * DW;
+
     // Determine which memory to select
-    localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% for aw, dw_select in selection_table.items() %}
+    localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% if minsize > 0 %} ({{ minsize }} >= TOTAL_BITS) ? "SOFT" :{% endif %}{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW >= {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
