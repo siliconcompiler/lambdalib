@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Single Port {{ type }}
+ * Function: Dual Port Memory ({{ type }})
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -13,14 +13,14 @@
  * Advanced ASIC development should rely on complete functional models
  * supplied on a per macro basis.
  *
- * Technologoy specific implementations of "la_sp{{ type }}" would generally include
+ * Technologoy specific implementations of "{{ type }}" would generally include
  * one or more hardcoded instantiations of {{ type }} modules with a generate
  * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *
  ****************************************************************************/
 
-module la_sp{{ type }}
+module {{ type }}
   #(parameter DW     = 32,          // Memory width
     parameter AW     = 10,          // Address width (derived)
     parameter PROP   = "DEFAULT",   // Pass through variable for hard macro
@@ -28,13 +28,18 @@ module la_sp{{ type }}
     parameter TESTW  = 128          // Width of asic test interface
     )
    (// Memory interface
-    input clk, // write clock
-    input ce, // chip enable
-    input we, // write enable
-    input [DW-1:0] wmask, //per bit write mask
-    input [AW-1:0] addr, //write address
-    input [DW-1:0] din, //write data
-    output [DW-1:0] dout, //read output data
+    // Write port
+    input wr_clk, // write clock
+    input wr_ce, // write chip-enable
+    input wr_we, // write enable
+    input [DW-1:0] wr_wmask, // write mask
+    input [AW-1:0] wr_addr, // write address
+    input [DW-1:0] wr_din, //write data in
+    // Read port
+    input rd_clk, // read clock
+    input rd_ce, // read chip-enable
+    input [AW-1:0] rd_addr, // read address
+    output [DW-1:0] rd_dout, //read data out
     // Power signals
     input vss, // ground signal
     input vdd, // memory core array power
@@ -44,8 +49,11 @@ module la_sp{{ type }}
     input [TESTW-1:0] test // pass through ASIC test interface
     );
 
+    // Total number of bits
+    localparam TOTAL_BITS = (2 ** AW) * DW;
+
     // Determine which memory to select
-    localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% for aw, dw_select in selection_table.items() %}
+    localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% if minsize > 0 %} ({{ minsize }} >= TOTAL_BITS) ? "SOFT" :{% endif %}{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW >= {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
@@ -58,7 +66,7 @@ module la_sp{{ type }}
 
     generate
       if (MEM_PROP == "SOFT") begin: isoft
-        la_spram_impl #(
+        la_dpram_impl #(
             .DW(DW),
             .AW(AW),
             .PROP(PROP),
@@ -89,20 +97,23 @@ module la_sp{{ type }}
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
           wire [MEM_ADDRS-1:0] mem_outputs;
-          assign dout[o] = |mem_outputs;
+          assign rd_dout[o] = |mem_outputs;
         end
 
         genvar a;
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin: ADDR
           wire selected;
-          wire [MEM_DEPTH-1:0] mem_addr;
+          wire [MEM_DEPTH-1:0] wr_mem_addr;
+          wire [MEM_DEPTH-1:0] rd_mem_addr;
 
           if (MEM_ADDRS == 1) begin: FITS
             assign selected = 1'b1;
-            assign mem_addr = addr;
+            assign wr_mem_addr = wr_addr;
+            assign rd_mem_addr = rd_addr;
           end else begin: NOFITS
             assign selected = addr[AW-1:MEM_DEPTH] == a;
-            assign mem_addr = addr[MEM_DEPTH-1:0];
+            assign wr_mem_addr = wr_addr[MEM_DEPTH-1:0];
+            assign rd_mem_addr = rd_addr[MEM_DEPTH-1:0];
           end
 
           genvar n;
@@ -114,8 +125,8 @@ module la_sp{{ type }}
             genvar i;
             for (i = 0; i < MEM_WIDTH; i = i + 1) begin: WORD_SELECT
               if (n + i < DW) begin: ACTIVE
-                assign mem_din[i] = din[n + i];
-                assign mem_wmask[i] = wmask[n + i];
+                assign mem_din[i] = wr_din[n + i];
+                assign mem_wmask[i] = wr_wmask[n + i];
                 assign OUTPUTS[n + i].mem_outputs[a] = selected ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE
@@ -126,13 +137,14 @@ module la_sp{{ type }}
 
             wire ce_in;
             wire we_in;
-            assign ce_in = ce && selected;
-            assign we_in = we && selected;
+            assign wr_ce_in = wr_ce && selected;
+            assign rd_ce_in = rd_ce && selected;
+            assign we_in = wr_we && selected;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
-              {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
-                .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
-              );
+  {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
+    .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
+  );
             end{% endfor %}
           end
         end
