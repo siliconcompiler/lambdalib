@@ -28,14 +28,21 @@ dynamic = ['version']
 [tool.setuptools.dynamic]
 version = {attr = "lambdalib._common._version"}
 
-[tool.pytest.ini_options]
-testpaths = "tests"
-timeout = "60"
-
 [project.optional-dependencies]
 # Dev dependencies.
 dev = [
     "flake8 >= 5.0.0",
     "pytest >= 6.2.4",
-    "pytest-timeout >= 2.1.0"
+    "pytest-timeout >= 2.1.0",
+    "cocotb==1.9.2",
+    "cocotb-bus==0.2.1"
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "eda: this test requires EDA tools installed to run.",
+]
+testpaths = [
+    "tests"
+]
+timeout = "60"

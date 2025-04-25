@@ -21,36 +21,39 @@
  ****************************************************************************/
 
 module la_asyncfifo #(
-    parameter DW    = 32,        // Memory width
-    parameter DEPTH = 4,         // FIFO depth
-    parameter NS    = 1,         // Number of power supplies
-    parameter CTRLW = 1,         // width of asic ctrl interface
-    parameter TESTW = 1,         // width of asic teset interface
-    parameter CHAOS = 0,         // generates random full logic when set
-    parameter PROP  = "DEFAULT"  // Pass through variable for hard macro
+    parameter DW                = 32,       // Memory width
+    parameter DEPTH             = 4,        // FIFO depth
+    parameter ALMOSTFULL        = 0,        // FIFO depth
+    parameter NS                = 1,        // Number of power supplies
+    parameter CTRLW             = 1,        // width of asic ctrl interface
+    parameter TESTW             = 1,        // width of asic teset interface
+    parameter CHAOS             = 0,        // generates random full logic when set
+    parameter PROP              = "DEFAULT" // Pass through variable for hard macro
 ) (  // write port
     input                  wr_clk,
     input                  wr_nreset,
-    input      [   DW-1:0] wr_din,        // data to write
-    input                  wr_en,         // write fifo
-    input                  wr_chaosmode,  // randomly assert fifo full when set
-    output reg             wr_full,       // fifo full
+    input      [   DW-1:0] wr_din,         // data to write
+    input                  wr_en,          // write fifo
+    input                  wr_chaosmode,   // randomly assert fifo full when set
+    output reg             wr_full,        // fifo full
+    output reg             wr_almost_full, // fifo almost full
     // read port
     input                  rd_clk,
     input                  rd_nreset,
-    output     [   DW-1:0] rd_dout,       // output data (next cycle)
-    input                  rd_en,         // read fifo
-    output reg             rd_empty,      // fifo is empty
+    output     [   DW-1:0] rd_dout,        // output data (next cycle)
+    input                  rd_en,          // read fifo
+    output reg             rd_empty,       // fifo is empty
     // Power signals
-    input                  vss,           // ground signal
-    input      [   NS-1:0] vdd,           // supplies
+    input                  vss,            // ground signal
+    input      [   NS-1:0] vdd,            // supplies
     // Generic interfaces
-    input      [CTRLW-1:0] ctrl,          // pass through ASIC control interface
-    input      [TESTW-1:0] test           // pass through ASIC test interface
+    input      [CTRLW-1:0] ctrl,           // pass through ASIC control interface
+    input      [TESTW-1:0] test            // pass through ASIC test interface
 );
 
     // local params
     localparam AW = (DEPTH == 1) ? 1 : $clog2(DEPTH);
+    localparam AFULLFINAL = (ALMOSTFULL != 0) ? ALMOSTFULL : DEPTH - 1;
 
     // local wires
     reg  [AW:0] wr_grayptr;
@@ -82,7 +85,7 @@ module la_asyncfifo #(
             wr_binptr[AW:0]     <= 'b0;
             wr_grayptr[AW:0]    <= 'b0;
         end else begin
-            wr_binptr_mem[AW:0] <= (wr_binptr_mem_nxt[AW:0] == DEPTH) ? 'b0 : wr_binptr_mem_nxt[AW:0];
+            wr_binptr_mem[AW:0] <= (wr_binptr_mem_nxt[AW:0] == DEPTH[AW:0]) ? 'b0 : wr_binptr_mem_nxt[AW:0];
             wr_binptr[AW:0] <= wr_binptr_nxt[AW:0];
             wr_grayptr[AW:0] <= wr_grayptr_nxt[AW:0];
         end
@@ -114,7 +117,13 @@ module la_asyncfifo #(
         if (~wr_nreset) wr_full <= 1'b0;
         else
             wr_full <= (wr_chaosfull & wr_chaosmode) |
-                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH;
+                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH[AW:0];
+
+    always @(posedge wr_clk or negedge wr_nreset)
+        if (~wr_nreset) wr_almost_full <= 1'b0;
+        else
+            wr_almost_full <=
+                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) > (AFULLFINAL[AW:0]-1);
 
     // Write --> Read clock synchronizer
     for (i = 0; i < (AW + 1); i = i + 1) begin
@@ -136,7 +145,7 @@ module la_asyncfifo #(
             rd_binptr[AW:0]     <= 'b0;
             rd_grayptr[AW:0]    <= 'b0;
         end else begin
-            rd_binptr_mem[AW:0] <= (rd_binptr_mem_nxt[AW:0] == DEPTH) ? 'b0 : rd_binptr_mem_nxt[AW:0];
+            rd_binptr_mem[AW:0] <= (rd_binptr_mem_nxt[AW:0] == DEPTH[AW:0]) ? 'b0 : rd_binptr_mem_nxt[AW:0];
             rd_binptr[AW:0] <= rd_binptr_nxt[AW:0];
             rd_grayptr[AW:0] <= rd_grayptr_nxt[AW:0];
         end
