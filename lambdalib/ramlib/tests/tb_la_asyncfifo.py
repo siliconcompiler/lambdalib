@@ -60,7 +60,7 @@ async def test_almost_full(dut):
     await Timer(wr_clk_period_ns * random.random(), "ns", round_mode="round")
     await cocotb.start(Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start())
 
-    almost_full_level = int(dut.ALMOST_FULL_LEVEL.value)
+    almost_full_level = int(dut.AFULLFINAL.value)
 
     await ClockCycles(dut.wr_clk, 3)
 
@@ -149,8 +149,6 @@ RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [utils.get_time_from_sim_steps(
     ) & ~1,
     units="ns"
 ) for _ in range(0, 2)]
-
-utils.get_sim_steps(Decimal("8.104"), "ns")
 
 # Factory to automatically generate a set of tests based on the different permutations
 # of the provided test arguments
