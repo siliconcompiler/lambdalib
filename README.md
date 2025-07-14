@@ -18,6 +18,16 @@ The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonst
 
 Lambdalib has been successfully used in multiple tapeouts using [SiliconCompiler](https://github.com/siliconcompiler/siliconcompiler).
 
+
+# Installation
+
+```sh
+git clone https://github.com/siliconcompiler/lambdalib
+cd lambdalib
+python3 -m pip install -e .            # Required install step
+python3 -m pip install -e .[docs,test]  # Optional install step for generating docs and running tests
+```
+
 # License
 
 [MIT](LICENSE)
