@@ -1,12 +1,12 @@
 from siliconcompiler import DesignSchema
 from lambdalib._common import basic_setup
 
-class Clkmux2(DesignSchema):
+class clkmux2(DesignSchema):
     def __init__(self):
         name = 'la_clkmux2'
         super().__init__(name)
         basic_setup(self, __file__, name)
 
 if __name__ == "__main__":
-    d = Clkmux2()
+    d = clkmux2()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")
