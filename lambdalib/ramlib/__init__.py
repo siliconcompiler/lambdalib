@@ -1,12 +1,12 @@
-from .la_asyncfifo.la_asyncfifo import Asyncfifo
-from .la_syncfifo.la_syncfifo import Syncfifo
-from .la_dpram.la_dpram import Dpram
-from .la_spram.la_spram import Spram
+from .la_asyncfifo.la_asyncfifo import asyncfifo
+from .la_syncfifo.la_syncfifo import syncfifo
+from .la_dpram.la_dpram import dpram
+from .la_spram.la_spram import spram
 
-__all__ = ['Asyncfifo',
-           'Syncfifo',
-           'Dpram',
-           'Spram']
+__all__ = ['asyncfifo',
+           'syncfifo',
+           'dpram',
+           'spram']
 
 ########################################
 # Old SiliconCompiler Setup (deprecated)

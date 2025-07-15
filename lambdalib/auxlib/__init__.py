@@ -38,7 +38,7 @@ __all__ = ['antenna',
            'isolo',
            'keeper',
            'obuf',
-           'ddr',
+           'oddr',
            'odiff',
            'pwrbuf',
            'rsync',
@@ -59,6 +59,8 @@ def setup():
 
     lib = Library('lambdalib_auxlib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
+
+    lib.use(stdlib)
 
     cells = ['la_antenna',
              'la_clkicgand',
@@ -85,7 +87,5 @@ def setup():
 
     for item in cells:
         lib.input(f'{item}/rtl/{item}.v')
-
-    lib.use(stdlib)
 
     return lib
