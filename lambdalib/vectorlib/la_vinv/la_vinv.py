@@ -1,12 +1,12 @@
 from siliconcompiler import DesignSchema
 from lambdalib._common import basic_setup
 
-class Vinv(DesignSchema):
+class vinv(DesignSchema):
     def __init__(self):
         name = 'la_vinv'
         super().__init__(name)
         basic_setup(self, __file__, name)
 
 if __name__ == "__main__":
-    d = Vinv()
+    d = vinv()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")
