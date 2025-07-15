@@ -1,20 +1,21 @@
-from .la_ioanalog.la_ioanalog import la_ioanalog
-from .la_iobidir.la_iobidir import la_iobidir
-from .la_ioclamp.la_ioclamp import la_ioclamp
-from .la_iocorner.la_iocorner import la_iocorner
-from .la_iocut.la_iocut import la_iocut
-from .la_ioinput.la_ioinput import la_ioinput
-from .la_iopoc.la_iopoc import la_iopoc
-from .la_iorxdiff.la_iorxdiff import la_iorxdiff
-from .la_iotxdiff.la_iotxdiff import la_iotxdiff
-from .la_iovdda.la_iovdda import la_iovdda
-from .la_iovddio.la_iovddio import la_iovddio
-from .la_iovdd.la_iovdd import la_iovdd
-from .la_iovssa.la_iovssa import la_iovssa
-from .la_iovssio.la_iovssio import la_iovssio
-from .la_iovss.la_iovss import la_iovss
-from .la_ioxtal.la_ioxtal impoirt Ioxtal
-
+from .la_ioanalog.la_ioanalog import Ioanalog
+from .la_iobidir.la_iobidir import Iobidir
+from .la_ioclamp.la_ioclamp import Ioclamp
+from .la_iocorner.la_iocorner import Iocorner
+from .la_iocut.la_iocut import Iocut
+from .la_ioinput.la_ioinput import Ioinput
+from .la_iopoc.la_iopoc import Iopoc
+from .la_iorxdiff.la_iorxdiff import Iorxdiff
+from .la_iotxdiff.la_iotxdiff import Iotxdiff
+from .la_iovdda.la_iovdda import Iovdda
+from .la_iovddio.la_iovddio import Iovddio
+from .la_iovdd.la_iovdd import Iovdd
+from .la_iovssa.la_iovssa import Iovssa
+from .la_iovssio.la_iovssio import Iovssio
+from .la_iovss.la_iovss import Iovss
+from .la_ioxtal.la_ioxtal import Ioxtal
+from .la_ioside.la_ioside import Ioside
+from .la_iopadring.la_iopadring import Iopadring
 
 __all__ = ['Ioanalog',
            'Iobidir',
@@ -31,7 +32,9 @@ __all__ = ['Ioanalog',
            'Iovssa',
            'Iovssio',
            'Iovss',
-           'Ioxtal']
+           'Ioxtal',
+           'Ioside',
+           'Iopadring']
 
 ########################################
 # Old SiliconCompiler Setup (deprecated)
@@ -63,7 +66,9 @@ def setup():
              'la_iovssa',
              'la_iovssio',
              'la_iovss',
-             'la_ioxtal']
+             'la_ioxtal',
+             'la_ioside',
+             'la_iopadring']
 
     for item in cells:
         lib.input(f'{item}/rtl/{item}.v')

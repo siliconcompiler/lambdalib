@@ -1,29 +1,11 @@
-from os.path import dirname, abspath
-from siliconcompiler.design import DesignSchema
-
+from siliconcompiler import DesignSchema
+from lambdalib._common import basic_setup
 
 class Isolo(DesignSchema):
     def __init__(self):
-
         name = 'la_isolo'
-        topmodule = 'la_isolo'
-        root = f'{name}_root'
-        source = [f'rtl/{name}.v']
-
-        # create a Design object
         super().__init__(name)
-
-        # set data home directory
-        self.register_datadir(root, __file__)
-
-        # rtl files
-        fileset = 'rtl'
-        for item in source:
-            self.add_file(item, fileset, datadir=root)
-
-        # top module
-        self.set_topmodule(topmodule, fileset)
-
+        basic_setup(self, __file__, name)
 
 if __name__ == "__main__":
     d = Isolo()
