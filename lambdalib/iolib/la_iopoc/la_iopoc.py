@@ -1,12 +1,12 @@
 from siliconcompiler import DesignSchema
 from lambdalib._common import basic_setup
 
-class Iopoc(DesignSchema):
+class iopoc(DesignSchema):
     def __init__(self):
         name = 'la_iopoc'
         super().__init__(name)
         basic_setup(self, __file__, name)
 
 if __name__ == "__main__":
-    d = Iopoc()
+    d = iopoc()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")

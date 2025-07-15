@@ -11,7 +11,7 @@ def basic_setup(design, path, name):
     source = [f'rtl/{name}.v']
 
     # set data home directory
-    design.register_datadir(datadir_name, path)
+    design.register_dataref(datadir_name, path)
 
     # rtl files
     fileset = 'rtl'

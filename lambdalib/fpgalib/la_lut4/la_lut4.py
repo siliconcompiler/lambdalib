@@ -1,12 +1,12 @@
 from siliconcompiler import DesignSchema
 from lambdalib._common import basic_setup
 
-class Lut4(DesignSchema):
+class lut4(DesignSchema):
     def __init__(self):
         name = 'la_lut4'
         super().__init__(name)
         basic_setup(self, __file__, name)
 
 if __name__ == "__main__":
-    d = Lut4()
+    d = lut4()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")
