@@ -42,7 +42,7 @@ __all__ = ['Antenna',
            'Idiff',
            'Pwrbuf',
            'Rsync',
-           'Ttbuf']
+           'Tbuf']
 
 ########################################
 # Old SiliconCompiler Setup (deprecated)
