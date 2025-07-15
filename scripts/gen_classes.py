@@ -29,7 +29,7 @@ def main():
     for item in lb_list:
 
         context = {
-            'class_name': item[3:].capitalize(),
+            'class_name': item[3:],
             'module_name': item
         }
         output = template.render(context)
