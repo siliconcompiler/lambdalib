@@ -306,6 +306,6 @@ def setup():
              'la_xor4']
 
     for item in cells:
-        lib.input(f'{item}/rtl/{item}.v')
+        lib.input(f'stdlib/{item}/rtl/{item}.v')
 
     return lib

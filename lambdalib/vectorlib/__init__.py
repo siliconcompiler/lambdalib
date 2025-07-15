@@ -56,6 +56,6 @@ def setup():
              'la_vmux8']
 
     for item in cells:
-        lib.input(f'{item}/rtl/{item}.v')
+        lib.input(f'vectorlib/{item}/rtl/{item}.v')
 
     return lib

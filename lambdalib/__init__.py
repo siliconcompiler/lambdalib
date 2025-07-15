@@ -9,7 +9,6 @@ from lambdalib import \
     auxlib, \
     fpgalib, \
     iolib, \
-    padring, \
     ramlib, \
     stdlib, \
     vectorlib
@@ -30,7 +29,6 @@ def setup():
         auxlib.setup(),
         fpgalib.setup(),
         iolib.setup(),
-        padring.setup(),
         ramlib.setup(),
         stdlib.setup(),
         vectorlib.setup()

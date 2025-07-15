@@ -15,7 +15,7 @@ from lambdalib.utils._tb_common import (
     drive_reset,
     random_bool_generator
 )
-from lambdalib.ramlib.tests.la_asyncfifo import (
+from lambdalib.ramlib.la_asyncfifo.testbench.la_asyncfifo import (
     LaAsyncFifoWrBus,
     LaAsyncFifoRdBus,
     LaAsyncFifoSource,
@@ -163,7 +163,8 @@ tf.generate_tests()
 def test_la_asyncfifo():
     chip = siliconcompiler.Chip("la_asyncfifo")
 
-    chip.input("ramlib/rtl/la_asyncfifo.v", package='lambdalib')
+    #TODO:bad practice, should not be needed?
+    chip.input("ramlib/la_asyncfifo/rtl/la_asyncfifo.v", package='lambdalib')
     chip.use(ramlib)
 
     for depth in [2, 4, 8]:

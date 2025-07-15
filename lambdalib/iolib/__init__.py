@@ -72,6 +72,6 @@ def setup():
              'la_iopadring']
 
     for item in cells:
-        lib.input(f'{item}/rtl/{item}.v')
+        lib.input(f'iolib/{item}/rtl/{item}.v')
 
     return lib

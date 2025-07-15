@@ -87,6 +87,6 @@ def setup():
              'la_tbuf']
 
     for item in cells:
-        lib.input(f'{item}/rtl/{item}.v')
+        lib.input(f'auxlib/{item}/rtl/{item}.v')
 
     return lib

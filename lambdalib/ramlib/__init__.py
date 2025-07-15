@@ -32,6 +32,6 @@ def setup():
              'la_spram']
 
     for item in cells:
-        lib.input(f'{item}/rtl/{item}.v')
+        lib.input(f'ramlib/{item}/rtl/{item}.v')
 
     return lib
