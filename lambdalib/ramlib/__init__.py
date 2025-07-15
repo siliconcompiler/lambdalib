@@ -14,6 +14,8 @@ __all__ = ['asyncfifo',
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
 from lambdalib import auxlib
+
+
 def setup():
     '''
     Lambdalib ramlib
@@ -31,6 +33,5 @@ def setup():
 
     for item in cells:
         lib.input(f'{item}/rtl/{item}.v')
-
 
     return lib

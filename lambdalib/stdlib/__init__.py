@@ -198,6 +198,8 @@ __all__ = ['and2',
 
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
+
+
 def setup():
     '''
     Lambdalib stdlib
@@ -302,7 +304,6 @@ def setup():
              'la_xor2',
              'la_xor3',
              'la_xor4']
-
 
     for item in cells:
         lib.input(f'{item}/rtl/{item}.v')

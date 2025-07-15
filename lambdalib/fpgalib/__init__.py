@@ -11,6 +11,8 @@ __all__ = ['ble4p0',
 ########################################
 from siliconcompiler import Library
 from lambdalib._common import register_data_source
+
+
 def setup():
     '''
     Lambdalib fpgalib
@@ -18,7 +20,6 @@ def setup():
 
     lib = Library('lambdalib_fpgalib', package='lambdalib', auto_enable=True)
     register_data_source(lib)
-
 
     cells = ['la_ble4p0',
              'la_clb4p0',

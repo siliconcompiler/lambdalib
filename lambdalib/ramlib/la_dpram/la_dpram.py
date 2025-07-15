@@ -1,11 +1,13 @@
 from siliconcompiler import DesignSchema
 from lambdalib._common import basic_setup
 
+
 class dpram(DesignSchema):
     def __init__(self):
         name = 'la_dpram'
         super().__init__(name)
         basic_setup(self, __file__, name)
+
 
 if __name__ == "__main__":
     d = dpram()

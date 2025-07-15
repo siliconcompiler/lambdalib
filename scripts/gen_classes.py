@@ -7,7 +7,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description="""\
     Generates boiler plate lambalib design classes
-    """,formatter_class=argparse.RawDescriptionHelpFormatter)
+    """, formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument("group", help="Group name")
     parser.add_argument("-name", help="Design name")
