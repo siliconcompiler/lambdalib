@@ -16,24 +16,9 @@ from lambdalib import \
 
 __version__ = _common._version
 
-
 ########################
 # SiliconCompiler Setup
 ########################
-def setup():
-    '''
-    Lambdalib library setup script
-    '''
-
-    return [
-        auxlib.setup(),
-        fpgalib.setup(),
-        iolib.setup(),
-        ramlib.setup(),
-        stdlib.setup(),
-        vectorlib.setup()
-    ]
-
 
 def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
