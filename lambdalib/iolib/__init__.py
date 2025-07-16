@@ -14,8 +14,6 @@ from .la_iovssa.la_iovssa import iovssa
 from .la_iovssio.la_iovssio import iovssio
 from .la_iovss.la_iovss import iovss
 from .la_ioxtal.la_ioxtal import ioxtal
-from .la_ioside.la_ioside import ioside
-from .la_iopadring.la_iopadring import iopadring
 
 __all__ = ['ioanalog',
            'iobidir',
