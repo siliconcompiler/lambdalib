@@ -24,9 +24,15 @@ Lambdalib has been successfully used in multiple tapeouts using [SiliconCompiler
 ```sh
 git clone https://github.com/siliconcompiler/lambdalib
 cd lambdalib
-python3 -m pip install -e .            # Required install step
-python3 -m pip install -e .[docs,test]  # Optional install step for generating docs and running tests
+python3 -m pip install -e .             # Local install
+python3 -m pip install -e .[docs,test]  # Optional step for generating docs and running tests
 ```
+
+# Project Methodology
+
+- One verilog module per rtl file
+- Class names are all lower case with the Verilog module prefix "la_" removed.
+
 
 # License
 
