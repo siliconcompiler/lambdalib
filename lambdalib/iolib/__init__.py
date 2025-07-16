@@ -30,6 +30,4 @@ __all__ = ['ioanalog',
            'iovssa',
            'iovssio',
            'iovss',
-           'ioxtal',
-           'ioside',
-           'iopadring']
+           'ioxtal']

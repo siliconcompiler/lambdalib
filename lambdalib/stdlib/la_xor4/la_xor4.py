@@ -1,13 +1,11 @@
 from siliconcompiler import DesignSchema
-from lambdalib._common import basic_setup
+from lambdalib import Lambda
 
-
-class xor4(DesignSchema):
+class xor4(Lambda):
     def __init__(self):
         name = 'la_xor4'
-        super().__init__(name)
-        basic_setup(self, __file__, name)
-
+        sources = [f'rtl/{name}.v']
+        super().__init__(name, sources, __file__)
 
 if __name__ == "__main__":
     d = xor4()

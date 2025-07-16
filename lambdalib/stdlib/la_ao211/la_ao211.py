@@ -1,13 +1,11 @@
 from siliconcompiler import DesignSchema
-from lambdalib._common import basic_setup
+from lambdalib import Lambda
 
-
-class ao211(DesignSchema):
+class ao211(Lambda):
     def __init__(self):
         name = 'la_ao211'
-        super().__init__(name)
-        basic_setup(self, __file__, name)
-
+        sources = [f'rtl/{name}.v']
+        super().__init__(name, sources, __file__)
 
 if __name__ == "__main__":
     d = ao211()
