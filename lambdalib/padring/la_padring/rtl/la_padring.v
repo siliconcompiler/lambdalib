@@ -31,7 +31,7 @@
  *
  ****************************************************************************/
 
-module la_iopadring
+module la_padring
   #(
     parameter                    CFGW = 8,         // config width
     parameter                    RINGW = 8,        // ioring width
@@ -116,7 +116,7 @@ module la_iopadring
     inout [WE_NSECTIONS*RINGW-1:0] we_ioring
     );
 
-`include "la_iopadring.vh"
+`include "la_padring.vh"
 
    // NORTH
    la_ioside #(.SIDE("NO"),
@@ -328,7 +328,7 @@ module tb();
     */
 
    // dut
-   la_iopadring #(.CFGW(CFGW),
+   la_padring #(.CFGW(CFGW),
                   .RINGW(RINGW),
                   .NO_NPINS(NPINS),
                   .EA_NPINS(NPINS),
@@ -342,7 +342,7 @@ module tb();
                   .EA_CELLMAP(CELLMAP),
                   .WE_CELLMAP(CELLMAP),
                   .SO_CELLMAP(CELLMAP))
-   la_iopadring (/*AUTOINST*/
+   la_padring (/*AUTOINST*/
                  // Outputs
                  .no_zp                 (),                      // Templated
                  .no_zn                 (),                      // Templated

@@ -59,7 +59,7 @@ module la_ioside
     inout [NSECTIONS*RINGW-1:0] ioring // generic io-ring
     );
 
-`include "la_iopadring.vh"
+`include "la_padring.vh"
 
    genvar i;
 
