@@ -29,8 +29,8 @@ def main():
     for item in lb_list:
 
         context = {
-            'class_name': item[3:],
-            'module_name': item
+            'module_name': item,
+            'class_name': item[3:].capitalize()
         }
         output = template.render(context)
         filename = f"{lib}/{args.group}/{item}/{item}.py"
