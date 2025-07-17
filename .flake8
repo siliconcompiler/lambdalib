@@ -1,4 +1,6 @@
 [flake8]
 max-line-length = 100
 extend-exclude = build,.venv
-extend-ignore = 
+extend-ignore =
+per-file-ignores =
+    lambdalib/__init__.py:F401
