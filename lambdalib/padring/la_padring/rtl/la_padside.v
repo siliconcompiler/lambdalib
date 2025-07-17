@@ -29,7 +29,7 @@
  *
  *************************************************************************/
 
-module la_ioside
+module la_padside
   #(// per side parameters
     parameter [15:0]          SIDE = "NO",   // "NO", "SO", "EA", "WE"
     parameter [7:0]           NPINS = 1,     // total pins per side (<256)

@@ -5,7 +5,7 @@ class Padring(ll.Lambda):
     def __init__(self):
         name = 'la_padring'
         sources = [f'rtl/{name}.v',
-                   f'rtl/la_ioside.v']
+                   f'rtl/la_padside.v']
         super().__init__(name, sources, __file__)
 
         # extra settings, #TODO: not great, hard-coded names inside Lambda

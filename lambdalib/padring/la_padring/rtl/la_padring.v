@@ -119,13 +119,13 @@ module la_padring
 `include "la_padring.vh"
 
    // NORTH
-   la_ioside #(.SIDE("NO"),
-               .NPINS(NO_NPINS),
-               .NCELLS(NO_NCELLS),
-               .NSECTIONS(NO_NSECTIONS),
-               .CELLMAP(NO_CELLMAP),
-               .RINGW(RINGW),
-               .CFGW(CFGW))
+   la_padside #(.SIDE("NO"),
+                .NPINS(NO_NPINS),
+                .NCELLS(NO_NCELLS),
+                .NSECTIONS(NO_NSECTIONS),
+                .CELLMAP(NO_CELLMAP),
+                .RINGW(RINGW),
+                .CFGW(CFGW))
    inorth (// Outputs
            .zp     (no_zp),
            .zn     (no_zn),
@@ -146,13 +146,13 @@ module la_padring
            .cfg    (no_cfg));
 
    // EAST
-   la_ioside #(.SIDE("EA"),
-               .NPINS(EA_NPINS),
-               .NCELLS(EA_NCELLS),
-               .NSECTIONS(EA_NSECTIONS),
-               .CELLMAP(EA_CELLMAP),
-               .RINGW(RINGW),
-               .CFGW(CFGW))
+   la_padside #(.SIDE("EA"),
+                .NPINS(EA_NPINS),
+                .NCELLS(EA_NCELLS),
+                .NSECTIONS(EA_NSECTIONS),
+                .CELLMAP(EA_CELLMAP),
+                .RINGW(RINGW),
+                .CFGW(CFGW))
    ieast (// Outputs
           .zp     (ea_zp),
           .zn     (ea_zn),
@@ -173,13 +173,13 @@ module la_padring
           .cfg    (ea_cfg));
 
    // WEST
-   la_ioside #(.SIDE("WE"),
-               .NPINS(WE_NPINS),
-               .NCELLS(WE_NCELLS),
-               .NSECTIONS(WE_NSECTIONS),
-               .CELLMAP(WE_CELLMAP),
-               .RINGW(RINGW),
-               .CFGW(CFGW))
+   la_padside #(.SIDE("WE"),
+                .NPINS(WE_NPINS),
+                .NCELLS(WE_NCELLS),
+                .NSECTIONS(WE_NSECTIONS),
+                .CELLMAP(WE_CELLMAP),
+                .RINGW(RINGW),
+                .CFGW(CFGW))
    iwest (// Outputs
           .zp     (we_zp),
           .zn     (we_zn),
@@ -200,13 +200,13 @@ module la_padring
           .cfg    (we_cfg));
 
    // SOUTH
-   la_ioside #(.SIDE("SO"),
-               .NPINS(SO_NPINS),
-               .NCELLS(SO_NCELLS),
-               .NSECTIONS(SO_NSECTIONS),
-               .CELLMAP(SO_CELLMAP),
-               .RINGW(RINGW),
-               .CFGW(CFGW))
+   la_padside #(.SIDE("SO"),
+                .NPINS(SO_NPINS),
+                .NCELLS(SO_NCELLS),
+                .NSECTIONS(SO_NSECTIONS),
+                .CELLMAP(SO_CELLMAP),
+                .RINGW(RINGW),
+                .CFGW(CFGW))
    isouth (// Outputs
            .zp     (so_zp),
            .zn     (so_zn),
