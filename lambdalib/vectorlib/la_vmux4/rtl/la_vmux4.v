@@ -22,6 +22,6 @@ module la_vmux4 #(parameter DW = 1,          // width of mux
    assign out[DW-1:0] = ({(DW){sel0}} & in0[DW-1:0] |
                          {(DW){sel1}} & in1[DW-1:0] |
                          {(DW){sel2}} & in2[DW-1:0] |
-                         {(DW){sel3}} & in3[N-1:0]);
+                         {(DW){sel3}} & in3[DW-1:0]);
 
 endmodule

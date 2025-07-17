@@ -11,7 +11,7 @@ module la_vmux #(parameter N = 1,           // number of ports
    (
     input [N-1:0]       sel, // select vector
     input [DW*N-1:0]    in,  // flattened input {.., in1[DW-1:0],in0[DW-1:0]}
-    output reg [ W-1:0] out  // output
+    output reg [DW-1:0] out  // output
     );
 
    integer i;
