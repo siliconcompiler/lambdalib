@@ -1,12 +1,13 @@
-from siliconcompiler import DesignSchema
 from lambdalib import Lambda
 
-class vmux(Lambda):
+
+class Vmux(Lambda):
     def __init__(self):
         name = 'la_vmux'
         sources = [f'rtl/{name}.v']
         super().__init__(name, sources, __file__)
 
+
 if __name__ == "__main__":
-    d = vmux()
+    d = Vmux()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")

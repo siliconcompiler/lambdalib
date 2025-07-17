@@ -163,7 +163,7 @@ tf.generate_tests()
 def test_la_asyncfifo():
     chip = siliconcompiler.Chip("la_asyncfifo")
 
-    #TODO:bad practice, should not be needed?
+    # TODO: should not be needed?
     chip.input("ramlib/la_asyncfifo/rtl/la_asyncfifo.v", package='lambdalib')
     chip.use(ramlib)
 

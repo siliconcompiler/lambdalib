@@ -1,12 +1,13 @@
-from siliconcompiler import DesignSchema
 from lambdalib import Lambda
 
-class vinv(Lambda):
+
+class Vinv(Lambda):
     def __init__(self):
         name = 'la_vinv'
         sources = [f'rtl/{name}.v']
         super().__init__(name, sources, __file__)
 
+
 if __name__ == "__main__":
-    d = vinv()
+    d = Vinv()
     d.write_fileset(f"{d.name()}.f", fileset="rtl")
