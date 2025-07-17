@@ -1,5 +1,5 @@
-from .la_ioside.la_ioside import ioside
-from .la_iopadring.la_iopadring import iopadring
+from .la_ioside.la_ioside import Ioside
+from .la_iopadring.la_iopadring import Iopadring
 
-__all__ = ['ioside',
-           'iopadring']
+__all__ = ['Ioside',
+           'Iopadring']
