@@ -22,9 +22,9 @@ def test_class_ramlib():
         assert instance.check_filepaths()
 
 
-def test_class_vectorlib():
-    for name in ll.vectorlib.__all__:
-        obj = getattr(ll.vectorlib, name)
+def test_class_veclib():
+    for name in ll.veclib.__all__:
+        obj = getattr(ll.veclib, name)
         instance = obj()
         assert instance.check_filepaths()
 

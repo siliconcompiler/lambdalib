@@ -2,6 +2,7 @@ import os
 import pytest
 import lambdalib
 
+pytestmark = pytest.mark.skip(reason="Skipping until SC update finished")
 
 def test_check():
     lambdalib.copy('./lambda')

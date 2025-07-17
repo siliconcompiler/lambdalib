@@ -29,9 +29,9 @@ def test_lint_ramlib():
         assert lint(design())
 
 
-def test_lint_vectorlib():
-    for name in ll.vectorlib.__all__:
-        design = getattr(ll.vectorlib, name)
+def test_lint_veclib():
+    for name in ll.veclib.__all__:
+        design = getattr(ll.veclib, name)
         assert lint(design())
 
 
