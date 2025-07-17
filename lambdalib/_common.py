@@ -1,4 +1,15 @@
-#TODO: remove
+import os
+import glob
+import shutil
+from siliconcompiler import Chip
+import siliconcompiler.package as sc_package
+
+
+def register_data_source(chip):
+    chip.register_source("lambdalib", "python://lambdalib")
+
+
+# TODO: remove
 def basic_setup(design, path, name):
     topmodule = name
     datadir_name = f'{name}_data'
@@ -19,9 +30,10 @@ def basic_setup(design, path, name):
 # SiliconCompiler Setup
 ########################
 
+
 def __get_lambdalib_dir(la_lib):
     path_assert = Chip('lambdalib')
-    _common.register_data_source(path_assert)
+    register_data_source(path_assert)
     lambdalib_path = sc_package.path(path_assert, 'lambdalib')
     return f'{lambdalib_path}/{la_lib}/rtl'
 

@@ -1,13 +1,7 @@
-from siliconcompiler import Chip
-import siliconcompiler.package as sc_package
-import glob
-import os
-import shutil
-
-# global class
+#  main setup class to inherit
 from .lambdalib import Lambda
 
-# individual modules
+#  individual modules
 from lambdalib import auxlib
 from lambdalib import fpgalib
 from lambdalib import iolib
