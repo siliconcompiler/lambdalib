@@ -5,7 +5,7 @@ class Padring(ll.Lambda):
     def __init__(self):
         name = 'la_padring'
         sources = [f'rtl/{name}.v',
-                   f'rtl/la_padside.v']
+                   'rtl/la_padside.v']
         super().__init__(name, sources, __file__)
 
         # extra settings, #TODO: not great, hard-coded names inside Lambda
@@ -28,6 +28,7 @@ class Padring(ll.Lambda):
                     ll.iolib.Iovssa,
                     ll.iolib.Ioclamp]:
             self.add_depfileset(dep(), depfileset='rtl', fileset='rtl')
+
 
 if __name__ == "__main__":
     d = Padring()

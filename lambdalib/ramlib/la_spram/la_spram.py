@@ -5,7 +5,7 @@ class Spram(Lambda):
     def __init__(self):
         name = 'la_spram'
         sources = [f'rtl/{name}.v',
-                   f'rtl/la_spram_impl.v']
+                   'rtl/la_spram_impl.v']
         super().__init__(name, sources, __file__)
 
 

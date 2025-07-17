@@ -1,5 +1,6 @@
 import lambdalib as ll
 
+
 class Asyncfifo(ll.Lambda):
     def __init__(self):
         name = 'la_asyncfifo'
@@ -8,6 +9,7 @@ class Asyncfifo(ll.Lambda):
 
         for dep in [ll.auxlib.Drsync]:
             self.add_depfileset(dep(), depfileset='rtl', fileset='rtl')
+
 
 if __name__ == "__main__":
     d = Asyncfifo()

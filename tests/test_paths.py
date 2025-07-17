@@ -4,6 +4,7 @@ import lambdalib
 
 pytestmark = pytest.mark.skip(reason="Skipping until SC update finished")
 
+
 def test_pdk_paths():
     chip = Chip('<lib>')
     chip.use(lambdalib)

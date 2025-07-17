@@ -4,11 +4,12 @@ import lambdalib
 
 pytestmark = pytest.mark.skip(reason="Skipping until SC update finished")
 
+
 def test_check():
     lambdalib.copy('./lambda')
     assert lambdalib.check('./lambda')
 
-@pytest.mark.skip("not clear that we need this test")
+
 def test_check_missing_file():
     lambdalib.copy('./lambda', exclude=('la_and3',))
     assert not lambdalib.check('./lambda')
@@ -30,13 +31,13 @@ def test_check_all_files_auxlib():
     lambdalib.copy('./lambda', la_lib='auxlib')
     assert lambdalib.check('./lambda', la_lib='auxlib')
 
-@pytest.mark.skip("not clear that we need this test")
+
 def test_copy():
     lambdalib.copy('./lambda')
 
     assert os.path.exists('./lambda/la_and2.v')
 
-@pytest.mark.skip("not clear that we need this test")
+
 def test_copy_with_exclude():
     lambdalib.copy('./lambda', exclude=('la_and3',))
 
