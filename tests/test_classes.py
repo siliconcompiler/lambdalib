@@ -42,6 +42,7 @@ def test_class_padring():
         instance = obj()
         assert instance.check_filepaths()
 
+
 def test_class_fpgalib():
     for name in ll.fpgalib.__all__:
         obj = getattr(ll.fpgalib, name)
