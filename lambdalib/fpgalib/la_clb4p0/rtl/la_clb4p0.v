@@ -81,7 +81,7 @@ module la_clb4p0
           if (N>1)
             assign fbmux[i][j] = fb[i][cfgfb[(i*K+j)*$clog2(N)+:$clog2(N)]];
           else
-            assign fbmux[i][j] = fb[i][j];
+            assign fbmux[i][j] = fb[i][0]; //TODO: suport N=1
      end
 
    // select between feedback and primary inputs
