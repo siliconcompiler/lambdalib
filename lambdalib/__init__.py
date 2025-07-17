@@ -8,6 +8,6 @@ from lambdalib import iolib
 from lambdalib import padring
 from lambdalib import stdlib
 from lambdalib import ramlib
-from lambdalib import vectorlib
+from lambdalib import veclib
 
 __version__ = "0.3.4"
