@@ -5,18 +5,14 @@
 //#############################################################################
 
 module la_vinv #(
-    parameter N    = 1,         // width of data inputs
-    parameter PROP = "DEFAULT"  // custom cell property
-) (
-    input  [N-1:0] a,
+                 parameter N = 1,           // width of data inputs
+                 parameter PROP = "DEFAULT" // custom cell property
+                 )
+   (
+    input [N-1:0]  a,
     output [N-1:0] z
-);
-
-    la_inv #(
-        .PROP(PROP)
-    ) i0[N-1:0] (
-        .a(a[N-1:0]),
-        .z(z[N-1:0])
     );
+
+   assign z = ~a;
 
 endmodule
