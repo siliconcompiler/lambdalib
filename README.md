@@ -6,12 +6,12 @@ Lambdalib includes the following hardware categories:
 
 | Category                            | Description                           |
 |-------------------------------------|---------------------------------------|
-|[stdlib](lambdalib/stdlib/rtl)       | Standard cells (inv, nand, ff, ...)
-|[auxlib](lambdalib/auxlib/rtl)       | Aux cells can consist of multiple standard cells or physical only cells
+|[stdlib](lambdalib/stdlib/rtl)       | Standard library cells (inv, nand, ff, ...)
+|[auxlib](lambdalib/auxlib/rtl)       | Special library cells (antenna, decap, clkmux,...)
 |[ramlib](lambdalib/ramlib/rtl)       | Memory (single port, dual port, fifo, ...)
 |[iolib](lambdalib/iolib)             | IO cells (bidir, vdd, clamp,...)
 |[padring](lambdalib/padring)         | Padring generator
-|[vectorlib](lambdalib/vectorlib/rtl) | Vectorized library (mux, isolation)
+|[vectorlib](lambdalib/vecib/rtl)     | Vectorized library (mux, isolation)
 |[fpgalib](lambdalib/fpgalib/rtl)     | FPGA cells (lut4, ble, clb)
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
@@ -28,11 +28,37 @@ python3 -m pip install -e .             # Local install
 python3 -m pip install -e .[docs,test]  # Optional step for generating docs and running tests
 ```
 
+# Examples
+
+The following example illustrate lambdalib use models
+
+## Instantiating a Lambdalib module
+
+This example shows how to instatiate the Padring module in a top level chip design.
+We could have chosen any module to instantiate (inverter, flip flop, dual port ram...).
+
+
+```python
+```
+
+To convert the design into a gate level netlist using yosys, just run python script
+in the examples folder. A file `chip.vg` will be written to disk in the run directory.
+
+```bash
+$ python examples/padring/make.py
+```
+
+## Using SiliconCompiler to target a technology
+
+```python
+```
+
+
 # Project Methodology
 
-- One verilog module per rtl file
-- Class names are all lower case with the Verilog module prefix "la_" removed.
-
+- One verilog module per RTL file
+- One Python module per reusable module
+- Class names are RTL module names with "la_" removed and capitalized
 
 # License
 
