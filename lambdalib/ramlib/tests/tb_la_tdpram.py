@@ -27,9 +27,9 @@ async def write_memory_port(dut, address, data, port):
 
 async def read_memory_port(dut, address, port):
     if (port == 'a'):
-        return await memory_read(dut.clk_a, dut.we_a, dut.ce_a, dut.addr_a, address, dut.din_a)
+        return await memory_read(dut.clk_a, dut.we_a, dut.ce_a, dut.addr_a, address, dut.dout_a)
     elif (port == 'b'):
-        return await memory_read(dut.clk_b, dut.we_b, dut.ce_b, dut.addr_b, address, dut.din_b)
+        return await memory_read(dut.clk_b, dut.we_b, dut.ce_b, dut.addr_b, address, dut.dout_b)
     else:
         raise ValueError("Port must be either \'a\' or \'b\'")
 
@@ -50,7 +50,6 @@ async def memory_write(
     # re_a.value = 0
     address_bus.value = address_value
     data_bus.value = data_value
-    # @(posedge clk);
     await FallingEdge(clock)
     
 
@@ -72,12 +71,10 @@ async def memory_read(
     return data_bus.value
 
 
-@cocotb.test()
-async def tdpram_rd_wr_test(
-    dut,
-    clk_a_period_ns=10.0,
-    clk_b_period_ns=10.0
-):
+async def tdpram_test_init(
+        dut,
+        clk_a_period_ns=10.0,
+        clk_b_period_ns=10.0):
 
     await cocotb.start(Clock(dut.clk_a, clk_a_period_ns, units="ns").start())
     # Randomize phase shift between clocks
@@ -98,6 +95,19 @@ async def tdpram_rd_wr_test(
     
     await FallingEdge(dut.clk_a)
 
+
+
+@cocotb.test()
+async def tdpram_rd_wr_hello_world(
+    dut,
+    clk_a_period_ns=10.0,
+    clk_b_period_ns=10.0
+):
+
+    await tdpram_test_init(dut,
+                           clk_a_period_ns=clk_a_period_ns,
+                           clk_b_period_ns=clk_b_period_ns)
+    
     await write_memory_port(dut, 0x0, 0x55555555, 'a')
     actual = await read_memory_port(dut, 0x0, 'a')
 
@@ -107,15 +117,58 @@ async def tdpram_rd_wr_test(
     assert actual == expected, f'Expected {expected} got {actual}'
 
 
+@cocotb.test()
+async def tdpram_rd_wr_test(
+        dut,
+        clk_a_period_ns=10.0,
+        clk_b_period_ns=10.0,
+        num_words=1000,
+):
+
+    await tdpram_test_init(dut,
+                           clk_a_period_ns=clk_a_period_ns,
+                           clk_b_period_ns=clk_b_period_ns)
+
+    address_width = int(dut.AW.value)
+    data_width = int(dut.DW.value)
+    
+    virtual_memory = [ random.getrandbits(data_width) for i in range(2 ** address_width)]
+    addresses_written = []
+
+    for port in ['a', 'b']:
+        
+        for i in range(num_words):
+            test_address = random.getrandbits(address_width)
+            addresses_written.append(test_address)
+            await write_memory_port(dut, test_address, virtual_memory[test_address], port)
+            
+        for i in range(num_words):
+            test_address = addresses_written[i]
+            expected = virtual_memory[test_address]
+            actual = await read_memory_port(dut, test_address, port)
+            if (port == 'a'):
+                await FallingEdge(dut.clk_a)
+            else:
+                await FallingEdge(dut.clk_b)
+                
+            assert actual == expected, f'Expected {expected} got {actual}'
+        
+    # Wait one more clock cycle to help out people looking at waveforms
+    await FallingEdge(dut.clk_b)
+
+
 def test_la_tdpram():
     chip = siliconcompiler.Chip("la_tdpram")
 
     chip.input("ramlib/rtl/la_tdpram.v", package='lambdalib')
     chip.use(ramlib)
 
+    tests_failed = 0
+    
     test_module_name = "lambdalib.ramlib.tests.tb_la_tdpram"
     test_name = f"{test_module_name}"
-    tests_failed = run_cocotb(
+
+    tests_failed += run_cocotb(
         chip=chip,
         test_module_name=test_module_name,
         timescale=("1ns", "1ps"),
@@ -125,6 +178,7 @@ def test_la_tdpram():
         },
         output_dir_name=test_name
     )
+
     assert (tests_failed == 0), f"Error test {test_name} failed!"
 
 
