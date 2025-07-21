@@ -1,20 +1,16 @@
 import random
-from decimal import Decimal
 
 import siliconcompiler
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles, Timer, Combine, FallingEdge
-from cocotb.regression import TestFactory
-from cocotb import utils
+from cocotb.triggers import Timer, FallingEdge
 
 from lambdalib import ramlib
 from lambdalib.utils._tb_common import (
     run_cocotb,
-    drive_reset,
-    random_bool_generator
 )
+
 
 async def write_memory_port(dut, address, data, port):
     if (port == 'a'):
@@ -51,7 +47,7 @@ async def memory_write(
     address_bus.value = address_value
     data_bus.value = data_value
     await FallingEdge(clock)
-    
+
 
 async def memory_read(
         clock,
@@ -66,7 +62,7 @@ async def memory_read(
     write_enable.value = 0
     clock_enable.value = 1
     # re_a.value = 0
-    address_bus.value = address_value    
+    address_bus.value = address_value
     await FallingEdge(clock)
     return data_bus.value
 
@@ -92,9 +88,8 @@ async def tdpram_test_init(
     dut.ce_b.value = 0
     dut.din_a.value = 0x0
     dut.din_b.value = 0x0
-    
-    await FallingEdge(dut.clk_a)
 
+    await FallingEdge(dut.clk_a)
 
 
 @cocotb.test()
@@ -107,7 +102,7 @@ async def tdpram_rd_wr_hello_world(
     await tdpram_test_init(dut,
                            clk_a_period_ns=clk_a_period_ns,
                            clk_b_period_ns=clk_b_period_ns)
-    
+
     await write_memory_port(dut, 0x0, 0x55555555, 'a')
     actual = await read_memory_port(dut, 0x0, 'a')
 
@@ -131,17 +126,17 @@ async def tdpram_rd_wr_test(
 
     address_width = int(dut.AW.value)
     data_width = int(dut.DW.value)
-    
-    virtual_memory = [ random.getrandbits(data_width) for i in range(2 ** address_width)]
+
+    virtual_memory = [random.getrandbits(data_width) for i in range(2 ** address_width)]
     addresses_written = []
 
     for port in ['a', 'b']:
-        
+
         for i in range(num_words):
             test_address = random.getrandbits(address_width)
             addresses_written.append(test_address)
             await write_memory_port(dut, test_address, virtual_memory[test_address], port)
-            
+
         for i in range(num_words):
             test_address = addresses_written[i]
             expected = virtual_memory[test_address]
@@ -150,9 +145,9 @@ async def tdpram_rd_wr_test(
                 await FallingEdge(dut.clk_a)
             else:
                 await FallingEdge(dut.clk_b)
-                
+
             assert actual == expected, f'Expected {expected} got {actual}'
-        
+
     # Wait one more clock cycle to help out people looking at waveforms
     await FallingEdge(dut.clk_b)
 
@@ -164,7 +159,7 @@ def test_la_tdpram():
     chip.use(ramlib)
 
     tests_failed = 0
-    
+
     test_module_name = "lambdalib.ramlib.tests.tb_la_tdpram"
     test_name = f"{test_module_name}"
 
