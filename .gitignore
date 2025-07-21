@@ -1,12 +1,19 @@
-
 #Editor files
 *~
-*~
+
+.vscod
+
+#Env
+venv/
+.venv
+
+
+# Sim
 *.log
-tmp*
-a.out
 *.vcd
-.venv/
+a.out
+*.vvp
+*.f
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

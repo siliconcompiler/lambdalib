@@ -1,49 +1,50 @@
-import pytest
-from siliconcompiler import Chip
-
-from lambdalib import \
-    auxlib, \
-    fpgalib, \
-    iolib, \
-    padring, \
-    ramlib, \
-    stdlib, \
-    vectorlib
-libraries = [
-    auxlib,
-    fpgalib,
-    iolib,
-    padring,
-    ramlib,
-    stdlib,
-    vectorlib
-]
+import lambdalib as ll
 
 
-@pytest.mark.parametrize('lib', libraries)
-def test_setup(lib):
-    chip = Chip('<lib>')
-    chip.use(lib)
-
-    lib_name = lib.__name__.replace('.', '_')
-
-    assert lib_name in chip.getkeys('library')
-    assert len(chip.get('library', lib_name, 'option', 'ydir')) == 1
+def test_class_stdlib():
+    for name in ll.stdlib.__all__:
+        obj = getattr(ll.stdlib, name)
+        instance = obj()
+        assert instance.check_filepaths()
 
 
-@pytest.mark.parametrize(
-        'lib,has_idir',
-        [(lib, lib == padring) for lib in libraries])
-def test_setup_with_idir(lib, has_idir):
-    chip = Chip('<lib>')
-    chip.use(lib)
+def test_class_auxlib():
+    for name in ll.auxlib.__all__:
+        obj = getattr(ll.auxlib, name)
+        instance = obj()
+        assert instance.check_filepaths()
 
-    lib_name = lib.__name__.replace('.', '_')
 
-    assert lib_name in chip.getkeys('library')
+def test_class_ramlib():
+    for name in ll.ramlib.__all__:
+        obj = getattr(ll.ramlib, name)
+        instance = obj()
+        assert instance.check_filepaths()
 
-    excpect_idir = 0
-    if has_idir:
-        excpect_idir = 1
 
-    assert len(chip.get('library', lib_name, 'option', 'idir')) == excpect_idir
+def test_class_veclib():
+    for name in ll.veclib.__all__:
+        obj = getattr(ll.veclib, name)
+        instance = obj()
+        assert instance.check_filepaths()
+
+
+def test_class_iolib():
+    for name in ll.iolib.__all__:
+        obj = getattr(ll.iolib, name)
+        instance = obj()
+        assert instance.check_filepaths()
+
+
+def test_class_padring():
+    for name in ll.padring.__all__:
+        obj = getattr(ll.padring, name)
+        instance = obj()
+        assert instance.check_filepaths()
+
+
+def test_class_fpgalib():
+    for name in ll.fpgalib.__all__:
+        obj = getattr(ll.fpgalib, name)
+        instance = obj()
+        assert instance.check_filepaths()
