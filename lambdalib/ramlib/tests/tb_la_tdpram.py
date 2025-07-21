@@ -29,26 +29,36 @@ async def tdpram_rd_wr_test(
     await Timer(clk_a_period_ns * random.random(), "ns", round_mode="round")
     await cocotb.start(Clock(dut.clk_b, clk_b_period_ns, units="ns").start())
 
+    # Initialze inputs
+    dut.addr_a = 0
+    dut.addr_b = 0
+    dut.wmask_a = 0xffffffff
+    dut.wmask_b = 0xffffffff
+    dut.we_a.value = 0
+    dut.we_b.value = 0
+    dut.ce_a.value = 0
+    dut.ce_b.value = 0
+    
     await ClockCycles(dut.clk_a, 3)
 
     expected = 0x55555555
     # Do a write
-    dut.we_a = 1
-    dut.ce_a = 1
-    dut.re_a = 0
-    dut.din_a = 0x55555555
-    await ClockCycles(dut.clk_a, 1)
+    dut.we_a.value = 1
+    dut.ce_a.value = 1
+    # re_a.value = 0
+    dut.din_a.value = 0x55555555
     await ClockCycles(dut.clk_a, 1)
     
     # Do a read
-    dut.we_a = 0
-    dut.ce_a = 1
-    dut.re_a = 1
-    dut.din_a = 0x0
+    dut.we_a.value = 0
+    dut.ce_a.value = 1
+    # dut.re_a.value = 1
+    dut.din_a.value = 0x0
     await ClockCycles(dut.clk_a, 1)    
-    actual = dut.din_b
+    await ClockCycles(dut.clk_a, 1)    
+    actual = dut.dout_a.value
 
-    assert actual == expected
+    assert actual == expected, f'Expected {expected} got {actual}'
 
 
 def test_la_tdpram():
