@@ -1,4 +1,5 @@
 import random
+import string
 from decimal import Decimal
 
 import siliconcompiler
@@ -7,7 +8,6 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, Timer, Combine
 from cocotb.regression import TestFactory
-from cocotb import utils
 
 from lambdalib import ramlib
 from lambdalib.utils._tb_common import (
@@ -28,6 +28,12 @@ def bursty_en_gen(burst_len=20):
         en_state = (random.randint(0, 1) == 1)
         for _ in range(0, burst_len):
             yield en_state
+
+
+def random_decimal(max: int, min: int, decimal_places=2) -> Decimal:
+    prefix = str(random.randint(min, max))
+    suffix = ''.join(random.choice(string.digits) for _ in range(decimal_places))
+    return Decimal(prefix + "." + suffix)
 
 
 @cocotb.test()
@@ -115,7 +121,7 @@ async def fifo_rd_wr_test(
 
     await cocotb.start(Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start())
     # Randomize phase shift between clocks
-    await Timer(wr_clk_period_ns * random.random(), "ns", round_mode="round")
+    await Timer(wr_clk_period_ns * Decimal(random.random()), "ns", round_mode="round")
     await cocotb.start(Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start())
 
     await ClockCycles(dut.wr_clk, 3)
@@ -134,21 +140,13 @@ async def fifo_rd_wr_test(
 
 
 # Generate sets of tests based on the different permutations of the possible arguments to fifo_test
-MAX_PERIOD_NS = 10.0
-MIN_PERIOD_NS = 1.0
+MAX_PERIOD_NS = 10
+MIN_PERIOD_NS = 1
+
 # Generate random clk period to test between min and max
-RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [utils.get_time_from_sim_steps(
-    # Time step must be even for cocotb clock driver
-    steps=utils.get_sim_steps(
-        time=Decimal(MIN_PERIOD_NS) + (
-            Decimal(MAX_PERIOD_NS - MIN_PERIOD_NS)
-            * Decimal(random.random()).quantize(Decimal("0.00"))
-        ),
-        units="ns",
-        round_mode="round"
-    ) & ~1,
-    units="ns"
-) for _ in range(0, 2)]
+RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [
+    random_decimal(MAX_PERIOD_NS, MIN_PERIOD_NS) for _ in range(2)
+]
 
 # Factory to automatically generate a set of tests based on the different permutations
 # of the provided test arguments
