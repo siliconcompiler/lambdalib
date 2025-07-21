@@ -57,7 +57,7 @@ module la_tdpram_impl #(
    /* verilator lint_on MULTIDRIVEN */
 
    genvar             i;
-   
+
    /* verilator lint_off MULTIDRIVEN */
    generate
       for (i = 0; i < DW; i = i + 1) begin
@@ -81,14 +81,14 @@ module la_tdpram_impl #(
    // Port A read
    always @(posedge clk_a) begin
       if (ce_a) begin
-	 dout_a <= ram[addr_a];
+         dout_a <= ram[addr_a];
       end
    end
 
    // Port B read
    always @(posedge clk_b) begin
       if (ce_b) begin
-	 dout_b <= ram[addr_b];
+         dout_b <= ram[addr_b];
       end
    end
 

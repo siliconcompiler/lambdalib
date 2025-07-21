@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: 
+ * Function:
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -65,7 +65,7 @@ module la_tdpram #(
         .addr_a     (addr_a),
         .din_a      (din_a),
         .dout_a     (dout_a),
-        
+
         .clk_b      (clk_b),
         .ce_b       (ce_b),
         .we_b       (we_b),
@@ -73,11 +73,11 @@ module la_tdpram #(
         .addr_b     (addr_b),
         .din_b      (din_b),
         .dout_b     (dout_b),
-        
+
         .vss        (vss),
         .vdd        (vdd),
         .vddio      (vddio),
-        
+
         .ctrl       (ctrl),
         .test       (test)
     );
