@@ -3,7 +3,7 @@ import lambdalib as ll
 
 
 def lint(design):
-    script = f"{design.name()}.f"
+    script = f"{design.name}.f"
     design.write_fileset(script, fileset="rtl")
     cmd = ['slang', '-f', script]
     return subprocess.run(cmd,

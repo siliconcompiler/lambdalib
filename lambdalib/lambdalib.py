@@ -1,23 +1,23 @@
-from typing import List, Union
 from pathlib import Path
+from typing import Union, List
 from siliconcompiler import DesignSchema
 
 
 class Lambda(DesignSchema):
-
     def __init__(self,
                  name: str,
-                 sources: List[str],
-                 path: Union[str, Path]):
+                 path: Union[str, Path],
+                 extrasources: List[str] = None):
 
         super().__init__(name)
 
-        fileset = 'rtl'
-        dataroot = f'{name}'
-        topmodule = f'la_{name}'
+        self.set_dataroot(name, path)
 
-        self.set_dataroot(dataroot, path)
-        self.set_topmodule(topmodule, fileset)
+        with self.active_fileset("rtl"):
+            self.set_topmodule(name)
 
-        for item in sources:
-            self.add_file(item, fileset, dataroot=dataroot)
+            with self.active_dataroot(name):
+                self.add_file(f"rtl/{name}.v")
+
+                if extrasources:
+                    self.add_file(extrasources)

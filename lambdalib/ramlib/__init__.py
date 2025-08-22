@@ -1,3 +1,5 @@
+from siliconcompiler import DesignSchema
+
 from .la_asyncfifo.la_asyncfifo import Asyncfifo
 from .la_syncfifo.la_syncfifo import Syncfifo
 from .la_dpram.la_dpram import Dpram
@@ -7,3 +9,14 @@ __all__ = ['Asyncfifo',
            'Syncfifo',
            'Dpram',
            'Spram']
+
+
+class RAMLib(DesignSchema):
+    def __init__(self):
+        super().__init__("la_ramlib")
+
+        with self.active_fileset("rtl"):
+            self.add_depfileset(Asyncfifo(), depfileset="rtl")
+            self.add_depfileset(Syncfifo(), depfileset="rtl")
+            self.add_depfileset(Dpram(), depfileset="rtl")
+            self.add_depfileset(Spram(), depfileset="rtl")

@@ -1,35 +1,24 @@
-import lambdalib as ll
+from lambdalib.lambdalib import Lambda
+
+from lambdalib.iolib import IOLib
 
 
-class Padring(ll.Lambda):
+class Padring(Lambda):
     def __init__(self):
         name = 'la_padring'
-        sources = [f'rtl/{name}.v',
-                   'rtl/la_padside.v']
-        super().__init__(name, sources, __file__)
+        super().__init__(name, __file__, extrasources=["rtl/la_padside.v"])
 
-        # extra settings, #TODO: not great, hard-coded names inside Lambda
-        self.add_idir('rtl', fileset='rtl', dataroot=name)
+        # extra settings
+        with self.active_fileset("rtl"):
+            self.set_topmodule(name)
 
-        # dependencies
-        for dep in [ll.iolib.Iobidir,
-                    ll.iolib.Ioinput,
-                    ll.iolib.Ioanalog,
-                    ll.iolib.Ioxtal,
-                    ll.iolib.Iorxdiff,
-                    ll.iolib.Iotxdiff,
-                    ll.iolib.Iopoc,
-                    ll.iolib.Iocut,
-                    ll.iolib.Iovddio,
-                    ll.iolib.Iovssio,
-                    ll.iolib.Iovdd,
-                    ll.iolib.Iovss,
-                    ll.iolib.Iovdda,
-                    ll.iolib.Iovssa,
-                    ll.iolib.Ioclamp]:
-            self.add_depfileset(dep(), depfileset='rtl', fileset='rtl')
+            with self.active_dataroot(name):
+                self.add_idir("rtl")
+
+            # dependencies
+            self.add_depfileset(IOLib(), depfileset='rtl')
 
 
 if __name__ == "__main__":
     d = Padring()
-    d.write_fileset(f"{d.name()}.f", fileset="rtl")
+    d.write_fileset(f"{d.name}.f", fileset="rtl")
