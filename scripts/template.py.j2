@@ -1,0 +1,12 @@
+from lambdalib.lambdalib import Lambda
+
+
+class {{ class_name }}(Lambda):
+    def __init__(self):
+        name = '{{ module_name }}'
+        super().__init__(name, __file__)
+
+
+if __name__ == "__main__":
+    d = {{ class_name }}()
+    d.write_fileset(f"{d.name}.f", fileset="rtl")

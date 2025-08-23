@@ -1,21 +1,22 @@
-from siliconcompiler import Library
-from lambdalib._common import register_data_source
-from lambdalib import auxlib
+from siliconcompiler import DesignSchema
+
+from .la_asyncfifo.la_asyncfifo import Asyncfifo
+from .la_syncfifo.la_syncfifo import Syncfifo
+from .la_dpram.la_dpram import Dpram
+from .la_spram.la_spram import Spram
+
+__all__ = ['Asyncfifo',
+           'Syncfifo',
+           'Dpram',
+           'Spram']
 
 
-########################
-# SiliconCompiler Setup
-########################
-def setup():
-    '''
-    Lambdalib ramlib
-    '''
+class RAMLib(DesignSchema):
+    def __init__(self):
+        super().__init__("la_ramlib")
 
-    lib = Library('lambdalib_ramlib', package='lambdalib', auto_enable=True)
-    register_data_source(lib)
-
-    lib.add('option', 'ydir', "ramlib/rtl")
-
-    lib.use(auxlib)
-
-    return lib
+        with self.active_fileset("rtl"):
+            self.add_depfileset(Asyncfifo(), depfileset="rtl")
+            self.add_depfileset(Syncfifo(), depfileset="rtl")
+            self.add_depfileset(Dpram(), depfileset="rtl")
+            self.add_depfileset(Spram(), depfileset="rtl")

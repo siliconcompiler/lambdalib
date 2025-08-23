@@ -1,18 +1,19 @@
-from siliconcompiler import Library
-from lambdalib._common import register_data_source
+from siliconcompiler import DesignSchema
+
+from .la_lut4.la_lut4 import Lut4
+from .la_ble4p0.la_ble4p0 import Ble4p0
+from .la_clb4p0.la_clb4p0 import Clb4p0
+
+__all__ = ['Ble4p0',
+           'Clb4p0',
+           'Lut4']
 
 
-########################
-# SiliconCompiler Setup
-########################
-def setup():
-    '''
-    Lambdalib fpgalib
-    '''
+class FPGALib(DesignSchema):
+    def __init__(self):
+        super().__init__("la_fpgalib")
 
-    lib = Library('lambdalib_fpgalib', package='lambdalib', auto_enable=True)
-    register_data_source(lib)
-
-    lib.add('option', 'ydir', "fpgalib/rtl")
-
-    return lib
+        with self.active_fileset("rtl"):
+            self.add_depfileset(Lut4(), depfileset="rtl")
+            self.add_depfileset(Ble4p0(), depfileset="rtl")
+            self.add_depfileset(Clb4p0(), depfileset="rtl")
