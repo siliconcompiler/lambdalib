@@ -4,9 +4,9 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                    #
 //############################################################################
 
-module la_vmux2 #(parameter W = 1,           // width of mux
-                  parameter PROP = "DEFAULT" // cell property
-                  )
+module la_vmux2b #(parameter W = 1,           // width of mux
+                   parameter PROP = "DEFAULT" // cell property
+                   )
    (
     input          sel,
     input [W-1:0]  in1,

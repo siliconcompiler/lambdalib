@@ -2,7 +2,8 @@ import os
 import pytest
 import lambdalib
 
-pytestmark = pytest.mark.skip(reason="Skipping until SC update finished")
+pytestmark = pytest.skip(reason="Skipping until SC update finished",
+                         allow_module_level=True)
 
 
 def test_check():
