@@ -3,7 +3,7 @@ from lambdalib.lambdalib import Lambda
 
 class Vmux2b(Lambda):
     def __init__(self):
-        name = 'la_vmux2'
+        name = 'la_vmux2b'
         super().__init__(name, __file__)
 
 

@@ -1,53 +1,47 @@
-import subprocess
+import pytest
+
 import lambdalib as ll
+from siliconcompiler import Project
+from siliconcompiler.flows import lintflow
 
 
 def lint(design):
-    script = f"{design.name}.f"
-    design.write_fileset(script, fileset="rtl")
-    cmd = ['slang', '-f', script]
-    return subprocess.run(cmd,
-                          stderr=subprocess.STDOUT,
-                          check=True)
+    proj = Project(design)
+    proj.add_fileset("rtl")
+    proj.set_flow(lintflow.LintFlow())
+    return proj.run()
 
 
-def test_lint_stdlib():
-    for name in ll.stdlib.__all__:
-        design = getattr(ll.stdlib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.stdlib.__all__)
+def test_lint_stdlib(name):
+    assert lint(getattr(ll.stdlib, name)())
 
 
-def test_lint_auxlib():
-    for name in ll.auxlib.__all__:
-        design = getattr(ll.auxlib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.auxlib.__all__)
+def test_lint_auxlib(name):
+    assert lint(getattr(ll.auxlib, name)())
 
 
-def test_lint_ramlib():
-    for name in ll.ramlib.__all__:
-        design = getattr(ll.ramlib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.ramlib.__all__)
+def test_lint_ramlib(name):
+    assert lint(getattr(ll.ramlib, name)())
 
 
-def test_lint_veclib():
-    for name in ll.veclib.__all__:
-        design = getattr(ll.veclib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.veclib.__all__)
+def test_lint_veclib(name):
+    assert lint(getattr(ll.veclib, name)())
 
 
-def test_lint_iolib():
-    for name in ll.iolib.__all__:
-        design = getattr(ll.iolib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.iolib.__all__)
+def test_lint_iolib(name):
+    assert lint(getattr(ll.iolib, name)())
 
 
-def test_lint_padring():
-    for name in ll.padring.__all__:
-        design = getattr(ll.padring, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.padring.__all__)
+def test_lint_padring(name):
+    assert lint(getattr(ll.padring, name)())
 
 
-def test_lint_fpgalib():
-    for name in ll.fpgalib.__all__:
-        design = getattr(ll.fpgalib, name)
-        assert lint(design())
+@pytest.mark.parametrize("name", ll.fpgalib.__all__)
+def test_lint_fpgalib(name):
+    assert lint(getattr(ll.fpgalib, name)())
