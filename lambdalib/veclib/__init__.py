@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from .la_vbuf.la_vbuf import Vbuf
 from .la_vinv.la_vinv import Vinv
@@ -25,7 +25,7 @@ __all__ = ['Vbuf',
            'Vmux8']
 
 
-class STDLib(DesignSchema):
+class STDLib(Design):
     def __init__(self):
         super().__init__("la_veclib")
 

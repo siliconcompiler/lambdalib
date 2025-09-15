@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from .la_asyncfifo.la_asyncfifo import Asyncfifo
 from .la_syncfifo.la_syncfifo import Syncfifo
@@ -11,7 +11,7 @@ __all__ = ['Asyncfifo',
            'Spram']
 
 
-class RAMLib(DesignSchema):
+class RAMLib(Design):
     def __init__(self):
         super().__init__("la_ramlib")
 

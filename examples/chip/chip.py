@@ -1,11 +1,11 @@
 import subprocess
 
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from lambdalib.padring import Padring
 
 
-class Chip(DesignSchema):
+class Chip(Design):
     def __init__(self):
 
         name = 'chip'

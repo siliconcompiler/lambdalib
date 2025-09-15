@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Union, List
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 
-class Lambda(DesignSchema):
+class Lambda(Design):
     def __init__(self,
                  name: str,
                  path: Union[str, Path],
