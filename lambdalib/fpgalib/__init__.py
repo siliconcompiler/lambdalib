@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from .la_lut4.la_lut4 import Lut4
 from .la_ble4p0.la_ble4p0 import Ble4p0
@@ -9,7 +9,7 @@ __all__ = ['Ble4p0',
            'Lut4']
 
 
-class FPGALib(DesignSchema):
+class FPGALib(Design):
     def __init__(self):
         super().__init__("la_fpgalib")
 

@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema, ASICProject
+from siliconcompiler import Design, ASICProject
 
 #  individual modules
 from lambdalib import auxlib
@@ -9,11 +9,11 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.4.0-rc1"
+__version__ = "0.4.0-rc2"
 
 
-class LambalibTechLibrary(DesignSchema):
-    """A DesignSchema class to manage a lambda library and its associated technology libraries.
+class LambalibTechLibrary(Design):
+    """A Design class to manage a lambda library and its associated technology libraries.
 
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.

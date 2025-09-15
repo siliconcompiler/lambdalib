@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from .la_and2.la_and2 import And2
 from .la_and3.la_and3 import And3
@@ -195,7 +195,7 @@ __all__ = ['And2',
            'Xor4']
 
 
-class STDLib(DesignSchema):
+class STDLib(Design):
     def __init__(self):
         super().__init__("la_stdlib")
 

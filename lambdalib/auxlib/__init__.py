@@ -1,4 +1,4 @@
-from siliconcompiler import DesignSchema
+from siliconcompiler import Design
 
 from .la_drsync.la_drsync import Drsync
 from .la_dsync.la_dsync import Dsync
@@ -47,7 +47,7 @@ __all__ = ['Antenna',
            'Tbuf']
 
 
-class AUXLib(DesignSchema):
+class AUXLib(Design):
     def __init__(self):
         super().__init__("la_auxlib")
 
