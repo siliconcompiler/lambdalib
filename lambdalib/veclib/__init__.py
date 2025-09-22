@@ -3,14 +3,15 @@ from siliconcompiler import Design
 from .la_vbuf.la_vbuf import Vbuf
 from .la_vinv.la_vinv import Vinv
 from .la_vmux.la_vmux import Vmux
-from .la_vmux2.la_vmux2 import Vmux2
 from .la_vmux2b.la_vmux2b import Vmux2b
+from .la_vmux2.la_vmux2 import Vmux2
 from .la_vmux3.la_vmux3 import Vmux3
 from .la_vmux4.la_vmux4 import Vmux4
 from .la_vmux5.la_vmux5 import Vmux5
 from .la_vmux6.la_vmux6 import Vmux6
 from .la_vmux7.la_vmux7 import Vmux7
 from .la_vmux8.la_vmux8 import Vmux8
+from .la_vpriority.la_vpriority import Vpriority
 
 __all__ = ['Vbuf',
            'Vinv',
@@ -22,7 +23,9 @@ __all__ = ['Vbuf',
            'Vmux5',
            'Vmux6',
            'Vmux7',
-           'Vmux8']
+           'Vmux8',
+           'Vpriority'
+           ]
 
 
 class STDLib(Design):
@@ -41,3 +44,4 @@ class STDLib(Design):
             self.add_depfileset(Vmux6(), depfileset="rtl")
             self.add_depfileset(Vmux7(), depfileset="rtl")
             self.add_depfileset(Vmux8(), depfileset="rtl")
+            self.add_depfileset(Vpriority(), depfileset="rtl")`
