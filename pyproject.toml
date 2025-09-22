@@ -1,15 +1,13 @@
 [build-system]
 requires = [
-    "setuptools >= 61.2",
-    "setuptools_scm[toml] >= 6.2"
+    "setuptools >= 64",
+    "setuptools_scm[toml] >= 8"
 ]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 include-package-data = true
-packages = [
-    "lambdalib"
-]
+packages = ["lambdalib"]
 
 [project]
 name = "lambdalib"
@@ -17,7 +15,7 @@ authors = [{name = "Zero ASIC"}]
 description = "Standardized ASIC design libraries"
 readme = "README.md"
 urls = {Homepage = "https://github.com/siliconcompiler/lambdalib"}
-requires-python = ">= 3.8"
+requires-python = ">= 3.9"
 license = {file = "LICENSE"}
 dependencies = [
     "siliconcompiler >= 0.34.3",
