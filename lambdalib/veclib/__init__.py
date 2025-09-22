@@ -44,4 +44,4 @@ class STDLib(Design):
             self.add_depfileset(Vmux6(), depfileset="rtl")
             self.add_depfileset(Vmux7(), depfileset="rtl")
             self.add_depfileset(Vmux8(), depfileset="rtl")
-            self.add_depfileset(Vpriority(), depfileset="rtl")`
+            self.add_depfileset(Vpriority(), depfileset="rtl")
