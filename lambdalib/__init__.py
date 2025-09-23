@@ -51,7 +51,7 @@ class LambalibTechLibrary(Design):
             return
 
         tech = cls()
-        if not project.has_library(tech.__cell):
+        if not project._has_library(tech.__cell):
             return
 
         project.add_alias(tech.__cell, "rtl", tech, "rtl")
