@@ -1,4 +1,7 @@
-from siliconcompiler import Design, ASICProject
+from typing import List
+
+from siliconcompiler import Design, ASIC
+from siliconcompiler.library import LibrarySchema
 
 #  individual modules
 from lambdalib import auxlib
@@ -18,7 +21,7 @@ class LambalibTechLibrary(Design):
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.
     """
-    def __init__(self, lambdalib, techlibs):
+    def __init__(self, lambdalib, techlibs: List[LibrarySchema]):
         """Initializes the LambalibTechLibrary instance.
 
         Args:
@@ -35,19 +38,19 @@ class LambalibTechLibrary(Design):
         self.__techlibs = techlibs
 
     @classmethod
-    def alias(cls, project: ASICProject):
+    def alias(cls, project: ASIC) -> None:
         """Creates and registers aliases for the library and its techlibs in a project.
 
-        This method checks if the provided project is an ASICProject and if the
+        This method checks if the provided project is an ASIC and if the
         lambda library cell exists within the project's libraries. If both
         conditions are met, it adds an alias for the main library and adds
         each associated technology library to the project's ASIC libraries.
 
         Args:
-            project (ASICProject): The ASIC project instance to which the aliases
+            project (ASIC): The ASIC project instance to which the aliases
                                    and libraries will be added.
         """
-        if not isinstance(project, ASICProject):
+        if not isinstance(project, ASIC):
             return
 
         tech = cls()
