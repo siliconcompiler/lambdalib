@@ -10,13 +10,13 @@ The table below summarizes the categories of cells available.
 
 | Category                            | Description                           |
 |-------------------------------------|---------------------------------------|
-|[stdlib](lambdalib/stdlib/rtl)       | Standard cells (inv, nand, ff, ...)
-|[auxlib](lambdalib/auxlib/rtl)       | Special cells (antenna, decap, clkmux,...)
-|[ramlib](lambdalib/ramlib/rtl)       | Memory (single port, dual port, fifo, ...)
+|[stdlib](lambdalib/stdlib)       | Standard cells (inv, nand, ff, ...)
+|[auxlib](lambdalib/auxlib)       | Special cells (antenna, decap, clkmux,...)
+|[ramlib](lambdalib/ramlib)       | Memory (single port, dual port, fifo, ...)
 |[iolib](lambdalib/iolib)             | IO cells (bidir, vdd, clamp,...)
 |[padring](lambdalib/padring)         | Padring generator
-|[veclib](lambdalib/veclib/rtl)       | Vectorized datapath cells (mux, buf,..)
-|[fpgalib](lambdalib/fpgalib/rtl)     | FPGA cells (lut4, ble, clb)
+|[veclib](lambdalib/veclib)       | Vectorized datapath cells (mux, buf,..)
+|[fpgalib](lambdalib/fpgalib)     | FPGA cells (lut4, ble, clb)
 
 The [Lambdapdk](https://github.com/siliconcompiler/lambdapdk) repository demonstrates implementation of the Lambdalib interfaces across a number of open source process technologies.
 
