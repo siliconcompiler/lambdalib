@@ -4,11 +4,13 @@ from .la_asyncfifo.la_asyncfifo import Asyncfifo
 from .la_syncfifo.la_syncfifo import Syncfifo
 from .la_dpram.la_dpram import Dpram
 from .la_spram.la_spram import Spram
+from .la_spram.la_spram import Tdpram
 
 __all__ = ['Asyncfifo',
            'Syncfifo',
            'Dpram',
-           'Spram']
+           'Spram',
+           'Tdpram']
 
 
 class RAMLib(Design):
@@ -20,3 +22,4 @@ class RAMLib(Design):
             self.add_depfileset(Syncfifo(), depfileset="rtl")
             self.add_depfileset(Dpram(), depfileset="rtl")
             self.add_depfileset(Spram(), depfileset="rtl")
+            self.add_depfileset(Tdpram(), depfileset="rtl")
