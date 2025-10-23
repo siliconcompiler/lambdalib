@@ -56,27 +56,25 @@ module la_tdpram_impl #(
    reg [DW-1:0]       ram[(2**AW)-1:0];
    /* verilator lint_on MULTIDRIVEN */
 
-   genvar             i;
+   integer            i;
 
-   /* verilator lint_off MULTIDRIVEN */
-   generate
+   // Port A write
+   always @(posedge clk_a) begin
       for (i = 0; i < DW; i = i + 1) begin
-         // Port A write
-         always @(posedge clk_a) begin
-            if (ce_a && we_a && wmask_a[i]) begin
-               ram[addr_a][i] <= din_a[i];
-            end
+         if (ce_a && we_a && wmask_a[i]) begin
+            ram[addr_a][i] <= din_a[i];
          end
-         // Port B write
-         always @(posedge clk_b) begin
-            if (ce_b && we_b && wmask_b[i]) begin
-               ram[addr_b][i] <= din_b[i];
-            end
-         end
-
       end
-   endgenerate
-   /* verilator lint_on MULTIDRIVEN */
+   end
+
+   // Port B write
+   always @(posedge clk_b) begin
+      for (i = 0; i < DW; i = i + 1) begin
+         if (ce_b && we_b && wmask_b[i]) begin
+            ram[addr_b][i] <= din_b[i];
+         end
+      end
+   end
 
    // Port A read
    always @(posedge clk_a) begin
