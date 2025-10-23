@@ -1,12 +1,12 @@
 from lambdalib.lambdalib import Lambda
 
 
-class Vdffq(Lambda):
+class Vdffnq(Lambda):
     def __init__(self):
-        name = 'la_dffq'
+        name = 'la_vdffnq'
         super().__init__(name, __file__)
 
 
 if __name__ == "__main__":
-    d = Vdffq()
+    d = Vdffnq()
     d.write_fileset(f"{d.name}.f", fileset="rtl")

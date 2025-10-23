@@ -1,7 +1,7 @@
 from lambdalib.lambdalib import Lambda
 
 
-class Vlatnq(Lambda):
+class Vlatq(Lambda):
     def __init__(self):
         name = 'la_vlatq'
         super().__init__(name, __file__)
