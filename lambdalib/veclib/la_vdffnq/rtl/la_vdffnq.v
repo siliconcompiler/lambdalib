@@ -4,9 +4,9 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_dffnq #(parameter W = 1,    // width of mux
-                  parameter PROP = "" // cell property
-                  )
+module la_vdffnq #(parameter W = 1,    // width of mux
+                   parameter PROP = "" // cell property
+                   )
    (
     input [W-1:0]      d,
     input              clk,
