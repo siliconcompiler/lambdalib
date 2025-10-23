@@ -1,12 +1,12 @@
 from lambdalib.lambdalib import Lambda
 
 
-class Vpriority(Lambda):
+class Vdffq(Lambda):
     def __init__(self):
-        name = 'la_vpriority'
+        name = 'la_vdffq'
         super().__init__(name, __file__)
 
 
 if __name__ == "__main__":
-    d = Vpriority()
+    d = Vdffq()
     d.write_fileset(f"{d.name}.f", fileset="rtl")

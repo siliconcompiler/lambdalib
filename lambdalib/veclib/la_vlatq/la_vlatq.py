@@ -1,0 +1,12 @@
+from lambdalib.lambdalib import Lambda
+
+
+class Vlatq(Lambda):
+    def __init__(self):
+        name = 'la_vlatq'
+        super().__init__(name, __file__)
+
+
+if __name__ == "__main__":
+    d = Vlatq()
+    d.write_fileset(f"{d.name}.f", fileset="rtl")
