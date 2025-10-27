@@ -1,10 +1,10 @@
-from lambdalib.lambdalib import Lambda
+from lambdalib.ramlib._common import _RAMLib
 
 
-class Tdpram(Lambda):
+class Tdpram(_RAMLib):
     def __init__(self):
         name = 'la_tdpram'
-        super().__init__(name, __file__, extrasources=['rtl/la_tdpram_impl.v'])
+        super().__init__(name, __file__, impl_file='rtl/la_tdpram_impl.v')
 
 
 if __name__ == "__main__":

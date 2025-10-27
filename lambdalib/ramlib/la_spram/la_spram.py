@@ -1,10 +1,10 @@
-from lambdalib.lambdalib import Lambda
+from lambdalib.ramlib._common import _RAMLib
 
 
-class Spram(Lambda):
+class Spram(_RAMLib):
     def __init__(self):
         name = 'la_spram'
-        super().__init__(name, __file__, extrasources=['rtl/la_spram_impl.v'])
+        super().__init__(name, __file__, impl_file='rtl/la_spram_impl.v')
 
 
 if __name__ == "__main__":
