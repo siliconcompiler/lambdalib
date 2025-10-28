@@ -31,8 +31,9 @@ version = {attr = "lambdalib.__version__"}
 dev = [
     "flake8 == 7.3.0",
     "pytest == 8.4.2",
+    "pytest-xdist==3.8.0",
     "pytest-timeout == 2.4.0",
-    "cocotb == 2.0.0",
+    "cocotb @ git+https://github.com/cocotb/cocotb.git@770d72214362cb366097267873839f50c69e417e",
     "cocotb-bus @ git+https://github.com/cocotb/cocotb-bus.git@c53c6024391fa02263969b02a0e0de5a22974cfc"
 ]
 
@@ -43,4 +44,4 @@ markers = [
 testpaths = [
     "tests"
 ]
-timeout = "60"
+timeout = "300"

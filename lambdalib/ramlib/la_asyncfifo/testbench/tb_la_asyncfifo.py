@@ -1,21 +1,17 @@
 import random
+import string
 from decimal import Decimal
-
-import siliconcompiler
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, Timer, Combine
-from cocotb.regression import TestFactory
-from cocotb import utils
 
-from lambdalib import ramlib
 from lambdalib.utils._tb_common import (
     run_cocotb,
-    drive_reset,
+    do_reset,
     random_bool_generator
 )
-from lambdalib.ramlib.la_asyncfifo.testbench.la_asyncfifo import (
+from .la_asyncfifo import (
     LaAsyncFifoWrBus,
     LaAsyncFifoRdBus,
     LaAsyncFifoSource,
@@ -30,7 +26,13 @@ def bursty_en_gen(burst_len=20):
             yield en_state
 
 
-@cocotb.test()
+def random_decimal(max: int, min: int, decimal_places=2) -> Decimal:
+    prefix = str(random.randint(min, max))
+    suffix = ''.join(random.choice(string.digits) for _ in range(decimal_places))
+    return Decimal(prefix + "." + suffix)
+
+
+@cocotb.test(timeout_time=100, timeout_unit="ms")
 async def test_almost_full(dut):
 
     wr_clk_period_ns = 10.0
@@ -51,14 +53,14 @@ async def test_almost_full(dut):
 
     # Reset DUT
     await Combine(
-        cocotb.start_soon(drive_reset(dut.wr_nreset)),
-        cocotb.start_soon(drive_reset(dut.rd_nreset))
+        cocotb.start_soon(do_reset(dut.wr_nreset, time_ns=wr_clk_period_ns*4)),
+        cocotb.start_soon(do_reset(dut.rd_nreset, time_ns=rd_clk_period_ns*4))
     )
 
-    await cocotb.start(Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start())
+    Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start()
     # Randomize phase shift between clocks
     await Timer(wr_clk_period_ns * random.random(), "ns", round_mode="round")
-    await cocotb.start(Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start())
+    Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start()
 
     almost_full_level = int(dut.AFULLFINAL.value)
 
@@ -85,6 +87,22 @@ async def test_almost_full(dut):
     assert dut.wr_almost_full.value == 0
 
 
+# Generate sets of tests based on the different permutations of the possible arguments to fifo_test
+MAX_PERIOD_NS = 10
+MIN_PERIOD_NS = 1
+# Generate random clk period to test between min and max
+RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [
+    random_decimal(MAX_PERIOD_NS, MIN_PERIOD_NS) for _ in range(2)
+]
+
+
+@cocotb.test(timeout_time=100, timeout_unit="ms")
+@cocotb.parametrize(
+    wr_clk_period_ns=[MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS],
+    rd_clk_period_ns=[MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS],
+    wr_en_generator=[None, random_bool_generator, bursty_en_gen],
+    rd_en_generator=[None, random_bool_generator, bursty_en_gen]
+)
 async def fifo_rd_wr_test(
     dut,
     wr_clk_period_ns=10.0,
@@ -98,25 +116,27 @@ async def fifo_rd_wr_test(
         clock=dut.wr_clk,
         reset=dut.wr_nreset
     )
-    fifo_source.set_wr_en_generator(random_bool_generator())
+    if wr_en_generator:
+        fifo_source.set_wr_en_generator(wr_en_generator())
 
     fifo_sink = LaAsyncFifoSink(
         bus=LaAsyncFifoRdBus.from_prefix(dut, ""),
         clock=dut.rd_clk,
         reset=dut.rd_nreset
     )
-    fifo_sink.set_rd_en_generator(random_bool_generator())
+    if rd_en_generator:
+        fifo_sink.set_rd_en_generator(rd_en_generator())
 
     # Reset DUT
     await Combine(
-        cocotb.start_soon(drive_reset(dut.wr_nreset)),
-        cocotb.start_soon(drive_reset(dut.rd_nreset))
+        cocotb.start_soon(do_reset(dut.wr_nreset, time_ns=wr_clk_period_ns*4)),
+        cocotb.start_soon(do_reset(dut.rd_nreset, time_ns=rd_clk_period_ns*4))
     )
 
-    await cocotb.start(Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start())
+    Clock(dut.wr_clk, wr_clk_period_ns, units="ns").start()
     # Randomize phase shift between clocks
-    await Timer(wr_clk_period_ns * random.random(), "ns", round_mode="round")
-    await cocotb.start(Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start())
+    await Timer(wr_clk_period_ns * Decimal(random.random()), "ns", round_mode="round")
+    Clock(dut.rd_clk, rd_clk_period_ns, units="ns").start()
 
     await ClockCycles(dut.wr_clk, 3)
 
@@ -133,55 +153,25 @@ async def fifo_rd_wr_test(
     await ClockCycles(dut.wr_clk, 10)
 
 
-# Generate sets of tests based on the different permutations of the possible arguments to fifo_test
-MAX_PERIOD_NS = 10.0
-MIN_PERIOD_NS = 1.0
-# Generate random clk period to test between min and max
-RAND_WR_CLK_PERIOD_NS, RAND_RD_CLK_PERIOD_NS = [utils.get_time_from_sim_steps(
-    # Time step must be even for cocotb clock driver
-    steps=utils.get_sim_steps(
-        time=Decimal(MIN_PERIOD_NS) + (
-            Decimal(MAX_PERIOD_NS - MIN_PERIOD_NS)
-            * Decimal(random.random()).quantize(Decimal("0.00"))
-        ),
-        units="ns",
-        round_mode="round"
-    ) & ~1,
-    units="ns"
-) for _ in range(0, 2)]
+def load_cocotb_test():
+    from siliconcompiler import Sim
+    from lambdalib.ramlib import Asyncfifo
 
-# Factory to automatically generate a set of tests based on the different permutations
-# of the provided test arguments
-tf = TestFactory(fifo_rd_wr_test)
-tf.add_option('wr_clk_period_ns', [MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS])
-tf.add_option('rd_clk_period_ns', [MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS])
-tf.add_option('wr_en_generator', [None, random_bool_generator, bursty_en_gen])
-tf.add_option('rd_en_generator', [None, random_bool_generator, bursty_en_gen])
-tf.generate_tests()
-
-
-def test_la_asyncfifo():
-    chip = siliconcompiler.Chip("la_asyncfifo")
-
-    # TODO: should not be needed?
-    chip.input("ramlib/la_asyncfifo/rtl/la_asyncfifo.v", package='lambdalib')
-    chip.use(ramlib)
+    project = Sim(Asyncfifo())
+    project.add_fileset("rtl")
 
     for depth in [2, 4, 8]:
-        test_module_name = "lambdalib.ramlib.tests.tb_la_asyncfifo"
+        test_module_name = __name__
         test_name = f"{test_module_name}_depth_{depth}"
         tests_failed = run_cocotb(
-            chip=chip,
+            project=project,
             test_module_name=test_module_name,
             timescale=("1ns", "1ps"),
             parameters={
                 "DW": 32,
                 "DEPTH": depth
             },
-            output_dir_name=test_name
+            output_dir_name=test_name,
+            waves=False
         )
         assert (tests_failed == 0), f"Error test {test_name} failed!"
-
-
-if __name__ == "__main__":
-    test_la_asyncfifo()

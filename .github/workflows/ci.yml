@@ -78,7 +78,6 @@ jobs:
 
   eda_ci:
     name: Run EDA
-    if: false
     runs-on: ubuntu-latest
     container: ghcr.io/siliconcompiler/sc_runner:latest
     steps:
@@ -90,10 +89,6 @@ jobs:
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install .[dev]
+          pip install -e .[dev]
 
-          # change running directory
-          mkdir testrun
-          cd testrun
-
-          pytest $GITHUB_WORKSPACE -m "eda"
+          pytest -n logical -m "eda" --verbose
