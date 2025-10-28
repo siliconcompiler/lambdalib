@@ -33,7 +33,7 @@ dev = [
     "pytest == 8.4.2",
     "pytest-timeout == 2.4.0",
     "cocotb == 2.0.0",
-    "cocotb-bus == 0.2.1"
+    "cocotb-bus @ git+https://github.com/cocotb/cocotb-bus.git@c53c6024391fa02263969b02a0e0de5a22974cfc"
 ]
 
 [tool.pytest.ini_options]
