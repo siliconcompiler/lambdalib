@@ -40,6 +40,13 @@ jobs:
           pip install --upgrade pip
           pip install .[dev]
 
+          # Temporary CI work around (Remove once cocotb and cocotb-bus get a version bump)
+          pip uninstall -y cocotb
+          pip install git+https://github.com/cocotb/cocotb.git@770d72214362cb366097267873839f50c69e417e
+
+          pip uninstall -y cocotb-bus
+          pip install git+https://github.com/cocotb/cocotb-bus.git@c53c6024391fa02263969b02a0e0de5a22974cfc
+
           # change running directory
           mkdir testrun
           cd testrun
@@ -90,5 +97,12 @@ jobs:
 
           pip install --upgrade pip
           pip install -e .[dev]
+
+          # Temporary CI work around (Remove once cocotb and cocotb-bus get a version bump)
+          pip uninstall -y cocotb
+          pip install git+https://github.com/cocotb/cocotb.git@770d72214362cb366097267873839f50c69e417e
+
+          pip uninstall -y cocotb-bus
+          pip install git+https://github.com/cocotb/cocotb-bus.git@c53c6024391fa02263969b02a0e0de5a22974cfc
 
           pytest -n logical -m "eda" --verbose
