@@ -2,7 +2,7 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb_bus.bus import Bus
 from cocotb.queue import Queue
-from cocotb.binary import BinaryValue
+from cocotb.types import LogicArray
 
 
 class LaAsyncFifoWrBus(Bus):
@@ -133,7 +133,7 @@ class LaAsyncFifoSink:
     def resume(self):
         self._pause = False
 
-    async def read(self) -> BinaryValue:
+    async def read(self) -> LogicArray:
         return await self.queue.get()
 
     async def _run(self):
