@@ -32,8 +32,8 @@ dev = [
     "flake8 == 7.3.0",
     "pytest == 8.4.2",
     "pytest-timeout == 2.4.0",
-    "cocotb == 1.9.2",
-    "cocotb-bus == 0.2.1"
+    "cocotb == 2.0.1",
+    "cocotb-bus == 0.3.0"
 ]
 
 [tool.pytest.ini_options]
