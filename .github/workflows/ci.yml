@@ -89,10 +89,10 @@ jobs:
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install .[dev]
+          pip install -e .[dev]
 
           # change running directory
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE -m "eda"
+          pytest $GITHUB_WORKSPACE -n logical -m "eda" --verbose
