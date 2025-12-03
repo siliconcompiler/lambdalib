@@ -78,7 +78,6 @@ jobs:
 
   eda_ci:
     name: Run EDA
-    if: false
     runs-on: ubuntu-latest
     container: ghcr.io/siliconcompiler/sc_runner:latest
     steps:
