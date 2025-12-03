@@ -182,6 +182,7 @@ async def fifo_rd_wr_test(
 
 
 @pytest.mark.eda
+@pytest.mark.timeout(120)
 @pytest.mark.parametrize("depth, simulator, output_wave", list(itertools.product(
     [2, 4, 8],
     ["icarus", "verilator"],
