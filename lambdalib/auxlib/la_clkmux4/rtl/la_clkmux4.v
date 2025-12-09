@@ -26,7 +26,6 @@ module la_clkmux4 #(
     wire [3:0] ensync;
     wire       ensyncb;
     wire [3:0] clkg;
-    wire [3:0] nreset_sync;
 
     // create clock mask (4)
     la_or3 ior0 (
