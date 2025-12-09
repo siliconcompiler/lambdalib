@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Lint with Flake8
         run: |
           python3 -m venv .venv
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Run tests
         run: |
           python3 -m venv .venv
@@ -51,10 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Check out siliconcompiler Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: siliconcompiler/siliconcompiler
           path: siliconcompiler
@@ -78,22 +78,21 @@ jobs:
 
   eda_ci:
     name: Run EDA
-    if: false
     runs-on: ubuntu-latest
     container: ghcr.io/siliconcompiler/sc_runner:latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Run tests
         run: |
           python3 -m venv .venv
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install .[dev]
+          pip install -e .[dev]
 
           # change running directory
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE -m "eda"
+          pytest $GITHUB_WORKSPACE -n logical -m "eda" --verbose
