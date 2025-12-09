@@ -9,6 +9,7 @@ def lint(design):
     proj = Project(design)
     proj.add_fileset("rtl")
     proj.set_flow(lintflow.LintFlow())
+    proj.set('option', 'nodashboard', True)
     return proj.run()
 
 
