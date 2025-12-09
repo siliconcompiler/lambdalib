@@ -27,13 +27,13 @@ module la_vmux8 #(parameter W = 1,           // width of mux
     output [W-1:0] out
     );
 
-   assign out[W-1:0] = ({(W){sel0}} & in0[W-1:0] |
-                        {(W){sel1}} & in1[W-1:0] |
-                        {(W){sel2}} & in2[W-1:0] |
-                        {(W){sel3}} & in3[W-1:0] |
-                        {(W){sel4}} & in4[W-1:0] |
-                        {(W){sel5}} & in5[W-1:0] |
-                        {(W){sel6}} & in6[W-1:0] |
-                        {(W){sel7}} & in7[W-1:0]);
+   assign out[W-1:0] = (({(W){sel0}} & in0[W-1:0]) |
+                        ({(W){sel1}} & in1[W-1:0]) |
+                        ({(W){sel2}} & in2[W-1:0]) |
+                        ({(W){sel3}} & in3[W-1:0]) |
+                        ({(W){sel4}} & in4[W-1:0]) |
+                        ({(W){sel5}} & in5[W-1:0]) |
+                        ({(W){sel6}} & in6[W-1:0]) |
+                        ({(W){sel7}} & in7[W-1:0]));
 
 endmodule

@@ -14,8 +14,6 @@ module la_rsync #(parameter PROP = "DEFAULT",
     );
 
    reg     [STAGES:0] sync_pipe;
-   integer            sync_delay;
-
 
    always @(posedge clk or negedge nrst_in)
      if (!nrst_in)
@@ -24,6 +22,7 @@ module la_rsync #(parameter PROP = "DEFAULT",
        sync_pipe[STAGES:0] <= {sync_pipe[STAGES-1:0], 1'b1};
 
 `ifdef SIM
+   integer            sync_delay;
    always @(posedge clk)
      sync_delay <= {$random} % 2;
 

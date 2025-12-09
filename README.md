@@ -8,13 +8,13 @@ Lambdalib abstracts away technology specific design modules that cannot be clean
 
 The table below summarizes the categories of cells available.
 
-| Category                            | Description                           |
-|-------------------------------------|---------------------------------------|
+| Category                        | Description                           |
+|---------------------------------|---------------------------------------|
 |[stdlib](lambdalib/stdlib)       | Standard cells (inv, nand, ff, ...)
 |[auxlib](lambdalib/auxlib)       | Special cells (antenna, decap, clkmux,...)
 |[ramlib](lambdalib/ramlib)       | Memory (single port, dual port, fifo, ...)
-|[iolib](lambdalib/iolib)             | IO cells (bidir, vdd, clamp,...)
-|[padring](lambdalib/padring)         | Padring generator
+|[iolib](lambdalib/iolib)         | IO cells (bidir, vdd, clamp,...)
+|[padring](lambdalib/padring)     | Padring generator
 |[veclib](lambdalib/veclib)       | Vectorized datapath cells (mux, buf,..)
 |[fpgalib](lambdalib/fpgalib)     | FPGA cells (lut4, ble, clb)
 

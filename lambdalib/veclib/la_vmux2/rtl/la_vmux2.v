@@ -15,7 +15,7 @@ module la_vmux2 #(parameter W = 1,           // width of mux
     output [W-1:0] out
     );
 
-   assign out[W-1:0] = ({(W) {sel0}} & in0[W-1:0] |
-                        {(W) {sel1}} & in1[W-1:0]);
+   assign out[W-1:0] = (({(W) {sel0}} & in0[W-1:0]) |
+                        ({(W) {sel1}} & in1[W-1:0]));
 
 endmodule

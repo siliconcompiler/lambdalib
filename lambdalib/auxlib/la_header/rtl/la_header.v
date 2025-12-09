@@ -13,6 +13,6 @@ module la_header #(
 );
 
     // Primitive Device
-    pmos m0 (vddout, vssin, sleep);  //d,s,g
+    pmos m0 (vddout, vddin, sleep);  //d,s,g
 
 endmodule

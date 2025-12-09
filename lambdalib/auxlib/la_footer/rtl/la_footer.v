@@ -13,6 +13,6 @@ module la_footer #(
 );
 
     // Primitive Device
-    nmos m0 (vddout, vddin, nsleep);  //d,s,g
+    nmos m0 (vssout, vssin, nsleep);  //d,s,g
 
 endmodule
