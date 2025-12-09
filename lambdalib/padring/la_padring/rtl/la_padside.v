@@ -36,8 +36,8 @@ module la_padside
     parameter [7:0]           NCELLS = 1,    // total cells per side (<256)
     parameter [7:0]           NSECTIONS = 1, // total power sections (<256)
     parameter [NCELLS*40-1:0] CELLMAP = 0,   // see ../README.md
-    parameter                 RINGW = 1,     // width of io ring
-    parameter                 CFGW = 1       // config width
+    parameter [7:0]           RINGW = 1,     // width of io ring
+    parameter [7:0]           CFGW = 1       // config width
     )
    (// io pad signals
     inout [NPINS-1:0]           pad,   // pad
