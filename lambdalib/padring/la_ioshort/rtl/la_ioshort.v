@@ -24,7 +24,7 @@ module la_ioshort (inout a,
    assign b = a2b ? a : 1'bz;
 `else
     // verilog_lint: waive-start module-port
-    la_pt la_ioalias (a,b);
+   la_ioalias la_ioalias (a,b);
     // verilog_lint: waive-end module-port
 `endif
 
