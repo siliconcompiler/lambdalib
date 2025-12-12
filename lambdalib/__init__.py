@@ -4,6 +4,7 @@ from siliconcompiler import Design, ASIC
 from siliconcompiler.library import LibrarySchema
 
 #  individual modules
+from lambdalib import analoglib
 from lambdalib import auxlib
 from lambdalib import fpgalib
 from lambdalib import iolib
@@ -12,7 +13,7 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 
 class LambalibTechLibrary(Design):
@@ -64,6 +65,7 @@ class LambalibTechLibrary(Design):
 
 
 __all__ = [
+    "analoglib",
     "auxlib",
     "fpgalib",
     "iolib",
