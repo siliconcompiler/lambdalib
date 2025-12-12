@@ -17,10 +17,10 @@ def lint(design):
     return proj.run()
 
 
-@pytest.mark.parametrize("name", ll.stdlib.__all__)
-def test_lint_stdlib(name):
-    assert lint(getattr(ll.stdlib, name)())
 
+@pytest.mark.parametrize("name", ll.analoglib.__all__)
+def test_lint_analoglib(name):
+    assert lint(getattr(ll.analoglib, name)())
 
 @pytest.mark.parametrize("name", ll.auxlib.__all__)
 def test_lint_auxlib(name):
@@ -50,3 +50,8 @@ def test_lint_padring(name):
 @pytest.mark.parametrize("name", ll.fpgalib.__all__)
 def test_lint_fpgalib(name):
     assert lint(getattr(ll.fpgalib, name)())
+
+
+@pytest.mark.parametrize("name", ll.stdlib.__all__)
+def test_lint_stdlib(name):
+    assert lint(getattr(ll.stdlib, name)())
