@@ -2,6 +2,7 @@ from lambdalib.lambdalib import Lambda
 from lambdalib.stdlib import Inv
 from lambdalib.stdlib import Nand2
 
+
 class Ring(Lambda):
     def __init__(self):
         name = 'la_ring'
