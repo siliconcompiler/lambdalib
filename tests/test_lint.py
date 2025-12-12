@@ -17,10 +17,10 @@ def lint(design):
     return proj.run()
 
 
-
 @pytest.mark.parametrize("name", ll.analoglib.__all__)
 def test_lint_analoglib(name):
     assert lint(getattr(ll.analoglib, name)())
+
 
 @pytest.mark.parametrize("name", ll.auxlib.__all__)
 def test_lint_auxlib(name):
