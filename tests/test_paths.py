@@ -3,9 +3,9 @@ import pytest
 import lambdalib as ll
 
 
-@pytest.mark.parametrize("name", ll.stdlib.__all__)
-def test_lint_stdlib(name):
-    assert getattr(ll.stdlib, name)().check_filepaths()
+@pytest.mark.parametrize("name", ll.analoglib.__all__)
+def test_lint_analoglib(name):
+    assert getattr(ll.analoglib, name)().check_filepaths()
 
 
 @pytest.mark.parametrize("name", ll.auxlib.__all__)
@@ -36,3 +36,8 @@ def test_lint_padring(name):
 @pytest.mark.parametrize("name", ll.fpgalib.__all__)
 def test_lint_fpgalib(name):
     assert getattr(ll.fpgalib, name)().check_filepaths()
+
+
+@pytest.mark.parametrize("name", ll.stdlib.__all__)
+def test_lint_stdlib(name):
+    assert getattr(ll.stdlib, name)().check_filepaths()
