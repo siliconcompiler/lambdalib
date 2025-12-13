@@ -3,8 +3,17 @@
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
- * NOTE: Interface was derived by reviewing a number of publicly
- * open source PLLs and FPGA IP datasheets.
+ * NOTE: The generic interface was derived by reviewing a number of
+ * publicly open source PLLs and FPGA IP datasheets and via llm
+ * promting.
+ *
+ * This is a synthesizable zeroth order PLL model that only
+ * supports one operating mode: clkout=clkref.
+ *
+ * Behavior of control signals such as divpost may differ between
+ * PLLs. For exact simulation behavior, see the simulation model. As long
+ * as these values can be set freely via a register this should not be
+ * a problem in real designs.
  *
  *************************************************************************/
 module la_pll  #(parameter PROP = "", // cell property
@@ -18,30 +27,42 @@ module la_pll  #(parameter PROP = "", // cell property
                  )
    (
     // supplies
-    inout               vdda,     // analog supply
-    inout               vdd,      // digital core supply
-    inout               vddaux,   // aux core supply
-    inout               vss,      // common ground
+    inout               vdda,    // analog supply
+    inout               vdd,     // digital core supply
+    inout               vddaux,  // aux core supply
+    inout               vss,     // common ground
     // clocks
-    input [NREF-1:0]    refclk,   // input reference clock
-    output [NOUT-1:0]   clkout,   // output clocks
+    input [NREF-1:0]    refclk,  // input reference clock
+    output [NOUT-1:0]   clkout,  // output clocks
     // standard controls
-    input               reset,    // active high async reset
-    input               en,       // pll enable
-    input               bypass,   // pll bypasses
-    input [NREF-1:0]    clksel,   // one hot clock selector
-    input [REFW-1:0]    divref,   // reference divider
-    input [FBW-1:0]     divfb,    // feedback divider
-    input [NOUT*PW-1:0] divpost,  // output divider
-    input [NOUT*PW-1:0] phaseout, // output phase shift
-    output              locked,   // pll is locked
-    // user defined controls
-    input [CW-1:0]      ctrl,     // user defined controls
-    output [SW-1:0]     status    // user defined status
+    input               reset,   // active high async reset
+    input               en,      // pll enable
+    input               bypass,  // pll bypasses
+    input [NREF-1:0]    clksel,  // one hot clock selector
+    input [REFW-1:0]    divref,  // reference divider
+    input [FBW-1:0]     divfb,   // feedback divider
+    input [NOUT*PW-1:0] divpost, // output divider
+    input [NOUT*PW-1:0] phase,   // output phase shift
+    output              locked,  // pll is locked
+    // user defined signals (defined per unique PLL)
+    input [CW-1:0]      ctrl,    // controls
+    output [SW-1:0]     status   // status
     );
 
+   genvar i;
 
+   wire   clk;
 
+   // input clock selector
+   assign clk = |(refclk[NREF-1:0] & clksel[NREF-1:0]);
+
+   // model bypass and pll en
+   for (i = 0; i < NOUT; i = i + 1) begin : gen_out
+      assign clkout[i] = bypass ? clk : clk & en;
+   end
+
+   // zero latency lock time
+   assign locked = en;
 
 
 endmodule
