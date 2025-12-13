@@ -16,37 +16,38 @@
  * a problem in real designs.
  *
  *************************************************************************/
-module la_pll  #(parameter PROP = "", // cell property
-                 parameter NIN = 1,   // number of input reference clocks
-                 parameter NOUT = 1,  // number of output clocks
-                 parameter REFW = 8,  // reference divider width
-                 parameter FBW = 8,   // feedback divider width
-                 parameter PW = 8,    // post feedback divider/phase width
-                 parameter CW = 1,    // control vector width
-                 parameter SW = 1     // status vector width
+module la_pll  #(parameter PROP = "",    // cell property
+                 parameter NIN = 1,      // number of input reference clocks
+                 parameter NOUT = 1,     // number of output clocks
+                 parameter DIVINW = 8,   // reference divider width
+                 parameter DIVFBW = 8,   // feedback divider width
+                 parameter DIVPOSTW = 8, // post feedback divider width
+                 parameter PHASEW = 8,   // phase shift adjust width
+                 parameter CW = 1,       // control vector width
+                 parameter SW = 1        // status vector width
                  )
    (
     // supplies
-    inout               vdda,    // analog supply
-    inout               vdd,     // digital core supply
-    inout               vddaux,  // aux core supply
-    inout               vss,     // common ground
+    inout                     vdda,    // analog supply
+    inout                     vdd,     // digital core supply
+    inout                     vddaux,  // aux core supply
+    inout                     vss,     // common ground
     // clocks
-    input [NIN-1:0]     refclk,  // input reference clock
-    output [NOUT-1:0]   clkout,  // output clocks
+    input [NIN-1:0]           clkin,   // input reference clock
+    output [NOUT-1:0]         clkout,  // output clocks
     // standard controls
-    input               reset,   // active high async reset
-    input               en,      // pll enable
-    input               bypass,  // pll bypasses
-    input [NIN-1:0]     clksel,  // one hot clock selector
-    input [REFW-1:0]    divref,  // reference divider
-    input [FBW-1:0]     divfb,   // feedback divider
-    input [NOUT*PW-1:0] divpost, // output divider
-    input [NOUT*PW-1:0] phase,   // output phase shift
-    output              locked,  // pll is locked
+    input                     reset,   // active high async reset
+    input                     en,      // pll enable
+    input                     bypass,  // pll bypasses
+    input [NIN-1:0]           clksel,  // one hot clock selector
+    input [DIVINW-1:0]        divin,   // reference divider
+    input [DIVFBW-1:0]        divfb,   // feedback divider
+    input [NOUT*DIVPOSTW-1:0] divpost, // output divider
+    input [NOUT*PHASEW-1:0]   phase,   // output phase shift
+    output                    locked,  // pll is locked
     // user defined signals (defined per unique PLL)
-    input [CW-1:0]      ctrl,    // controls
-    output [SW-1:0]     status   // status
+    input [CW-1:0]            ctrl,    // controls
+    output [SW-1:0]           status   // status
     );
 
    genvar i;
@@ -54,7 +55,7 @@ module la_pll  #(parameter PROP = "", // cell property
    wire   clk;
 
    // input clock selector
-   assign clk = |(refclk[NIN-1:0] & clksel[NIN-1:0]);
+   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
 
    // model bypass and pll en
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
