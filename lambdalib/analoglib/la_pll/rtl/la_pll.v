@@ -17,7 +17,7 @@
  *
  *************************************************************************/
 module la_pll  #(parameter PROP = "", // cell property
-                 parameter NREF = 1,  // number of input reference clocks
+                 parameter NIN = 1,   // number of input reference clocks
                  parameter NOUT = 1,  // number of output clocks
                  parameter REFW = 8,  // reference divider width
                  parameter FBW = 8,   // feedback divider width
@@ -32,13 +32,13 @@ module la_pll  #(parameter PROP = "", // cell property
     inout               vddaux,  // aux core supply
     inout               vss,     // common ground
     // clocks
-    input [NREF-1:0]    refclk,  // input reference clock
+    input [NIN-1:0]     refclk,  // input reference clock
     output [NOUT-1:0]   clkout,  // output clocks
     // standard controls
     input               reset,   // active high async reset
     input               en,      // pll enable
     input               bypass,  // pll bypasses
-    input [NREF-1:0]    clksel,  // one hot clock selector
+    input [NIN-1:0]     clksel,  // one hot clock selector
     input [REFW-1:0]    divref,  // reference divider
     input [FBW-1:0]     divfb,   // feedback divider
     input [NOUT*PW-1:0] divpost, // output divider
@@ -54,7 +54,7 @@ module la_pll  #(parameter PROP = "", // cell property
    wire   clk;
 
    // input clock selector
-   assign clk = |(refclk[NREF-1:0] & clksel[NREF-1:0]);
+   assign clk = |(refclk[NIN-1:0] & clksel[NIN-1:0]);
 
    // model bypass and pll en
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
