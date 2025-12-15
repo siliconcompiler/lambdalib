@@ -28,13 +28,17 @@ version = {attr = "lambdalib.__version__"}
 
 [project.optional-dependencies]
 # Dev dependencies.
-dev = [
-    "flake8 == 7.3.0",
+test = [
     "pytest == 8.4.2",
     "pytest-xdist==3.8.0",
     "pytest-timeout == 2.4.0",
     "cocotb == 2.0.1",
     "cocotb-bus == 0.3.0"
+]
+
+lint = [
+    "flake8 == 7.3.0",
+    "codespell == 2.4.1"
 ]
 
 [tool.pytest.ini_options]
@@ -48,3 +52,8 @@ testpaths = [
     "tests"
 ]
 timeout = "60"
+
+[tool.codespell]
+count = true
+quiet-level = 3
+ignore-words-list = 'inout,inouts,nin,te,dout'

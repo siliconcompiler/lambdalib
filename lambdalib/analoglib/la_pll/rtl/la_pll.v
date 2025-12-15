@@ -5,7 +5,7 @@
  *
  * NOTE: The generic interface was derived by reviewing a number of
  * publicly open source PLLs and FPGA IP datasheets and via llm
- * promting.
+ * prompting.
  *
  * This is a synthesizable zeroth order PLL model that only
  * supports one operating mode: clkout=clkref.
@@ -19,7 +19,7 @@
 module la_pll  #(parameter PROP = "",   // cell property
                  parameter NIN = 1,     // number of input reference clocks
                  parameter NOUT = 1,    // number of output clocks
-                 parameter DIVINW = 8,  // iunpyt divider width
+                 parameter DIVINW = 8,  // input divider width
                  parameter DIVFBW = 8,  // feedback divider width
                  parameter DIVOUTW = 8, // output divider width
                  parameter PHASEW = 8,  // phase shift adjust width
@@ -38,7 +38,7 @@ module la_pll  #(parameter PROP = "",   // cell property
     // standard controls
     input                    reset,  // active high async reset
     input                    en,     // pll enable
-    input                    bypass, // pll bypasses
+    input                    bypass, // pll bypass
     input [NIN-1:0]          clksel, // one hot clock selector
     input [DIVINW-1:0]       divin,  // reference divider
     input [DIVFBW-1:0]       divfb,  // feedback divider

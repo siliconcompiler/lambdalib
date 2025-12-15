@@ -10,6 +10,10 @@ on:
   # Manual Dispatch
   workflow_dispatch:
 
+concurrency:
+  group: lambdalib-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint_python:
     name: Lint Python Code
@@ -23,8 +27,23 @@ jobs:
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install .[dev]
+          pip install .[lint]
           flake8 --statistics .
+
+  check_spelling:
+    name: Check code spelling
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v6
+      - name: Check spelling with codespell
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+
+          pip install --upgrade pip
+          pip install .[lint]
+          codespell .
 
   python_ci:
     name: Run Python Only
@@ -38,13 +57,13 @@ jobs:
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install .[dev]
+          pip install .[test]
 
           # change running directory
           mkdir testrun
           cd testrun
 
-          pytest $GITHUB_WORKSPACE -m "not eda"
+          pytest $GITHUB_WORKSPACE -n logical -m "not eda"
 
   lint_verilog:
     name: Lint Verilog Code
@@ -89,7 +108,7 @@ jobs:
           . .venv/bin/activate
 
           pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -e .[test]
 
           # change running directory
           mkdir testrun
