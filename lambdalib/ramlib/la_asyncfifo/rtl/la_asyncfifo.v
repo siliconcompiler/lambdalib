@@ -64,6 +64,7 @@ module la_asyncfifo #(
     wire [AW:0] wr_binptr_mem_nxt;
     wire [AW:0] wr_grayptr_sync;
     wire        wr_chaosfull;
+    wire        wr_almost_full_next;
 
     reg  [AW:0] rd_grayptr;
     reg  [AW:0] rd_binptr;
@@ -119,11 +120,16 @@ module la_asyncfifo #(
             wr_full <= (wr_chaosfull & wr_chaosmode) |
                   (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH[AW:0];
 
+    generate
+      if (DEPTH == 1)
+        assign wr_almost_full_next = 1'b1;
+      else
+        assign wr_almost_full_next = (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) >= AFULLFINAL[AW:0];
+    endgenerate
+
     always @(posedge wr_clk or negedge wr_nreset)
         if (~wr_nreset) wr_almost_full <= 1'b0;
-        else
-            wr_almost_full <=
-                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) > (AFULLFINAL[AW:0]-1);
+        else wr_almost_full <= wr_almost_full_next;
 
     // Write --> Read clock synchronizer
     for (i = 0; i < (AW + 1); i = i + 1) begin

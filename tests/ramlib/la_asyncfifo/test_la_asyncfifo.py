@@ -72,25 +72,32 @@ async def test_almost_full(dut):
     # Test DUT
     ####################################
 
-    # Almost full should be low before writing to FIFO
-    assert bool(dut.wr_almost_full.value) is False
+    if (int(dut.DEPTH.value) != 1):
+        # Almost full should be low before writing to FIFO
+        assert bool(dut.wr_almost_full.value) is False
 
-    # Write to FIFO
-    for i in range(0, almost_full_level):
-        await fifo_source.send(i)
+        # Write to FIFO
+        for i in range(0, almost_full_level):
+            await fifo_source.send(i)
 
-    await ClockCycles(dut.wr_clk, 1)
+        await ClockCycles(dut.wr_clk, 1)
 
-    assert bool(dut.wr_almost_full.value) is True
+        assert bool(dut.wr_almost_full.value) is True
 
-    # Read one value out of FIFO
-    dut.rd_en.value = 1
-    await fifo_sink.wait_for_recv()
-    dut.rd_en.value = 0
+        # Read one value out of FIFO
+        dut.rd_en.value = 1
+        await fifo_sink.wait_for_recv()
+        dut.rd_en.value = 0
 
-    # Check that almost full is lowered
-    await ClockCycles(dut.wr_clk, 4)
-    assert bool(dut.wr_almost_full.value) is False
+        # Check that almost full is lowered
+        await ClockCycles(dut.wr_clk, 4)
+        assert bool(dut.wr_almost_full.value) is False
+    else:
+        # Special case when DEPTH == 1 FIFO is always almost full
+        assert bool(dut.wr_almost_full.value) is True
+        await fifo_source.send(0)
+        await ClockCycles(dut.wr_clk, 1)
+        assert bool(dut.wr_almost_full.value) is True
 
 
 # Generate sets of tests based on the different permutations of the possible arguments to fifo_test
@@ -182,9 +189,9 @@ async def fifo_rd_wr_test(
 
 
 @pytest.mark.eda
-@pytest.mark.timeout(120)
+@pytest.mark.timeout(240)
 @pytest.mark.parametrize("depth, simulator, output_wave", list(itertools.product(
-    [2, 4, 8],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9],
     ["icarus", "verilator"],
     [False]
 )))
