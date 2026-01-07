@@ -22,7 +22,7 @@ class LambalibTechLibrary(Design):
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.
     """
-    def __init__(self, lambdalib, techlibs: List[LibrarySchema]):
+    def __init__(self, lambdalib: str, techlibs: List[LibrarySchema]):
         """Initializes the LambalibTechLibrary instance.
 
         Args:

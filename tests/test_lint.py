@@ -9,11 +9,6 @@ def lint(design):
     proj = Project(design)
     proj.add_fileset("rtl")
     proj.set_flow(lintflow.LintFlow())
-    proj.set('option', 'nodashboard', True)
-# TODO: later
-#    proj.add('option', 'warningoff', ['no-undriven-port',
-#                                      'no-unused-port',
-#                                      'no-unused-parameter'])
     return proj.run()
 
 
