@@ -18,7 +18,7 @@ class _RAMLib(Lambda):
 
     def write_lambdalib(self, path: Union[str, Path],
                         memories: Dict[str, Dict[str, Union[int, str, List[Tuple[str, str]]]]],
-                        control_signals: List[str],
+                        control_signals: Optional[List[str]] = None,
                         min_size: Optional[int] = None) -> None:
         """Writes a fileset file listing the RTL files for this lambda library.
 
@@ -65,4 +65,4 @@ class _RAMLib(Lambda):
             >>> lib.write_lambdalib("output.v", memories, control_signals)
         """
         with open(path, 'w') as f:
-            write_la_ram(f, memories, control_signals, la_type=self.name, minsize=min_size)
+            write_la_ram(f, memories, control_signals or [], la_type=self.name, minsize=min_size)
