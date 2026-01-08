@@ -11,7 +11,7 @@ from cocotb.triggers import ClockCycles, Timer, Combine
 from cocotb_bus.scoreboard import Scoreboard
 from cocotb_bus.drivers import BitDriver
 
-from cocotb_common import (
+from lambdalib.reusable_tests.cocotb_common import (
     run_cocotb,
     do_reset,
     random_decimal,
