@@ -92,7 +92,7 @@ class RAMLib(Lambda):
         if min_size is None:
             min_size = 0
 
-        for memory, info in memdata.items():
+        for memory, info in sorted(memdata.items(), key=lambda mem: mem[0]):
             widths_table.append(
                 (memory, info['DW'])
             )
