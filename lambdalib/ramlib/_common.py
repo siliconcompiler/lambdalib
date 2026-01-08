@@ -37,8 +37,8 @@ class RAMLib(Lambda):
             >>> lib.write_lambdalib("output.v", lambda_memories.techlibs)
         """
         template_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                 'templates',
-                                                 f'{self.name}memory.v'))
+                                                     'templates',
+                                                     f'{self.name}memory.v'))
 
         memdata = {}
         for mem in memories:

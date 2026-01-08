@@ -28,7 +28,6 @@ class RAMLib(Design):
             self.add_depfileset(Tdpram(), depfileset="rtl")
 
 
-
 class RAMTechLib:
     """Abstract base class for RAM technology libraries."""
     def get_ram_width(self) -> int:

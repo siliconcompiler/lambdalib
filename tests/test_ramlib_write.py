@@ -6,6 +6,7 @@ def create_mock_ram(name, width, depth, ports):
     ports = {
         port: wire for port, wire in ports
     }
+
     class MockRAM:
         def get_ram_libcell(self):
             return name
