@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Dual Port Memory ({{ type }})
+ * Function: True Dual Port Memory ({{ type }})
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
