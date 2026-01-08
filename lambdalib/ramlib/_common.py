@@ -101,10 +101,7 @@ class RAMLib(Lambda):
             )
 
             memory_port_map[memory] = sorted(info["port_map"])
-            if "inst_name" not in info:
-                memory_inst_map[memory] = memory
-            else:
-                memory_inst_map[memory] = info["inst_name"]
+            memory_inst_map[memory] = memory
 
             selection_table.setdefault(info['AW'], {})[int(info['DW'])] = memory
 
