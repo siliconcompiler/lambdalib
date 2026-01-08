@@ -4,7 +4,7 @@ from collections import OrderedDict
 from jinja2 import Template
 from pathlib import Path
 
-from typing import Union, Optional, List, TYPE_CHECKING
+from typing import Union, Optional, List, Type, TYPE_CHECKING
 
 from lambdalib.lambdalib import Lambda
 
@@ -24,7 +24,7 @@ class RAMLib(Lambda):
                 self.add_depfileset(self, "rtl.impl")
 
     def write_lambdalib(self, path: Union[str, Path],
-                        memories: List["RAMTechLib"],
+                        memories: List[Type["RAMTechLib"]],
                         min_size: Optional[int] = None) -> None:
         """Writes a fileset file listing the RTL files for this lambda library.
 
@@ -76,10 +76,11 @@ class RAMLib(Lambda):
 
         memdata = {}
         for mem in memories:
-            memdata[mem.get_ram_libcell()] = {
-                "DW": mem.get_ram_width(),
-                "AW": mem.get_ram_depth(),
-                "port_map": mem.get_ram_ports()
+            memobj = mem()
+            memdata[memobj.get_ram_libcell()] = {
+                "DW": memobj.get_ram_width(),
+                "AW": memobj.get_ram_depth(),
+                "port_map": [(port, wire) for port, wire in memobj.get_ram_ports().items()]
             }
 
         widths_table = []

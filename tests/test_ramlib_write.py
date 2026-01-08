@@ -2,24 +2,24 @@ import pytest
 from lambdalib.ramlib._common import RAMLib
 
 
-class MockRAM:
-    def __init__(self, name, width, depth, ports):
-        self.name = name
-        self.width = width
-        self.depth = depth
-        self.ports = ports
+def create_mock_ram(name, width, depth, ports):
+    ports = {
+        port: wire for port, wire in ports
+    }
+    class MockRAM:
+        def get_ram_libcell(self):
+            return name
 
-    def get_ram_libcell(self):
-        return self.name
+        def get_ram_width(self):
+            return width
 
-    def get_ram_width(self):
-        return self.width
+        def get_ram_depth(self):
+            return depth
 
-    def get_ram_depth(self):
-        return self.depth
+        def get_ram_ports(self):
+            return ports
 
-    def get_ram_ports(self):
-        return self.ports
+    return MockRAM
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def test_write_lambdalib_asap7(ramlib, tmp_path):
         ("wd_in", "mem_din")
     ]
     memories = [
-        MockRAM("fakeram7_sp_512x32", 32, 9, asap7_spram_port_map_sp)
+        create_mock_ram("fakeram7_sp_512x32", 32, 9, asap7_spram_port_map_sp)
     ]
     out = tmp_path / "asap7.v"
     ramlib.write_lambdalib(out, memories)
@@ -59,7 +59,7 @@ def test_write_lambdalib_freepdk45(ramlib, tmp_path):
         ("wd_in", "mem_din")
     ]
     memories = [
-        MockRAM("fakeram45_512x32", 32, 9, freepdk45_spram_port_map)
+        create_mock_ram("fakeram45_512x32", 32, 9, freepdk45_spram_port_map)
     ]
     out = tmp_path / "freepdk45.v"
     ramlib.write_lambdalib(out, memories)
@@ -79,7 +79,7 @@ def test_write_lambdalib_gf180(ramlib, tmp_path):
         ("Q", "mem_dout")
     ]
     memories = [
-        MockRAM("gf180mcu_fd_ip_sram__sram512x8m8wm1", 8, 9, gf180_spram_port_map)
+        create_mock_ram("gf180mcu_fd_ip_sram__sram512x8m8wm1", 8, 9, gf180_spram_port_map)
     ]
     out = tmp_path / "gf180.v"
     ramlib.write_lambdalib(out, memories)
@@ -103,7 +103,7 @@ def test_write_lambdalib_sky130(ramlib, tmp_path):
         ("dout1", "mem_dout"),
     ]
     memories = [
-        MockRAM("sky130_sram_1rw1r_64x256_8", 64, 8, sky130_spram_port_map)
+        create_mock_ram("sky130_sram_1rw1r_64x256_8", 64, 8, sky130_spram_port_map)
     ]
     out = tmp_path / "sky130.v"
     ramlib.write_lambdalib(out, memories)
@@ -133,7 +133,7 @@ def test_write_lambdalib_ihp130(ramlib, tmp_path):
         ("A_BIST_BM", "'b0")
     ]
     memories = [
-        MockRAM("RM_IHPSG13_1P_1024x64_c2_bm_bist", 64, 10, ihp130_spram_port_map)
+        create_mock_ram("RM_IHPSG13_1P_1024x64_c2_bm_bist", 64, 10, ihp130_spram_port_map)
     ]
     out = tmp_path / "ihp130.v"
     ramlib.write_lambdalib(out, memories)
