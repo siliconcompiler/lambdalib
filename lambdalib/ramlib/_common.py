@@ -30,45 +30,11 @@ class RAMLib(Lambda):
 
         Args:
             path: The path to the output fileset file.
-            memories: A dictionary of memory specifications.
-            control_signals: A list of control signal declarations.
+            memories: A list of memory classes.
             min_size: An optional minimum size for the memories.
 
         Example:
-            >>> memories = {
-            ...     "fakeram45_64x32": {
-            ...         "DW": 32,
-            ...         "AW": 6,
-            ...         "port_map": [
-            ...             ("clk", "clk"),
-            ...             ("addr_in", "mem_addr"),
-            ...             ("ce_in", "ce_in"),
-            ...             ("rd_out", "mem_dout"),
-            ...             ("we_in", "we_in"),
-            ...             ("w_mask_in", "mem_wmask"),
-            ...             ("wd_in", "mem_din")
-            ...         ]
-            ...     },
-            ...     "fakeram45_64x32_2": {
-            ...         "DW": 64,
-            ...         "AW": 8,
-            ...         "port_map": [
-            ...             ("clk0", "clk"),
-            ...             ("csb0", "ce_in && we_in"),
-            ...             ("web0", "ce_in && we_in"),
-            ...             ("wmask0", "{mem_wmask[8], mem_wmask[0]}"),
-            ...             ("addr0", "mem_addr"),
-            ...             ("din0", "mem_din"),
-            ...             ("dout0", ""),
-            ...             ("clk1", "clk"),
-            ...             ("csb1", "ce_in && ~we_in"),
-            ...             ("addr1", "mem_addr"),
-            ...             ("dout1", "mem_dout"),
-            ...         ]
-            ...     }
-            ... }
-            >>> control_signals = ["wire [3:0] extra_ctrl"]
-            >>> lib.write_lambdalib("output.v", memories, control_signals)
+            >>> lib.write_lambdalib("output.v", lambda_memories.techlibs)
         """
         template_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                  'templates',
