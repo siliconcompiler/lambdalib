@@ -1,10 +1,31 @@
 import pytest
-from lambdalib.ramlib._common import _RAMLib
+from lambdalib.ramlib._common import RAMLib
+
+
+def create_mock_ram(name, width, depth, ports):
+    ports = {
+        port: wire for port, wire in ports
+    }
+
+    class MockRAM:
+        def get_ram_libcell(self):
+            return name
+
+        def get_ram_width(self):
+            return width
+
+        def get_ram_depth(self):
+            return depth
+
+        def get_ram_ports(self):
+            return ports
+
+    return MockRAM
 
 
 @pytest.fixture
 def ramlib():
-    return _RAMLib("la_spram", ".")
+    return RAMLib("la_spram", ".")
 
 
 def test_write_lambdalib_asap7(ramlib, tmp_path):
@@ -17,13 +38,11 @@ def test_write_lambdalib_asap7(ramlib, tmp_path):
         ("w_mask_in", "mem_wmask"),
         ("wd_in", "mem_din")
     ]
-    memories = {
-        "fakeram7_sp_512x32": {
-            "DW": 32, "AW": 9, "port_map": asap7_spram_port_map_sp
-        }
-    }
+    memories = [
+        create_mock_ram("fakeram7_sp_512x32", 32, 9, asap7_spram_port_map_sp)
+    ]
     out = tmp_path / "asap7.v"
-    ramlib.write_lambdalib(out, memories, [])
+    ramlib.write_lambdalib(out, memories)
     assert out.exists()
     content = out.read_text()
     assert "module la_spram" in content
@@ -40,13 +59,11 @@ def test_write_lambdalib_freepdk45(ramlib, tmp_path):
         ("w_mask_in", "mem_wmask"),
         ("wd_in", "mem_din")
     ]
-    memories = {
-        "fakeram45_512x32": {
-            "DW": 32, "AW": 9, "port_map": freepdk45_spram_port_map
-        }
-    }
+    memories = [
+        create_mock_ram("fakeram45_512x32", 32, 9, freepdk45_spram_port_map)
+    ]
     out = tmp_path / "freepdk45.v"
-    ramlib.write_lambdalib(out, memories, [])
+    ramlib.write_lambdalib(out, memories)
     assert out.exists()
     content = out.read_text()
     assert "fakeram45_512x32" in content
@@ -62,13 +79,11 @@ def test_write_lambdalib_gf180(ramlib, tmp_path):
         ("D", "mem_din"),
         ("Q", "mem_dout")
     ]
-    memories = {
-        "gf180mcu_fd_ip_sram__sram512x8m8wm1": {
-            "DW": 8, "AW": 9, "port_map": gf180_spram_port_map
-        }
-    }
+    memories = [
+        create_mock_ram("gf180mcu_fd_ip_sram__sram512x8m8wm1", 8, 9, gf180_spram_port_map)
+    ]
     out = tmp_path / "gf180.v"
-    ramlib.write_lambdalib(out, memories, [])
+    ramlib.write_lambdalib(out, memories)
     assert out.exists()
     content = out.read_text()
     assert "gf180mcu_fd_ip_sram__sram512x8m8wm1" in content
@@ -88,13 +103,11 @@ def test_write_lambdalib_sky130(ramlib, tmp_path):
         ("addr1", "mem_addr"),
         ("dout1", "mem_dout"),
     ]
-    memories = {
-        "sky130_sram_1rw1r_64x256_8": {
-            "DW": 64, "AW": 8, "port_map": sky130_spram_port_map
-        }
-    }
+    memories = [
+        create_mock_ram("sky130_sram_1rw1r_64x256_8", 64, 8, sky130_spram_port_map)
+    ]
     out = tmp_path / "sky130.v"
-    ramlib.write_lambdalib(out, memories, [])
+    ramlib.write_lambdalib(out, memories)
     assert out.exists()
     content = out.read_text()
     assert "sky130_sram_1rw1r_64x256_8" in content
@@ -120,13 +133,11 @@ def test_write_lambdalib_ihp130(ramlib, tmp_path):
         ("A_BIST_DIN", "'b0"),
         ("A_BIST_BM", "'b0")
     ]
-    memories = {
-        "RM_IHPSG13_1P_1024x64_c2_bm_bist": {
-            "DW": 64, "AW": 10, "port_map": ihp130_spram_port_map
-        }
-    }
+    memories = [
+        create_mock_ram("RM_IHPSG13_1P_1024x64_c2_bm_bist", 64, 10, ihp130_spram_port_map)
+    ]
     out = tmp_path / "ihp130.v"
-    ramlib.write_lambdalib(out, memories, [])
+    ramlib.write_lambdalib(out, memories)
     assert out.exists()
     content = out.read_text()
     assert "RM_IHPSG13_1P_1024x64_c2_bm_bist" in content

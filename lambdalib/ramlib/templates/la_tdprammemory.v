@@ -102,9 +102,6 @@ module {{ type }}
         // Create memories
         localparam MEM_ADDRS = 2 ** (AW - MEM_DEPTH) < 1 ? 1 : 2 ** (AW - MEM_DEPTH);
 
-        {% if control_signals %}// Control signals{% for line in control_signals %}
-        {{ line }}{% endfor %}{% endif %}
-
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin : OUTPUTS
           wire [MEM_ADDRS-1:0] mem_outputsA;
