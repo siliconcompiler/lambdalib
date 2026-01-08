@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Single Port Memory ({{ type }})
+ * Function: Single Port Register File ({{ type }})
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
