@@ -103,16 +103,19 @@ module {{ type }}
 
         genvar a;
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin: ADDR
-          wire selected;
+          wire we_selected;
+          wire re_selected;
           wire [MEM_DEPTH-1:0] wr_mem_addr;
           wire [MEM_DEPTH-1:0] rd_mem_addr;
 
           if (MEM_ADDRS == 1) begin: FITS
-            assign selected = 1'b1;
+            assign we_selected = 1'b1;
+            assign re_selected = 1'b1;
             assign wr_mem_addr = wr_addr;
             assign rd_mem_addr = rd_addr;
           end else begin: NOFITS
-            assign selected = addr[AW-1:MEM_DEPTH] == a;
+            assign we_selected = wr_addr[AW-1:MEM_DEPTH] == a;
+            assign re_selected = rd_addr[AW-1:MEM_DEPTH] == a;
             assign wr_mem_addr = wr_addr[MEM_DEPTH-1:0];
             assign rd_mem_addr = rd_addr[MEM_DEPTH-1:0];
           end
@@ -128,7 +131,7 @@ module {{ type }}
               if (n + i < DW) begin: ACTIVE
                 assign mem_din[i] = wr_din[n + i];
                 assign mem_wmask[i] = wr_wmask[n + i];
-                assign OUTPUTS[n + i].mem_outputs[a] = selected ? mem_dout[i] : 1'b0;
+                assign OUTPUTS[n + i].mem_outputs[a] = re_selected ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE
                 assign mem_din[i] = 1'b0;
@@ -136,11 +139,12 @@ module {{ type }}
               end
             end
 
-            wire ce_in;
+            wire wr_ce_in;
+            wire rd_ce_in;
             wire we_in;
-            assign wr_ce_in = wr_ce && selected;
-            assign rd_ce_in = rd_ce && selected;
-            assign we_in = wr_we && selected;
+            assign wr_ce_in = wr_ce && we_selected;
+            assign rd_ce_in = rd_ce && re_selected;
+            assign we_in = wr_we && we_selected;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
   {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
