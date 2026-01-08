@@ -13,6 +13,7 @@ __all__ = ['Asyncfifo',
            'Syncfifo',
            'Dpram',
            'Spram',
+           'Spregfile',
            'Tdpram']
 
 
