@@ -48,7 +48,7 @@ class _RAMLib(Lambda):
             ...             ("clk0", "clk"),
             ...             ("csb0", "ce_in && we_in"),
             ...             ("web0", "ce_in && we_in"),
-            ...             ("wmask0", "{mem_wmask[24], mem_wmask[16], mem_wmask[8], mem_wmask[0]}"),
+            ...             ("wmask0", "{mem_wmask[8], mem_wmask[0]}"),
             ...             ("addr0", "mem_addr"),
             ...             ("din0", "mem_din"),
             ...             ("dout0", ""),

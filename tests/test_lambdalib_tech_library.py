@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock
 from lambdalib import LambalibTechLibrary
 from siliconcompiler import ASIC
