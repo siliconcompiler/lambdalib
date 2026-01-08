@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Dual Port Memory ({{ type }})
+ * Function: Single Port Memory ({{ type }})
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -29,18 +29,13 @@ module {{ type }}
     parameter TESTW  = 128          // Width of asic test interface
     )
    (// Memory interface
-    // Write port
-    input wr_clk, // write clock
-    input wr_ce, // write chip-enable
-    input wr_we, // write enable
-    input [DW-1:0] wr_wmask, // write mask
-    input [AW-1:0] wr_addr, // write address
-    input [DW-1:0] wr_din, //write data in
-    // Read port
-    input rd_clk, // read clock
-    input rd_ce, // read chip-enable
-    input [AW-1:0] rd_addr, // read address
-    output [DW-1:0] rd_dout, //read data out
+    input clk, // write clock
+    input ce, // chip enable
+    input we, // write enable
+    input [DW-1:0] wmask, //per bit write mask
+    input [AW-1:0] addr, //write address
+    input [DW-1:0] din, //write data
+    output [DW-1:0] dout, //read output data
     // Power signals
     input vss, // ground signal
     input vdd, // memory core array power
@@ -67,7 +62,7 @@ module {{ type }}
 
     generate
       if (MEM_PROP == "SOFT") begin: isoft
-        la_dpram_impl #(
+        la_spram_impl #(
             .DW(DW),
             .AW(AW),
             .PROP(PROP),
@@ -92,32 +87,23 @@ module {{ type }}
         // Create memories
         localparam MEM_ADDRS = 2**(AW - MEM_DEPTH) < 1 ? 1 : 2**(AW - MEM_DEPTH);
 
-        {% if control_signals %}// Control signals{% for line in control_signals %}
-        {{ line }}{% endfor %}{% endif %}
-
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
           wire [MEM_ADDRS-1:0] mem_outputs;
-          assign rd_dout[o] = |mem_outputs;
+          assign dout[o] = |mem_outputs;
         end
 
         genvar a;
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin: ADDR
-          wire we_selected;
-          wire re_selected;
-          wire [MEM_DEPTH-1:0] wr_mem_addr;
-          wire [MEM_DEPTH-1:0] rd_mem_addr;
+          wire selected;
+          wire [MEM_DEPTH-1:0] mem_addr;
 
           if (MEM_ADDRS == 1) begin: FITS
-            assign we_selected = 1'b1;
-            assign re_selected = 1'b1;
-            assign wr_mem_addr = wr_addr;
-            assign rd_mem_addr = rd_addr;
+            assign selected = 1'b1;
+            assign mem_addr = addr;
           end else begin: NOFITS
-            assign we_selected = wr_addr[AW-1:MEM_DEPTH] == a;
-            assign re_selected = rd_addr[AW-1:MEM_DEPTH] == a;
-            assign wr_mem_addr = wr_addr[MEM_DEPTH-1:0];
-            assign rd_mem_addr = rd_addr[MEM_DEPTH-1:0];
+            assign selected = addr[AW-1:MEM_DEPTH] == a;
+            assign mem_addr = addr[MEM_DEPTH-1:0];
           end
 
           genvar n;
@@ -129,9 +115,9 @@ module {{ type }}
             genvar i;
             for (i = 0; i < MEM_WIDTH; i = i + 1) begin: WORD_SELECT
               if (n + i < DW) begin: ACTIVE
-                assign mem_din[i] = wr_din[n + i];
-                assign mem_wmask[i] = wr_wmask[n + i];
-                assign OUTPUTS[n + i].mem_outputs[a] = re_selected ? mem_dout[i] : 1'b0;
+                assign mem_din[i] = din[n + i];
+                assign mem_wmask[i] = wmask[n + i];
+                assign OUTPUTS[n + i].mem_outputs[a] = selected ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE
                 assign mem_din[i] = 1'b0;
@@ -139,17 +125,15 @@ module {{ type }}
               end
             end
 
-            wire wr_ce_in;
-            wire rd_ce_in;
+            wire ce_in;
             wire we_in;
-            assign wr_ce_in = wr_ce && we_selected;
-            assign rd_ce_in = rd_ce && re_selected;
-            assign we_in = wr_we && we_selected;
+            assign ce_in = ce && selected;
+            assign we_in = we && selected;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
-  {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
-    .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
-  );
+              {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
+                .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
+              );
             end{% endfor %}
           end
         end

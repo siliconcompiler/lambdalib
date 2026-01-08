@@ -1,11 +1,18 @@
+import os.path
+
+from collections import OrderedDict
+from jinja2 import Template
 from pathlib import Path
-from typing import Dict, Union, Optional, List, Tuple
+
+from typing import Union, Optional, List, TYPE_CHECKING
 
 from lambdalib.lambdalib import Lambda
-from lambdalib.utils import write_la_ram
+
+if TYPE_CHECKING:
+    from lambdalib.ramlib import RAMTechLib
 
 
-class _RAMLib(Lambda):
+class RAMLib(Lambda):
     def __init__(self, name: str, path: Union[str, Path],
                  impl_file: Optional[Union[str, Path]] = None):
         super().__init__(name, path)
@@ -17,8 +24,7 @@ class _RAMLib(Lambda):
                 self.add_depfileset(self, "rtl.impl")
 
     def write_lambdalib(self, path: Union[str, Path],
-                        memories: Dict[str, Dict[str, Union[int, str, List[Tuple[str, str]]]]],
-                        control_signals: Optional[List[str]] = None,
+                        memories: List["RAMTechLib"],
                         min_size: Optional[int] = None) -> None:
         """Writes a fileset file listing the RTL files for this lambda library.
 
@@ -64,5 +70,59 @@ class _RAMLib(Lambda):
             >>> control_signals = ["wire [3:0] extra_ctrl"]
             >>> lib.write_lambdalib("output.v", memories, control_signals)
         """
-        with open(path, 'w') as f:
-            write_la_ram(f, memories, control_signals or [], la_type=self.name, minsize=min_size)
+        template_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                 'templates',
+                                                 f'{self.name}memory.v'))
+
+        memdata = {}
+        for mem in memories:
+            memdata[mem.get_ram_libcell()] = {
+                "DW": mem.get_ram_width(),
+                "AW": mem.get_ram_depth(),
+                "port_map": mem.get_ram_ports()
+            }
+
+        widths_table = []
+        depths_table = []
+        memory_port_map = {}
+        selection_table = {}
+        memory_inst_map = {}
+
+        if min_size is None:
+            min_size = 0
+
+        for memory, info in memdata.items():
+            widths_table.append(
+                (memory, info['DW'])
+            )
+            depths_table.append(
+                (memory, info['AW'])
+            )
+
+            memory_port_map[memory] = sorted(info["port_map"])
+            if "inst_name" not in info:
+                memory_inst_map[memory] = memory
+            else:
+                memory_inst_map[memory] = info["inst_name"]
+
+            selection_table.setdefault(info['AW'], {})[int(info['DW'])] = memory
+
+        selection_table = OrderedDict(sorted(selection_table.items(), reverse=True))
+        for aw, items in selection_table.items():
+            selection_table[aw] = OrderedDict(sorted(items.items(), reverse=True))
+
+        widths_table.sort()
+        depths_table.sort()
+
+        with open(template_path) as f:
+            template = Template(f.read())
+
+        with open(path, 'w') as fout:
+            fout.write(template.render(
+                type=self.name,
+                width_table=widths_table,
+                depth_table=depths_table,
+                selection_table=selection_table,
+                inst_map=memory_inst_map,
+                port_mapping=memory_port_map,
+                minsize=min_size))
