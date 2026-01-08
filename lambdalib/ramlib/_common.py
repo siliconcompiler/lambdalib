@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Union, Optional, List
+from typing import Dict, Union, Optional, List, Tuple
 
 from lambdalib.lambdalib import Lambda
 from lambdalib.utils import write_la_ram
@@ -17,7 +17,7 @@ class _RAMLib(Lambda):
                 self.add_depfileset(self, "rtl.impl")
 
     def write_lambdalib(self, path: Union[str, Path],
-                        memories: Dict[str, Dict[str, str]],
+                        memories: Dict[str, Dict[str, Union[int, str, List[Tuple[str, str]]]]],
                         control_signals: List[str]) -> None:
         """Writes a fileset file listing the RTL files for this lambda library.
 
