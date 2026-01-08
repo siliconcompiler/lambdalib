@@ -20,7 +20,7 @@
  *
  ****************************************************************************/
 
-module la_spregfile
+module la_spregfile_impl
   #(
     parameter DW = 32,          // Memory width
     parameter AW = 10,          // Address width (derived)
