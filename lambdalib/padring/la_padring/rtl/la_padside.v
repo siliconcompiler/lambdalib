@@ -31,13 +31,13 @@
 
 module la_padside
   #(// per side parameters
-    parameter [15:0]          SIDE = "NO",   // "NO", "SO", "EA", "WE"
-    parameter [7:0]           NPINS = 1,     // total pins per side (<256)
-    parameter [7:0]           NCELLS = 1,    // total cells per side (<256)
-    parameter [7:0]           NSECTIONS = 1, // total power sections (<256)
-    parameter [NCELLS*40-1:0] CELLMAP = 0,   // see ../README.md
-    parameter [7:0]           RINGW = 1,     // width of io ring
-    parameter [7:0]           CFGW = 1       // config width
+    parameter [15:0]       SIDE = "NO",   // "NO", "SO", "EA", "WE"
+    parameter [7:0]        NPINS = 1,     // total pins per side (<256)
+    parameter [7:0]        NCELLS = 1,    // total cells per side (<256)
+    parameter [7:0]        NSECTIONS = 1, // total power sections (<256)
+    parameter [256*40-1:0] CELLMAP = 0,   // see ../README.md
+    parameter [7:0]        RINGW = 1,     // width of io ring
+    parameter [7:0]        CFGW = 1       // config width
     )
    (// io pad signals
     inout [NPINS-1:0]           pad,   // pad

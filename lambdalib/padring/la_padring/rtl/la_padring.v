@@ -33,24 +33,24 @@
 
 module la_padring
   #(
-    parameter                    CFGW = 8,         // config width
-    parameter                    RINGW = 8,        // ioring width
-    parameter                    NO_NPINS = 1,     // pins per side
-    parameter                    NO_NCELLS = 1,    // cells per side
-    parameter                    NO_NSECTIONS = 1, // sections per side
-    parameter [NO_NCELLS*40-1:0] NO_CELLMAP = 0,   // see ../README.md
-    parameter                    EA_NPINS = 1,
-    parameter                    EA_NCELLS = 1,
-    parameter                    EA_NSECTIONS = 1,
-    parameter [EA_NCELLS*40-1:0] EA_CELLMAP = 0,
-    parameter                    SO_NPINS = 1,
-    parameter                    SO_NCELLS = 1,
-    parameter                    SO_NSECTIONS = 1,
-    parameter [SO_NCELLS*40-1:0] SO_CELLMAP = 0,
-    parameter                    WE_NPINS = 1,
-    parameter                    WE_NCELLS = 1,
-    parameter                    WE_NSECTIONS = 1,
-    parameter [WE_NCELLS*40-1:0] WE_CELLMAP = 0
+    parameter [7:0]        CFGW = 8,         // config width
+    parameter [7:0]        RINGW = 8,        // ioring width
+    parameter [7:0]        NO_NPINS = 1,     // pins per side
+    parameter [7:0]        NO_NCELLS = 1,    // cells per side
+    parameter [7:0]        NO_NSECTIONS = 1, // sections per side
+    parameter [256*40-1:0] NO_CELLMAP = 0,   // see ../README.md
+    parameter [7:0]        EA_NPINS = 1,
+    parameter [7:0]        EA_NCELLS = 1,
+    parameter [7:0]        EA_NSECTIONS = 1,
+    parameter [256*40-1:0] EA_CELLMAP = 0,
+    parameter [7:0]        SO_NPINS = 1,
+    parameter [7:0]        SO_NCELLS = 1,
+    parameter [7:0]        SO_NSECTIONS = 1,
+    parameter [256*40-1:0] SO_CELLMAP = 0,
+    parameter [7:0]        WE_NPINS = 1,
+    parameter [7:0]        WE_NCELLS = 1,
+    parameter [7:0]        WE_NSECTIONS = 1,
+    parameter [256*40-1:0] WE_CELLMAP = 0
     )
    (// CONTINUOUS GROUND
     inout                          vss,
