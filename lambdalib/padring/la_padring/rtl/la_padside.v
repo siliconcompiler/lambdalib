@@ -59,6 +59,12 @@ module la_padside
     inout [NSECTIONS*RINGW-1:0] ioring // generic io-ring
     );
 
+   //#######################################################################
+   /* verilator lint_off WIDTHTRUNC */
+   //#######################################################################
+   // Safe to disable check b/c the index is 8 bits and the number of pads
+   // per side is always <= 256.
+
 `include "la_padring.vh"
 
    genvar i;
