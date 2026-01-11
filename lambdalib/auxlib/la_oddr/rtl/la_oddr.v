@@ -14,6 +14,7 @@
 //       to improve dity cycle resilence.
 //
 //#############################################################################
+
 module la_oddr #(parameter PROP = "LATCH"
                  )
    (
@@ -24,39 +25,52 @@ module la_oddr #(parameter PROP = "LATCH"
     output      out   // dual data rate output
     );
 
-   // Internal Signals
-   reg q0;        // Captures in0 on Rising Edge
-   reg q1_sh;     // Alignment/Shift register for in1
-   wire ddr;
+   //###################################
+   // Declarations
+   //###################################
 
-   // Capture Rising Edge
+   reg  q0;            // Sampled rising edge data
+   reg  q1_low;        // For Mode 1 (Opposite-Edge)
+   reg  q1_high;       // For Mode 2 (Same-Edge)
+   wire q1_sh;         // Final ddata for negedge
+   wire ddr;           // Dual data rate (pre bypass mux)
+
+   //###################################
+   // Primary Capture (Latch or FF)
+   //###################################
+
    always @(posedge clk)
      q0 <= in0;
 
-   // Mode 1 (Opposite Edge): Internal logic provides in1 with setup before
-   // falling edge.
-   // Mode 2 (Same Edge): Internal logic provides in1 on rising edge;
-   // we must delay it.
+   //###################################
+   // Secondary Capture (Latch or FF)
+   //###################################
 
    generate
       if (PROP == "LATCH") begin : g_latch
 `ifdef VERILATOR
-         always @(posedge clk)
-           q1_sh <= in1;
+         // In Verilator, we mimic the latch behavior with FFs
+         wire clk_sample = (mode == 1) ? !clk : clk;
+         reg  q1_sim;
+         always @(posedge clk_sample)
+           q1_sim <= in1;
+         assign q1_sh = q1_sim;
 `else
-         always @(clk or in1)
-           if (clk)
-             q1_sh <= in1;
-
+         always @(clk or in1) if (clk)  q1_high <= in1; // high latch
+         always @(clk or in1) if (!clk) q1_low  <= in1; // low latch
+         assign q1_sh = (mode == 1) ? q1_low : q1_high; // edge/mode selector
 `endif
       end else begin : g_ff
-         // Standard Approach: Capture in1 on falling edge.
-         always @(negedge clk)
-           q1_sh <= in1;
+         always @(posedge clk) q1_high <= in1;
+         always @(negedge clk) q1_low  <= in1;
+         assign q1_sh = (mode == 1) ? q1_low : q1_high;
       end
    endgenerate
 
-   // Output Multiplexing ---
+   //###################################
+   // Output muxing
+   //###################################
+
    assign ddr = clk ? q0 : q1_sh;
    assign out = (mode == 0) ? in0 : ddr;
 
