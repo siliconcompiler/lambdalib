@@ -13,7 +13,7 @@
 // NOTE:
 // - external to this block, a forward-shifted clock must be provided that
 //   is forward shifted by 90 degrees from this clock
-// - See docs/oiddr_waveform.json for waveform description
+// - See docs/oddr_waveform.json for waveform description
 //
 //#############################################################################
 
