@@ -34,25 +34,27 @@
  ****************************************************************************/
 
 module la_padring
-  #(
-    parameter [15:0]         CFGW = 8,         // config width
-    parameter [15:0]         RINGW = 8,        // ioring width
-    parameter [15:0]         NO_NPINS = 1,     // pins per side
-    parameter [15:0]         NO_NCELLS = 1,    // cells per side
-    parameter [15:0]         NO_NSECTIONS = 1, // sections per side
-    parameter [65536*80-1:0] NO_CELLMAP = 0,   // see ../README.md
-    parameter [15:0]         EA_NPINS = 1,
-    parameter [15:0]         EA_NCELLS = 1,
-    parameter [15:0]         EA_NSECTIONS = 1,
-    parameter [65536*80-1:0] EA_CELLMAP = 0,
-    parameter [15:0]         SO_NPINS = 1,
-    parameter [15:0]         SO_NCELLS = 1,
-    parameter [15:0]         SO_NSECTIONS = 1,
-    parameter [65536*80-1:0] SO_CELLMAP = 0,
-    parameter [15:0]         WE_NPINS = 1,
-    parameter [15:0]         WE_NCELLS = 1,
-    parameter [15:0]         WE_NSECTIONS = 1,
-    parameter [65536*80-1:0] WE_CELLMAP = 0
+  #(// global padring params
+    parameter [15:0]       MAX = 256,        // max cells
+    parameter [15:0]       CFGW = 8,         // config width
+    parameter [15:0]       RINGW = 8,        // ioring width
+    // per side parameters
+    parameter [15:0]       NO_NPINS = 1,     // pins per side
+    parameter [15:0]       NO_NCELLS = 1,    // cells per side
+    parameter [15:0]       NO_NSECTIONS = 1, // sections per side
+    parameter [MAX*80-1:0] NO_CELLMAP = 0,   // see ../README.md
+    parameter [15:0]       EA_NPINS = 1,
+    parameter [15:0]       EA_NCELLS = 1,
+    parameter [15:0]       EA_NSECTIONS = 1,
+    parameter [MAX*80-1:0] EA_CELLMAP = 0,
+    parameter [15:0]       SO_NPINS = 1,
+    parameter [15:0]       SO_NCELLS = 1,
+    parameter [15:0]       SO_NSECTIONS = 1,
+    parameter [MAX*80-1:0] SO_CELLMAP = 0,
+    parameter [15:0]       WE_NPINS = 1,
+    parameter [15:0]       WE_NCELLS = 1,
+    parameter [15:0]       WE_NSECTIONS = 1,
+    parameter [MAX*80-1:0] WE_CELLMAP = 0
     )
    (// CONTINUOUS GROUND
     inout                          vss,
@@ -127,7 +129,8 @@ module la_padring
                 .NSECTIONS(NO_NSECTIONS),
                 .CELLMAP(NO_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    inorth (// Outputs
            .zp     (no_zp),
            .zn     (no_zn),
@@ -154,7 +157,8 @@ module la_padring
                 .NSECTIONS(EA_NSECTIONS),
                 .CELLMAP(EA_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    ieast (// Outputs
           .zp     (ea_zp),
           .zn     (ea_zn),
@@ -181,7 +185,8 @@ module la_padring
                 .NSECTIONS(WE_NSECTIONS),
                 .CELLMAP(WE_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    iwest (// Outputs
           .zp     (we_zp),
           .zn     (we_zn),
@@ -208,7 +213,8 @@ module la_padring
                 .NSECTIONS(SO_NSECTIONS),
                 .CELLMAP(SO_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    isouth (// Outputs
            .zp     (so_zp),
            .zn     (so_zn),
