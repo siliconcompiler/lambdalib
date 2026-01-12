@@ -1,7 +1,7 @@
-from lambdalib.ramlib._common import _RAMLib
+from lambdalib.ramlib._common import RAMLib
 
 
-class Tdpram(_RAMLib):
+class Tdpram(RAMLib):
     def __init__(self):
         name = 'la_tdpram'
         super().__init__(name, __file__, impl_file='rtl/la_tdpram_impl.v')

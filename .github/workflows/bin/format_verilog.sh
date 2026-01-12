@@ -15,7 +15,7 @@ find . \( \
     -or -name "*.vh" \
 \)  -not \( \
     -path "./siliconcompiler/*" \
-    -or -path "./lambdalib/utils/templates/*" \
+    -or -path "./lambdalib/ramlib/templates/*" \
 \) >> $FILES
 
 #verible-verilog-format \

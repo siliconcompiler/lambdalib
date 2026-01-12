@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Single Port Memory ({{ type }})
+ * Function: Single Port Register File ({{ type }})
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -13,13 +13,14 @@
  * Advanced ASIC development should rely on complete functional models
  * supplied on a per macro basis.
  *
- * Technologoy specific implementations of "{{ type }}" would generally include
+ * Technology specific implementations of "{{ type }}" would generally include
  * one or more hardcoded instantiations of {{ type }} modules with a generate
  * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *
  ****************************************************************************/
 
+(* keep_hierarchy *)
 module {{ type }}
   #(parameter DW     = 32,          // Memory width
     parameter AW     = 10,          // Address width (derived)
@@ -85,9 +86,6 @@ module {{ type }}
       if (MEM_PROP != "SOFT") begin: itech
         // Create memories
         localparam MEM_ADDRS = 2**(AW - MEM_DEPTH) < 1 ? 1 : 2**(AW - MEM_DEPTH);
-
-        {% if control_signals %}// Control signals{% for line in control_signals %}
-        {{ line }}{% endfor %}{% endif %}
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS

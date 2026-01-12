@@ -13,7 +13,7 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.6.0"
+__version__ = "0.8.0"
 
 
 class LambalibTechLibrary(Design):
@@ -36,7 +36,17 @@ class LambalibTechLibrary(Design):
 
         if not techlibs:
             techlibs = []
-        self.__techlibs = techlibs
+        self.__techlibs = techlibs.copy()
+
+    @property
+    def cell(self) -> str:
+        """Returns the main lambda library cell."""
+        return self.__cell
+
+    @property
+    def techlibs(self) -> List[LibrarySchema]:
+        """Returns a copy of the list of associated technology libraries."""
+        return self.__techlibs.copy()
 
     @classmethod
     def alias(cls, project: ASIC) -> None:

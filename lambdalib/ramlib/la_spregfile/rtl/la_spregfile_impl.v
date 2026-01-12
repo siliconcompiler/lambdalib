@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function: Single Port RAM
+ * Function: Single Port Register File
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -13,14 +13,14 @@
  * Advanced ASIC development should rely on complete functional models
  * supplied on a per macro basis.
  *
- * Technology specific implementations of "la_spram" would generally include
+ * Technology specific implementations of "la_spregfile" would generally include
  * one or more hardcoded instantiations of RAM modules with a generate
  * statement relying on the "PROP" to select between the list of modules
  * at build time.
  *
  ****************************************************************************/
 
-module la_spram_impl
+module la_spregfile_impl
   #(
     parameter DW = 32,          // Memory width
     parameter AW = 10,          // Address width (derived)
