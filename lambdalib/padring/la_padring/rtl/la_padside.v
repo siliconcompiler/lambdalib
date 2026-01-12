@@ -43,8 +43,8 @@ module la_padside
    //#######################################################################
    /* verilator lint_off WIDTHTRUNC */
    //#######################################################################
-   // Safe to disable check b/c the index is 8 bits and the number of pads
-   // per side is always <= 256.
+   // Safe to disable check b/c MAX cells should be consistent with the
+   // CELLMAP, which should be generated.
    //#######################################################################
 
 
