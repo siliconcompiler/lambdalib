@@ -5,24 +5,24 @@
  ****************************************************************************/
 
 // NULL (place holder)
-localparam [7:0] NULL      = 8'h00;
+localparam [15:0] NULL      = 16'h00;
 
 // io cells
-localparam [7:0] LA_BIDIR  = 8'h01;
-localparam [7:0] LA_INPUT  = 8'h02;
-localparam [7:0] LA_OUTPUT = 8'h03;
-localparam [7:0] LA_ANALOG = 8'h04;
-localparam [7:0] LA_XTAL   = 8'h05;
-localparam [7:0] LA_RXDIFF = 8'h06;
-localparam [7:0] LA_TXDIFF = 8'h07;
+localparam [15:0] LA_BIDIR  = 16'h01;
+localparam [15:0] LA_INPUT  = 16'h02;
+localparam [15:0] LA_OUTPUT = 16'h03;
+localparam [15:0] LA_ANALOG = 16'h04;
+localparam [15:0] LA_XTAL   = 16'h05;
+localparam [15:0] LA_RXDIFF = 16'h06;
+localparam [15:0] LA_TXDIFF = 16'h07;
 
 // supply cells
-localparam [7:0] LA_VDDIO  = 8'h10;
-localparam [7:0] LA_VSSIO  = 8'h11;
-localparam [7:0] LA_VDD    = 8'h12;
-localparam [7:0] LA_VSS    = 8'h13;
-localparam [7:0] LA_VDDA   = 8'h14;
-localparam [7:0] LA_VSSA   = 8'h15;
-localparam [7:0] LA_POC    = 8'h16;
-localparam [7:0] LA_CUT    = 8'h17;
-localparam [7:0] LA_CLAMP  = 8'h18;
+localparam [15:0] LA_VDDIO  = 16'h10;
+localparam [15:0] LA_VSSIO  = 16'h11;
+localparam [15:0] LA_VDD    = 16'h12;
+localparam [15:0] LA_VSS    = 16'h13;
+localparam [15:0] LA_VDDA   = 16'h14;
+localparam [15:0] LA_VSSA   = 16'h15;
+localparam [15:0] LA_POC    = 16'h16;
+localparam [15:0] LA_CUT    = 16'h17;
+localparam [15:0] LA_CLAMP  = 16'h18;

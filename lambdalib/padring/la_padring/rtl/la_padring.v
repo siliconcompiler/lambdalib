@@ -7,50 +7,52 @@
  *
  * - See "../README.md" for complete information
  *
- * PIN[7:0] = pin number connected to cell
+ * ------------------------------------------------------------------------
  *
- * COMP[7:0] = pin number for negative pad for differential cells
+ * CELLMAP[79:0] = {PROP[15:0],SECTION[15:0],CELL[15:0],COMP[15:0],PIN[15:0]}
  *
- * CELL[7:0] = cell type (see ./la_padring.vh)
+ * PIN[15:0] = pin number connected to cell
  *
- * SECTION[7:0] = padring power section number connected to cell
+ * COMP[15:0] = pin number for negative leg for differential cells
  *
- * PROP[7:0] = property passed to technology specific iolib implementation
+ * CELL[15:0] = cell type (see ./la_padring.vh)
+ *
+ * SECTION[15:0] = padring power section number connected to cell
+ *
+ * PROP[15:0] = property passed to technology specific iolib implementation
  *
  * Cell Map Example:
  *
- * CELLMAP[79:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
- *                  {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
+ * CELLMAP[159:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
+ *                   {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
  *
-
  * Testing:
  *
  * >> iverilog la_iopadring.v -DTB_LA_IOPADRING -y . -y ../../iolib/rtl
  * >> ./a.out
  *
- *
  ****************************************************************************/
 
 module la_padring
   #(
-    parameter [7:0]        CFGW = 8,         // config width
-    parameter [7:0]        RINGW = 8,        // ioring width
-    parameter [7:0]        NO_NPINS = 1,     // pins per side
-    parameter [7:0]        NO_NCELLS = 1,    // cells per side
-    parameter [7:0]        NO_NSECTIONS = 1, // sections per side
-    parameter [256*40-1:0] NO_CELLMAP = 0,   // see ../README.md
-    parameter [7:0]        EA_NPINS = 1,
-    parameter [7:0]        EA_NCELLS = 1,
-    parameter [7:0]        EA_NSECTIONS = 1,
-    parameter [256*40-1:0] EA_CELLMAP = 0,
-    parameter [7:0]        SO_NPINS = 1,
-    parameter [7:0]        SO_NCELLS = 1,
-    parameter [7:0]        SO_NSECTIONS = 1,
-    parameter [256*40-1:0] SO_CELLMAP = 0,
-    parameter [7:0]        WE_NPINS = 1,
-    parameter [7:0]        WE_NCELLS = 1,
-    parameter [7:0]        WE_NSECTIONS = 1,
-    parameter [256*40-1:0] WE_CELLMAP = 0
+    parameter [15:0]       CFGW = 8,         // config width
+    parameter [15:0]       RINGW = 8,        // ioring width
+    parameter [15:0]       NO_NPINS = 1,     // pins per side
+    parameter [15:0]       NO_NCELLS = 1,    // cells per side
+    parameter [15:0]       NO_NSECTIONS = 1, // sections per side
+    parameter [256*80-1:0] NO_CELLMAP = 0,   // see ../README.md
+    parameter [15:0]       EA_NPINS = 1,
+    parameter [15:0]       EA_NCELLS = 1,
+    parameter [15:0]       EA_NSECTIONS = 1,
+    parameter [256*80-1:0] EA_CELLMAP = 0,
+    parameter [15:0]       SO_NPINS = 1,
+    parameter [15:0]       SO_NCELLS = 1,
+    parameter [15:0]       SO_NSECTIONS = 1,
+    parameter [256*80-1:0] SO_CELLMAP = 0,
+    parameter [15:0]       WE_NPINS = 1,
+    parameter [15:0]       WE_NCELLS = 1,
+    parameter [15:0]       WE_NSECTIONS = 1,
+    parameter [256*80-1:0] WE_CELLMAP = 0
     )
    (// CONTINUOUS GROUND
     inout                          vss,
@@ -249,10 +251,10 @@ module tb();
    parameter NSECTIONS = 1;
 
    // pinmap
-   parameter [7:0] PIN_IO0  = 8'h03;
-   parameter [7:0] PIN_AN0  = 8'h02;
-   parameter [7:0] PIN_RXN  = 8'h01;
-   parameter [7:0] PIN_RXP  = 8'h00;
+   parameter [15:0] PIN_IO0  = 8'h03;
+   parameter [15:0] PIN_AN0  = 8'h02;
+   parameter [15:0] PIN_RXN  = 8'h01;
+   parameter [15:0] PIN_RXP  = 8'h00;
 
 
    parameter [40*NCELLS-1:0] CELLMAP =
