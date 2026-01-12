@@ -6,35 +6,32 @@
 //
 // Supports the following operating modes
 // 0 - bypass
-// 1 - oppositive-edge (sampling on fall and rise edge)
-// 2 - same-edge (samples falling edge data with posedge of clock)
-// 3 - pipeline-same edge (presents rise/fall edge data on same cycle)
+// 1 - sample (capture input on fall and rise edge of clk)
+// 2 - align (falling edge data aligned to posedge of clk)
+// 3 - pipe (align rise/fall edge data on same
 //
-// NOTE: hold latch used for negedge sampling in place of negedge sampling
-//       to improve dity cycle resilence.
-//
-// Requirements:
-// input data is valid "setup" time before and "hold time" after rising edge
-// input data is valid
+// NOTE:
+// - input clock is forward-shifted so that posedge capture qrise first
+// - See docs/iddr_waveform.json for waveform description
 //
 //#############################################################################
 
 module la_iddr #(parameter PROP = "LATCH"
                  )
    (
-    input       clk,     // clock
-    input [1:0] mode,    // operating modes
-    input       in,      // data input sampled on both edges of clock
-    output      outrise, // rising edge sample
-    output      outfall  // falling edge sample
+    input       clk,   // clock
+    input       in,    // dual data rate input
+    input [1:0] mode,  // operating modes
+    output      qrise, // rising edge sample
+    output      qfall  // falling edge sample
     );
 
    reg r_edge_q;       // Rising edge capture
-   reg f_edge_q;       // Fall edge sample
+   reg f_edge_q;       // Falling edge capture
    reg f_edge_aligned; // Falling edge data moved to rising edge
-   reg pipe_r, pipe_f; // Pipeline registers
+   reg r_edge_aligned; // Rising edge data pipleline for mode 3
 
-   // Posedge sample
+   // Sample
    always @(posedge clk)
      r_edge_q <= in;
 
@@ -44,23 +41,20 @@ module la_iddr #(parameter PROP = "LATCH"
 
    // Alignment logic
    always @(posedge clk)
-     f_edge_aligned <= f_edge_q;
-
-   // Pipeline
-   always @(posedge clk) begin
-      pipe_r <= r_edge_q;
-      pipe_f <= f_edge_aligned;
-   end
+     begin
+        r_edge_aligned <= r_edge_q; // pipe mode only
+        f_edge_aligned <= f_edge_q; // resample negedge locally
+     end
 
    // Mode selection
-   assign outrise = (mode==1) ? r_edge_q        :
-                    (mode==2) ? r_edge_aligned  :
-                    (mode==3) ? pipe_r          :
-                                in;
+   assign qrise = (mode==1) ? r_edge_q        :
+                  (mode==2) ? r_edge_q        :
+                  (mode==3) ? r_edge_aligned  :
+                              in;
 
-   assign outfall = (mode==1) ? f_edge_q       : // "Opposite"
-                    (mode==2) ? f_edge_aligned : // "Same-Edge" (Aligned)
-                    (mode==3) ? pipe_f         : // pipelined
-                                1'b0;
+   assign qfall = (mode==1) ? f_edge_q       : // raw sample
+                  (mode==2) ? f_edge_aligned : // aligned
+                  (mode==3) ? f_edge_aligned : // pipelined
+                              1'b0;
 
 endmodule
