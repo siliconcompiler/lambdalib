@@ -1,0 +1,4 @@
+pr:
+  update_summary: false
+  update_title: false
+  update_labels: false
