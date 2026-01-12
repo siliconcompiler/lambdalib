@@ -6,12 +6,16 @@
 //
 // Supports the following operating modes
 // 0 - bypass
-// 1 - oppositive-edge
-// 2 - same-edge
-// 3 - pipeline-same edge
+// 1 - oppositive-edge (sampling on fall and rise edge)
+// 2 - same-edge (samples falling edge data with posedge of clock)
+// 3 - pipeline-same edge (presents rise/fall edge data on same cycle)
 //
 // NOTE: hold latch used for negedge sampling in place of negedge sampling
 //       to improve dity cycle resilence.
+//
+// Requirements:
+// input data is valid "setup" time before and "hold time" after rising edge
+// input data is valid
 //
 //#############################################################################
 
@@ -30,31 +34,13 @@ module la_iddr #(parameter PROP = "LATCH"
    reg f_edge_aligned; // Falling edge data moved to rising edge
    reg pipe_r, pipe_f; // Pipeline registers
 
-   // Posedge clk sample
-    always @(posedge clk)
-      r_edge_q <= in;
+   // Posedge sample
+   always @(posedge clk)
+     r_edge_q <= in;
 
-   // Latch hold circuit (smaller, faster operation)
-   generate
-      if (PROP == "LATCH") begin: g_latch
-`ifdef VERILATOR
-         // Verilator: Use negedge FF to mimic latch behavior
-         always @(negedge clk) begin
-            f_edge_q <= in;
-         end
-`else
-         // ASIC: Use the actual latch hold circuit
-         always @(clk or in) begin
-            if (!clk)
-              f_edge_q <= in;
-         end
-`endif
-      end
-      else begin: g_ff
-         always @(negedge clk)
-           f_edge_q <= in;
-      end
-   endgenerate
+   // Negedge sample
+   always @(negedge clk)
+     f_edge_q <= in;
 
    // Alignment logic
    always @(posedge clk)
@@ -67,12 +53,14 @@ module la_iddr #(parameter PROP = "LATCH"
    end
 
    // Mode selection
-   assign outrise = (mode==0) ? in :
-                    (mode==3) ? pipe_r : r_edge_q;
+   assign outrise = (mode==1) ? r_edge_q        :
+                    (mode==2) ? r_edge_aligned  :
+                    (mode==3) ? pipe_r          :
+                                in;
 
-   assign outfall = (mode==0) ? 1'b0 :           // "Bypass"
-                    (mode==1) ? f_edge_q :       // "Opposite"
+   assign outfall = (mode==1) ? f_edge_q       : // "Opposite"
                     (mode==2) ? f_edge_aligned : // "Same-Edge" (Aligned)
-                    (mode==3) ? pipe_f : 1'b0;   // "Pipelined"
+                    (mode==3) ? pipe_f         : // pipelined
+                                1'b0;
 
 endmodule
