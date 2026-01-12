@@ -8,7 +8,7 @@
 // 0 - bypass
 // 1 - sample (capture input on fall and rise edge of clk)
 // 2 - align (falling edge data aligned to posedge of clk)
-// 3 - pipe (align rise/fall edge data on same
+// 3 - pipe (align rise/fall edge data on same clk cycle)
 //
 // NOTE:
 // - input clock is forward-shifted so that posedge capture qrise first
@@ -16,7 +16,7 @@
 //
 //#############################################################################
 
-module la_iddr #(parameter PROP = "LATCH"
+module la_iddr #(parameter PROP = ""
                  )
    (
     input       clk,   // clock
@@ -29,7 +29,7 @@ module la_iddr #(parameter PROP = "LATCH"
    reg r_edge_q;       // Rising edge capture
    reg f_edge_q;       // Falling edge capture
    reg f_edge_aligned; // Falling edge data moved to rising edge
-   reg r_edge_aligned; // Rising edge data pipleline for mode 3
+   reg r_edge_aligned; // Rising edge data pipeline for mode 3
 
    // Sample
    always @(posedge clk)
