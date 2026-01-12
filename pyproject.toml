@@ -35,6 +35,10 @@ test = [
     "cocotb == 2.0.1",
     "cocotb-bus == 0.3.0"
 ]
+cocotb = [
+    "cocotb == 2.0.1",
+    "cocotb-bus == 0.3.0"
+]
 
 lint = [
     "flake8 == 7.3.0",
