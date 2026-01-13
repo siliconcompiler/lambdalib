@@ -7,50 +7,54 @@
  *
  * - See "../README.md" for complete information
  *
- * PIN[7:0] = pin number connected to cell
+ * ------------------------------------------------------------------------
  *
- * COMP[7:0] = pin number for negative pad for differential cells
+ * CELLMAP[79:0] = {PROP[15:0],SECTION[15:0],CELL[15:0],COMP[15:0],PIN[15:0]}
  *
- * CELL[7:0] = cell type (see ./la_padring.vh)
+ * PIN[15:0] = pin number connected to cell
  *
- * SECTION[7:0] = padring power section number connected to cell
+ * COMP[15:0] = pin number for negative leg for differential cells
  *
- * PROP[7:0] = property passed to technology specific iolib implementation
+ * CELL[15:0] = cell type (see ./la_padring.vh)
+ *
+ * SECTION[15:0] = padring power section number connected to cell
+ *
+ * PROP[15:0] = property passed to technology specific iolib implementation
  *
  * Cell Map Example:
  *
- * CELLMAP[79:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
- *                  {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
+ * CELLMAP[159:0] = {{NULL,  NULL, LA_RXDIFF, PIN_RXN, PIN_RXP}
+ *                   {NULL,  NULL, LA_BIDIR,  NULL,    PIN_IO0}}
  *
-
  * Testing:
  *
  * >> iverilog la_iopadring.v -DTB_LA_IOPADRING -y . -y ../../iolib/rtl
  * >> ./a.out
  *
- *
  ****************************************************************************/
 
 module la_padring
-  #(
-    parameter                    CFGW = 8,         // config width
-    parameter                    RINGW = 8,        // ioring width
-    parameter                    NO_NPINS = 1,     // pins per side
-    parameter                    NO_NCELLS = 1,    // cells per side
-    parameter                    NO_NSECTIONS = 1, // sections per side
-    parameter [NO_NCELLS*40-1:0] NO_CELLMAP = 0,   // see ../README.md
-    parameter                    EA_NPINS = 1,
-    parameter                    EA_NCELLS = 1,
-    parameter                    EA_NSECTIONS = 1,
-    parameter [EA_NCELLS*40-1:0] EA_CELLMAP = 0,
-    parameter                    SO_NPINS = 1,
-    parameter                    SO_NCELLS = 1,
-    parameter                    SO_NSECTIONS = 1,
-    parameter [SO_NCELLS*40-1:0] SO_CELLMAP = 0,
-    parameter                    WE_NPINS = 1,
-    parameter                    WE_NCELLS = 1,
-    parameter                    WE_NSECTIONS = 1,
-    parameter [WE_NCELLS*40-1:0] WE_CELLMAP = 0
+  #(// global padring params
+    parameter [15:0]       MAX = 256,        // max cells
+    parameter [15:0]       CFGW = 8,         // config width
+    parameter [15:0]       RINGW = 8,        // ioring width
+    // per side parameters
+    parameter [15:0]       NO_NPINS = 1,     // pins per side
+    parameter [15:0]       NO_NCELLS = 1,    // cells per side
+    parameter [15:0]       NO_NSECTIONS = 1, // sections per side
+    parameter [MAX*80-1:0] NO_CELLMAP = 0,   // see ../README.md
+    parameter [15:0]       EA_NPINS = 1,
+    parameter [15:0]       EA_NCELLS = 1,
+    parameter [15:0]       EA_NSECTIONS = 1,
+    parameter [MAX*80-1:0] EA_CELLMAP = 0,
+    parameter [15:0]       SO_NPINS = 1,
+    parameter [15:0]       SO_NCELLS = 1,
+    parameter [15:0]       SO_NSECTIONS = 1,
+    parameter [MAX*80-1:0] SO_CELLMAP = 0,
+    parameter [15:0]       WE_NPINS = 1,
+    parameter [15:0]       WE_NCELLS = 1,
+    parameter [15:0]       WE_NSECTIONS = 1,
+    parameter [MAX*80-1:0] WE_CELLMAP = 0
     )
    (// CONTINUOUS GROUND
     inout                          vss,
@@ -125,7 +129,8 @@ module la_padring
                 .NSECTIONS(NO_NSECTIONS),
                 .CELLMAP(NO_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    inorth (// Outputs
            .zp     (no_zp),
            .zn     (no_zn),
@@ -152,7 +157,8 @@ module la_padring
                 .NSECTIONS(EA_NSECTIONS),
                 .CELLMAP(EA_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    ieast (// Outputs
           .zp     (ea_zp),
           .zn     (ea_zn),
@@ -179,7 +185,8 @@ module la_padring
                 .NSECTIONS(WE_NSECTIONS),
                 .CELLMAP(WE_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    iwest (// Outputs
           .zp     (we_zp),
           .zn     (we_zn),
@@ -206,7 +213,8 @@ module la_padring
                 .NSECTIONS(SO_NSECTIONS),
                 .CELLMAP(SO_CELLMAP),
                 .RINGW(RINGW),
-                .CFGW(CFGW))
+                .CFGW(CFGW),
+                .MAX(MAX))
    isouth (// Outputs
            .zp     (so_zp),
            .zn     (so_zn),
@@ -249,10 +257,10 @@ module tb();
    parameter NSECTIONS = 1;
 
    // pinmap
-   parameter [7:0] PIN_IO0  = 8'h03;
-   parameter [7:0] PIN_AN0  = 8'h02;
-   parameter [7:0] PIN_RXN  = 8'h01;
-   parameter [7:0] PIN_RXP  = 8'h00;
+   parameter [15:0] PIN_IO0  = 8'h03;
+   parameter [15:0] PIN_AN0  = 8'h02;
+   parameter [15:0] PIN_RXN  = 8'h01;
+   parameter [15:0] PIN_RXP  = 8'h00;
 
 
    parameter [40*NCELLS-1:0] CELLMAP =
