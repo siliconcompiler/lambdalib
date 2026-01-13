@@ -129,7 +129,7 @@ module la_padside
                          .RINGW(RINGW))
              i0 (// pad
                  .padi(pad[CELLMAP[(i*80)+:16]]),
-                 .pado(pad[CELLMAP[(i*80+8)+:16]]),
+                 .pado(pad[CELLMAP[(i*80+16)+:16]]),
                  // core
                  .z(zp[CELLMAP[(i*80)+:16]]),
                  .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
@@ -150,7 +150,7 @@ module la_padside
                            .RINGW(RINGW))
              i0 (// pad
                  .padp(pad[CELLMAP[(i*80)+:16]]),
-                 .padn(pad[CELLMAP[(i*80+8)+:16]]),
+                 .padn(pad[CELLMAP[(i*80+16)+:16]]),
                  // core
                  .zp(zp[CELLMAP[(i*80)+:16]]),
                  .zn(zn[CELLMAP[(i*80)+:16]]),
@@ -173,7 +173,7 @@ module la_padside
                            .RINGW(RINGW))
              i0 (// pad
                  .padp(pad[CELLMAP[(i*80)+:16]]),
-                 .padn(pad[CELLMAP[(i*80+8)+:16]]),
+                 .padn(pad[CELLMAP[(i*80+16)+:16]]),
                  // core
                  .a(a[CELLMAP[(i*80)+:16]]),
                  .oe(oe[CELLMAP[(i*80)+:16]]),
