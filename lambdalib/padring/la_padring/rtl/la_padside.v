@@ -70,7 +70,7 @@ module la_padside
                  .oe(oe[CELLMAP[(i*80)+:16]]),
                  .pe(pe[CELLMAP[(i*80)+:16]]),
                  .ps(ps[CELLMAP[(i*80)+:16]]),
-                 .cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+                 .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -93,7 +93,7 @@ module la_padside
                  .ie(ie[CELLMAP[(i*80)+:16]]),
                  .pe(pe[CELLMAP[(i*80)+:16]]),
                  .ps(ps[CELLMAP[(i*80)+:16]]),
-                 .cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+                 .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -111,7 +111,7 @@ module la_padside
              i0 (// pad
                  .pad(pad[CELLMAP[(i*80)+:16]]),
                  // core signals
-                 .aio(aio[{1'b0, CELLMAP[(i*80)+:16]}+:3]),
+                 .aio(aio[CELLMAP[(i*80)+:16]*3+:3]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -132,7 +132,7 @@ module la_padside
                  .pado(pad[CELLMAP[(i*80+8)+:16]]),
                  // core
                  .z(zp[CELLMAP[(i*80)+:16]]),
-                 .cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+                 .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -155,7 +155,7 @@ module la_padside
                  .zp(zp[CELLMAP[(i*80)+:16]]),
                  .zn(zn[CELLMAP[(i*80)+:16]]),
                  .ie(ie[CELLMAP[(i*80)+:16]]),
-                 .cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+                 .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -177,7 +177,7 @@ module la_padside
                  // core
                  .a(a[CELLMAP[(i*80)+:16]]),
                  .oe(oe[CELLMAP[(i*80)+:16]]),
-                 .cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+                 .cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
@@ -192,7 +192,7 @@ module la_padside
                         .PROP(CELLMAP[(i*80+32)+:16]),
                         .CFGW(CFGW),
                         .RINGW(RINGW))
-             i0 (.cfg(cfg[{2'b00, CELLMAP[(i*80)+:16]}*CFGW +: CFGW]),
+             i0 (.cfg(cfg[CELLMAP[(i*80)+:16]*CFGW+:CFGW]),
                  .vss(vss),
                  .vdd(vdd[CELLMAP[(i*80+24)+:16]]),
                  .vddio(vddio[CELLMAP[(i*80+24)+:16]]),
