@@ -32,44 +32,45 @@ if _has_cocotb:
         nrst_out = dut.nrst_out
         clk = dut.clk
 
-        # Drive clock signal
-        clk.value = 0
+        for _ in range(3):
+            # Drive clock signal
+            clk.value = 0
 
-        # De-assert reset during start of test
-        nrst_in.value = 1
+            # De-assert reset during start of test
+            nrst_in.value = 1
 
-        await Timer(clk_period_ns*2, unit="ns")
+            await Timer(clk_period_ns*2, unit="ns")
 
-        ####################################
-        # 1. Trigger Asynchronous Reset
-        ####################################
+            ####################################
+            # 1. Trigger Asynchronous Reset
+            ####################################
 
-        # Assert reset
-        nrst_in.value = 0
+            # Assert reset
+            nrst_in.value = 0
 
-        # Check for asynchronous assertion
-        await ValueChange(nrst_out)
-        assert nrst_out.value == 0, "Reset output did not assert immediately!"
+            # Check for asynchronous assertion
+            await ValueChange(nrst_out)
+            assert nrst_out.value == 0, "Reset output did not assert immediately!"
 
-        ####################################
-        # 2. Trigger De-assertion
-        ####################################
-        await Timer(clk_period_ns*2, unit="ns")
-        nrst_in.value = 1
-        await Timer(clk_period_ns*2, unit="ns")
+            ####################################
+            # 2. Trigger De-assertion
+            ####################################
+            await Timer(clk_period_ns*2, unit="ns")
+            nrst_in.value = 1
+            await Timer(clk_period_ns*2, unit="ns")
 
-        # Wait for the synchronizer pipeline to clear.
-        cycle = 0
-        while True:
-            # Check if it de-asserts too early
-            if cycle < STAGES:
-                assert nrst_out.value == 0, f"Reset de-asserted too early at cycle {cycle}"
-            else:
-                assert nrst_out.value == 1, f"Reset failed to de-assert {cycle}"
-                break
+            # Wait for the synchronizer pipeline to clear.
+            cycle = 0
+            while True:
+                # Check if it de-asserts too early
+                if cycle < STAGES:
+                    assert nrst_out.value == 0, f"Reset de-asserted too early at cycle {cycle}"
+                else:
+                    assert nrst_out.value == 1, f"Reset failed to de-assert {cycle}"
+                    break
 
-            await drive_clock(clk, clk_period_ns)
-            cycle += 1
+                await drive_clock(clk, clk_period_ns)
+                cycle += 1
 
 else:
     def test_la_rsync_basic():
