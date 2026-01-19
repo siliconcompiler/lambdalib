@@ -80,13 +80,11 @@ def run_cocotb(
 
     defines = {}
     for define in sc_defines:
-        parts = define.split("=")
+        parts = define.split("=", 1)
         if len(parts) == 2:
             defines[parts[0]] = parts[1]
         elif len(parts) == 1:
             defines[parts[0]] = "1"
-        else:
-            raise ValueError(f"Invalid define format: {define}")
 
     sources = []
     for lib, fileset in filesets:

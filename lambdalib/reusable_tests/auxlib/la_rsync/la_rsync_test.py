@@ -60,8 +60,7 @@ if _has_cocotb:
             await Timer(clk_period_ns*2, unit="ns")
 
             # Wait for the synchronizer pipeline to clear.
-            cycle = 0
-            while True:
+            for cycle in range(STAGES+1):
                 # Check if it de-asserts too early
                 if cycle < STAGES:
                     assert nrst_out.value == 0, f"Reset de-asserted too early at cycle {cycle}"
@@ -70,7 +69,6 @@ if _has_cocotb:
                     break
 
                 await drive_clock(clk, clk_period_ns)
-                cycle += 1
 
 else:
     def test_la_rsync_basic():
