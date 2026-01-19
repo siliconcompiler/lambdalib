@@ -73,10 +73,20 @@ def run_cocotb(
 
     filesets = project.get_filesets()
     idirs = []
-    defines = []
+    sc_defines = []
     for lib, fileset in filesets:
         idirs.extend(lib.find_files("fileset", fileset, "idir"))
-        defines.extend(lib.get("fileset", fileset, "define"))
+        sc_defines.extend(lib.get("fileset", fileset, "define"))
+
+    defines = {}
+    for define in sc_defines:
+        parts = define.split("=")
+        if len(parts) == 2:
+            defines[parts[0]] = parts[1]
+        elif len(parts) == 1:
+            defines[parts[0]] = "1"
+        else:
+            raise ValueError(f"Invalid define format: {define}")
 
     sources = []
     for lib, fileset in filesets:
@@ -102,7 +112,8 @@ def run_cocotb(
         waves=waves,
         timescale=timescale,
         build_dir=build_dir,
-        parameters=parameters
+        parameters=parameters,
+        defines=defines
     )
 
     # Run test

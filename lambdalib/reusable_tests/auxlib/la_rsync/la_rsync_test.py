@@ -15,7 +15,7 @@ if _has_cocotb:
 
     async def drive_clock(clk, period_ns, n=1):
         half_period = period_ns / 2
-        for i in range(n):
+        for _ in range(n):
             clk.value = 0
             await Timer(half_period, unit="ns")
             clk.value = 1
