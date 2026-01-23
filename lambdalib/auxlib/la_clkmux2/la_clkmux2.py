@@ -18,6 +18,7 @@ class Clkmux2(Lambda):
             for item in deps:
                 self.add_depfileset(item)
 
+
 class Clkmux2TB(Design):
     def __init__(self):
         name = 'tb_la_clkmux2'
@@ -28,6 +29,7 @@ class Clkmux2TB(Design):
         with self.active_fileset('rtl'):
             self.add_file(f"testbench/{name}.v")
             self.add_depfileset(Clkmux2())
+
 
 if __name__ == "__main__":
     d = Clkmux2()
