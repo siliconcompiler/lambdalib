@@ -5,67 +5,66 @@
 //#############################################################################
 
 module la_clkmux2 #(
-    parameter PROP = "DEFAULT"  // cell property
-) (
+                    parameter PROP = "DEFAULT" // cell property
+                    )
+   (
     input  clk0,
     input  clk1,
-    input  sel0,
-    input  sel1,
+    input  sel, // sel ==0, clk0 is active
     input  nreset,
     output out
-);
-
-    wire [1:0] maskb;
-    wire [1:0] en;
-    wire       enb;
-    wire [1:0] ensync;
-    wire       ensyncb;
-    wire [1:0] clkg;
-
-    // invert mask (2)
-    la_inv iinv[1:0] (
-        .a({ensync[0], ensync[1]}),
-        .z(maskb[1:0])
     );
 
-    // clock enable (2)
-    la_and2 isel[1:0] (
-        .a({sel1, sel0}),
-        .b(maskb[1:0]),
-        .z(en[1:0])
-    );
+   // local wires
+   wire       selb;
+   wire [1:0] en;
+   wire [1:0] ensync;
+   wire [1:0] maskb;
+   wire [1:0] clkg;
 
-    la_inv ienb (
-        .a(en[0]),
-        .z(enb)
-    );
+   // non glitch clock enable trick
+   la_inv isel (.a(sel),
+                .z(selb));
 
-    // synchronizers (2)
-    la_drsync isync[1:0] (
-        .clk({clk1, clk0}),
-        .nreset({nreset, nreset}),
-        .in({en[1], enb}),
-        .out({ensync[1], ensyncb})
-    );
+   la_inv inv0 (.a(ensync[0]),
+                .z(maskb[0]));
 
-    la_inv iensync (
-        .a(ensyncb),
-        .z(ensync[0])
-    );
+   la_inv inv1 (.a(ensync[1]),
+                .z(maskb[1]));
 
-    // glith free clock gate (2)
-    la_clkicgand igate[1:0] (
-        .clk ({clk1, clk0}),
-        .te  (2'b00),
-        .en  (ensync[1:0]),
-        .eclk(clkg[1:0])
-    );
+   la_and2 ien0 (.a(selb),
+                 .b(maskb[1]), // en once clk1 is safely zero
+                 .z(en[0]));
 
-    // final clock or (1)
-    la_clkor2 iorclk (
-        .a(clkg[0]),
-        .b(clkg[1]),
-        .z(out)
-    );
+   la_and2 ien1 (.a(sel),
+                 .b(maskb[0]), // en once clk0 is safely zero
+                 .z(en[1]));
 
-endmodule  // la_clkmux2
+   // syncing logic to each clock domain
+   la_drsync isync0 (.clk    (clk0),
+                     .nreset (nreset),
+                     .in     (en[0]),
+                     .out    (ensync[0]));
+
+   la_drsync isync1 (.clk    (clk1),
+                     .nreset (nreset),
+                     .in     (en[1]),
+                     .out    (ensync[1]));
+
+   // glitch free clock gating
+   la_clkicgand igate0 (.clk  (clk0),
+                        .te   (1'b0),
+                        .en   (ensync[0]),
+                        .eclk (clkg[0]));
+
+   la_clkicgand igate1 (.clk  (clk1),
+                        .te   (1'b0),
+                        .en   (ensync[1]),
+                        .eclk (clkg[1]));
+
+   // or-ing one hot clocks
+   la_clkor2 iorclk (.a(clkg[0]),
+                     .b(clkg[1]),
+                     .z(out));
+
+endmodule
