@@ -13,8 +13,8 @@ module la_padside
   #(// per side parameters
     parameter [15:0]       SIDE = "NO",   // "NO", "SO", "EA", "WE"
     parameter [15:0]       MAX = 256,     // max cells
-    parameter [15:0]       NPINS = 1,     // total pins per side (<256)
-    parameter [15:0]       NCELLS = 1,    // total cells per side (<256)
+    parameter [15:0]       NPINS = 32,    // total pins per side (<256)
+    parameter [15:0]       NCELLS = 64,   // total cells per side (<256)
     parameter [15:0]       NSECTIONS = 1, // total power sections (<256)
     parameter [MAX*80-1:0] CELLMAP = 0,   // see ../README.md
     parameter [15:0]       RINGW = 1,     // width of io ring
@@ -54,11 +54,11 @@ module la_padside
 
 
    //#######################################################################
-   /* verilator lint_off WIDTHTRUNC */
-   //#######################################################################
    // Safe to disable check b/c MAX cells should be consistent with the
    // CELLMAP, which should be generated.
    //#######################################################################
+   /* verilator lint_off WIDTHTRUNC */
+
 
 
 `include "la_padring.vh"
@@ -85,7 +85,7 @@ module la_padside
                  .ps(ps[CELLMAP[(i*CMW)+:FW]]),
                  .schmitt(schmitt[CELLMAP[(i*CMW)+:FW]]),
                  .fast(fast[CELLMAP[(i*CMW)+:FW]]),
-                 .ds(cfg[CELLMAP[(i*CMW)+:FW]*2+:2]),
+                 .ds(ds[CELLMAP[(i*CMW)+:FW]*2+:2]),
                  .cfg(cfg[CELLMAP[(i*CMW)+:FW]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),

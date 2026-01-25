@@ -39,20 +39,20 @@ module la_padring
     parameter [15:0]       CFGW = 8,         // config width
     parameter [15:0]       RINGW = 8,        // ioring width
     // per side parameters
-    parameter [15:0]       NO_NPINS = 1,     // pins per side
-    parameter [15:0]       NO_NCELLS = 1,    // cells per side
+    parameter [15:0]       NO_NPINS = 16,    // pins per side
+    parameter [15:0]       NO_NCELLS = 32,   // cells per side (io, gnd, cut..)
     parameter [15:0]       NO_NSECTIONS = 1, // sections per side
     parameter [MAX*80-1:0] NO_CELLMAP = 0,   // see ../README.md
-    parameter [15:0]       EA_NPINS = 1,
-    parameter [15:0]       EA_NCELLS = 1,
+    parameter [15:0]       EA_NPINS = 16,
+    parameter [15:0]       EA_NCELLS = 32,
     parameter [15:0]       EA_NSECTIONS = 1,
     parameter [MAX*80-1:0] EA_CELLMAP = 0,
-    parameter [15:0]       SO_NPINS = 1,
-    parameter [15:0]       SO_NCELLS = 1,
+    parameter [15:0]       SO_NPINS = 16,
+    parameter [15:0]       SO_NCELLS = 32,
     parameter [15:0]       SO_NSECTIONS = 1,
     parameter [MAX*80-1:0] SO_CELLMAP = 0,
-    parameter [15:0]       WE_NPINS = 1,
-    parameter [15:0]       WE_NCELLS = 1,
+    parameter [15:0]       WE_NPINS = 16,
+    parameter [15:0]       WE_NCELLS = 32,
     parameter [15:0]       WE_NSECTIONS = 1,
     parameter [MAX*80-1:0] WE_CELLMAP = 0
     )
@@ -160,7 +160,7 @@ module la_padring
            .oe     (no_oe),
            .pe     (no_pe),
            .ps     (no_ps),
-           .schmitt(no_ps),
+           .schmitt(no_schmitt),
            .fast   (no_fast),
            .ds     (no_ds),
            .cfg    (no_cfg));
@@ -191,7 +191,7 @@ module la_padring
           .oe     (ea_oe),
           .pe     (ea_pe),
           .ps     (ea_ps),
-          .schmitt(ea_ps),
+          .schmitt(ea_schmitt),
           .fast   (ea_fast),
           .ds     (ea_ds),
           .cfg    (ea_cfg));
@@ -222,7 +222,7 @@ module la_padring
           .oe     (we_oe),
           .pe     (we_pe),
           .ps     (we_ps),
-          .schmitt(we_ps),
+          .schmitt(we_schmitt),
           .fast   (we_fast),
           .ds     (we_ds),
           .cfg    (we_cfg));
@@ -253,7 +253,7 @@ module la_padring
            .oe     (so_oe),
            .pe     (so_pe),
            .ps     (so_ps),
-           .schmitt(so_ps),
+           .schmitt(so_schmitt),
            .fast   (so_fast),
            .ds     (so_ds),
            .cfg    (so_cfg));
