@@ -12,24 +12,27 @@ module la_iobidir
   #(
     parameter PROP = "DEFAULT", // cell property
     parameter SIDE = "NO",      // "NO", "SO", "EA", "WE"
-    parameter CFGW = 16,        // width of core config bus
+    parameter CFGW = 16,        // width of tech specific config bus
     parameter RINGW = 8         // width of io ring
     )
    (// io pad signals
-    inout             pad,    // bidirectional pad signal
-    inout             vdd,    // core supply
-    inout             vss,    // core ground
-    inout             vddio,  // io supply
-    inout             vssio,  // io ground
+    inout             pad,     // bidirectional pad signal
+    inout             vdd,     // core supply
+    inout             vss,     // core ground
+    inout             vddio,   // io supply
+    inout             vssio,   // io ground
     // core facing signals
-    input             a,      // input from core
-    output            z,      // output to core
-    input             ie,     // input enable, 1 = active
-    input             oe,     // output enable, 1 = active
-    input             pe,     // pull enable, 1 = enable
-    input             ps,     // pull select, 1 = pullup, 0 = pulldown
-    inout [RINGW-1:0] ioring, // generic io ring
-    input [CFGW-1:0]  cfg     // generic config interface
+    input             a,       // input from core
+    output            z,       // output to core
+    input             ie,      // input enable, 1 = active
+    input             oe,      // output enable, 1 = active
+    input             pe,      // pull enable, 1 = enable
+    input             ps,      // pull select, 1 = pullup, 0 = pulldown
+    input             schmitt, // schmitt cfg, 1 = active
+    input             fast,    // 1 = fast slew rate
+    input [1:0]       ds,      // drive strength, 0=weakest
+    inout [RINGW-1:0] ioring,  // generic io ring
+    input [CFGW-1:0]  cfg      // generic config interface
     );
 
    assign z   = ie ? pad : 1'b0;
@@ -74,6 +77,9 @@ module tb();
      begin
         // inactive
         a = 1'bx;
+        schmitt = 1'b0;
+        fast = 1'b0;
+        ds = 2'b0;
         ie = 1'b0;
         oe = 1'b0;
         pe = 1'b0;
@@ -118,10 +124,13 @@ module tb();
    // Beginning of automatic reg inputs (for undeclared instantiated-module inputs)
    reg                  a;
    reg [CFGW-1:0]       cfg;
+   reg [1:0]            ds;
+   reg                  fast;
    reg                  ie;
    reg                  oe;
    reg                  pe;
    reg                  ps;
+   reg                  schmitt;
    // End of automatics
    /*AUTOWIRE*/
    // Beginning of automatic wires (for undeclared instantiated-module outputs)
@@ -151,6 +160,9 @@ module tb();
                 .oe             (oe),
                 .pe             (pe),
                 .ps             (ps),
+                .schmitt        (schmitt),
+                .fast           (fast),
+                .ds             (ds[1:0]),
                 .cfg            (cfg[CFGW-1:0]));
 
 endmodule
