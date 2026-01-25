@@ -21,23 +21,26 @@ module la_padside
     parameter [15:0]       CFGW = 1       // config width
     )
    (// io pad signals
-    inout [NPINS-1:0]           pad,   // pad
+    inout [NPINS-1:0]           pad,     // pad
     //core facing signals
-    inout [NPINS*3-1:0]         aio,   // analog inout
-    output [NPINS-1:0]          zp,    // positive output to core
-    output [NPINS-1:0]          zn,    // negative output to core
-    input [NPINS-1:0]           a,     // input from core
-    input [NPINS-1:0]           ie,    // input enable, 1 = active
-    input [NPINS-1:0]           oe,    // output enable, 1 = active
-    input [NPINS-1:0]           pe,    // pull enable, 1 = enable
-    input [NPINS-1:0]           ps,    // pull select, 1 = pullup
-    input [NPINS*CFGW-1:0]      cfg,   // generic config interface
+    inout [NPINS*3-1:0]         aio,     // analog inout
+    output [NPINS-1:0]          zp,      // positive output to core
+    output [NPINS-1:0]          zn,      // negative output to core
+    input [NPINS-1:0]           a,       // input from core
+    input [NPINS-1:0]           ie,      // input enable, 1 = active
+    input [NPINS-1:0]           oe,      // output enable, 1 = active
+    input [NPINS-1:0]           pe,      // pull enable, 1 = enable
+    input [NPINS-1:0]           ps,      // pull select, 1 = pullup
+    input [NPINS-1:0]           schmitt, // schmitt cfg, 1 = active
+    input [NPINS-1:0]           fast,    // slew rate, 1 = fast
+    input [NPINS*2-1:0]         ds,      // drive strength, 11=strongest
+    input [NPINS*CFGW-1:0]      cfg,     // generic config interface
     // supplies/ring (per cell)
-    inout                       vss,   // common ground
-    inout [NSECTIONS-1:0]       vdd,   // core supply
-    inout [NSECTIONS-1:0]       vddio, // io supply
-    inout [NSECTIONS-1:0]       vssio, // io ground
-    inout [NSECTIONS*RINGW-1:0] ioring // generic io-ring
+    inout                       vss,     // common ground
+    inout [NSECTIONS-1:0]       vdd,     // core supply
+    inout [NSECTIONS-1:0]       vddio,   // io supply
+    inout [NSECTIONS-1:0]       vssio,   // io ground
+    inout [NSECTIONS*RINGW-1:0] ioring   // generic io-ring
     );
 
    // Field width
@@ -80,6 +83,9 @@ module la_padside
                  .oe(oe[CELLMAP[(i*CMW)+:FW]]),
                  .pe(pe[CELLMAP[(i*CMW)+:FW]]),
                  .ps(ps[CELLMAP[(i*CMW)+:FW]]),
+                 .schmitt(schmitt[CELLMAP[(i*CMW)+:FW]]),
+                 .fast(fast[CELLMAP[(i*CMW)+:FW]]),
+                 .ds(cfg[CELLMAP[(i*CMW)+:FW]*2+:2]),
                  .cfg(cfg[CELLMAP[(i*CMW)+:FW]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
@@ -103,6 +109,7 @@ module la_padside
                  .ie(ie[CELLMAP[(i*CMW)+:FW]]),
                  .pe(pe[CELLMAP[(i*CMW)+:FW]]),
                  .ps(ps[CELLMAP[(i*CMW)+:FW]]),
+                 .schmitt(schmitt[CELLMAP[(i*CMW)+:FW]]),
                  .cfg(cfg[CELLMAP[(i*CMW)+:FW]*CFGW+:CFGW]),
                  // supplies
                  .vss(vss),
