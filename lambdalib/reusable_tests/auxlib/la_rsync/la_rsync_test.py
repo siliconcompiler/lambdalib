@@ -80,8 +80,7 @@ def run_test(
     stages: int,
     simulator: str,
     output_wave: bool,
-    project: Project = None,
-    process_name: str = ""
+    project: Project = None
 ):
     if not _has_cocotb:
         raise RuntimeError("Cocotb is not installed; cannot run test.")
@@ -90,7 +89,7 @@ def run_test(
         project = Sim(Rsync())
         project.add_fileset("rtl")
 
-    test_inst_name = f"{process_name}_stages_{stages}_sim_{simulator}_output_wave{output_wave}"
+    test_inst_name = f"stages_{stages}_sim_{simulator}_output_wave{output_wave}"
 
     test_module_name = __name__
     test_name = f"{test_module_name}_{test_inst_name}"
