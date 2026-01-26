@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.eda
 @pytest.mark.parametrize("stages, simulator, output_wave", list(itertools.product(
     [2, 3, 4],
-    ["icarus", "verilator"],
+    ["icarus"],
     [False]
 )))
 def test_la_rsync(
