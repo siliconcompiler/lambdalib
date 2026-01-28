@@ -18,8 +18,8 @@
  * between PLLs. For exact simulation behavior, use the actual designer supplied
  * mixed signal simulation model.
  *
- * Without LAMBDASIM all output clocks are modeled as zero delay copies of
- * clkin[0].
+ * DIVIN corresponds exactly to "N" (0 is an illegal value).
+ * DIVFB correspons exactly to "M" (0 is an illegal value).
  *
  *******************************************************************************/
 `timescale 1ns/1ps
