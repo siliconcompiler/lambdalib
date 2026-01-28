@@ -21,7 +21,7 @@
  * Without LAMBDASIM all output clocks are modeled as zero delay copies of
  * clkin[0].
  *
- ******************************************************************************/
+ *******************************************************************************/
 module la_pll
   #(parameter      NIN = 1,      // number of input reference clocks
     parameter      NOUT = 1,     // number of output clocks
@@ -66,22 +66,55 @@ module la_pll
 
 `ifdef VERILATOR
 
+   //#######################################################################
+   // Ignore lint warnings for signals that aren't implemented
+   // in the limited verilator model.
+   //#######################################################################
+
+   /* verilator lint_off UNUSEDPARAM */
+   /* verilator lint_off UNUSEDSIGNAL */
+
+   localparam real NO_FREF = FREF;
+   localparam      NO_PROP = PROP;
+   localparam      NCW = (1 + DIVINW + DIVFBW + DIVFRACW +
+                          NOUT * (DIVOUTW + PHASEW)+CW);
+
+
+   // inputs are not modeled!!
+   wire [NCW-1:0] unconnected = {clkfbin,
+                                 divin,
+                                 divfb,
+                                 divfrac,
+                                 divout,
+                                 phase,
+                                 ctrl};
+
    //###############################################
    // Limited verilator safe model
    //###############################################
 
+   wire clk;
+
    // Input clock mux
    assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
 
+   // N/M=1 mode
+   assign clkvco   = clk & en & ~reset;
+   assign clkfbout = clkvco;
+
+   // Minimal bypass mode model
    genvar i;
-   // Bypass mode model
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clk & en;
+      assign clkout[i] = bypass ? clk : clkvco;
    end
 
    // Lock model
    assign freqlock = en;
    assign phaselock = en;
+
+   // not modeling status (PLL specific)
+   assign status = 'b0;
+
 
 `else
 
@@ -94,7 +127,9 @@ module la_pll
                 .PHASEW(PHASEW),
                 .CW(CW),
                 .SW(CW),
-                .PROP(PROP))
+                .FREF(FREF)
+                .PROP(PROP),
+                .FREF(FREF))
    ipll (/*AUTOINST*/
          // Outputs
          .clkout                (clkout[NOUT-1:0]),
