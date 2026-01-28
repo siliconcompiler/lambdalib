@@ -20,7 +20,7 @@ module la_pll_sim
     parameter      CW = 1,       // control vector width
     parameter      SW = 1,       // status vector width
     parameter      PROP = "",    // cell property
-    parameter real FREF = 25.0   // clkin frequency (for simulation model)
+    parameter real FREF = 25.0   // clkin frequency (MHz)
     )
    (
     // supplies
@@ -51,12 +51,14 @@ module la_pll_sim
     output [SW-1:0]          status     // status
     );
 
+   localparam LOCKTIME = 32; // lock cycles
+
    //####################################
    // One hot clock input selector
    //####################################
-   reg     sel_clk;
-   integer i;
 
+   reg        sel_clk;
+   integer i;
    always @(*) begin
       sel_clk = 1'b0;
       for (i=0; i<NIN; i=i+1) begin
@@ -69,100 +71,147 @@ module la_pll_sim
    // VCO Clock
    //####################################
 
-   // calculate vco period
-   real t_vco;
-   initial begin
-      t_vco = FREF * (divfb / divin); // multiply FREF by N/M
+   real t_vco_period;
+   real t_ref_period;
+   real n_int;
+   real n_frac;
+   real n_eff;
+   real frac_scale;
+   integer k;
+
+   // Trigger calculation only when the PLL is actually enabled
+   always @(posedge en) begin : calc_setup
+
+      // Calculate 2^DIVFRACW
+      frac_scale = 1.0;
+      for (k = 0; k < DIVFRACW; k = k + 1) begin
+         frac_scale = frac_scale * 2.0;
+      end
+
+      // Sample the ports now that en is high
+      n_int  = divfb + 0.0;
+      n_frac = (divfrac + 0.0) / frac_scale;
+      n_eff  = n_int + n_frac;
+
+      t_ref_period = 1000.0 / FREF;
+
+      // Safety check to prevent simulation hang
+      if (n_eff > 0.0001) begin
+         t_vco_period = (t_ref_period * (divin + 0.0)) / n_eff;
+      end else begin
+         t_vco_period = 0.0;
+         $display("[PLL SIM] ERROR: n_eff is zero. VCO will not start.");
+      end
+
+      $display("[PLL SIM] @ %0t: Ref Period: %0.3f ns, VCO Period: %0.3f ns",
+               $time, t_ref_period, t_vco_period);
    end
 
-   // high speed vco clock
-   reg vco_clk;
-   initial vco_clk = 0;
+   reg  vco_clk = 0;
    always begin
-      #(t_vco/2.0) vco_clk = ~vco_clk;
+      // PLL is disabled or configuration is invalid
+      if (!en || t_vco_period <= 0) begin
+          vco_clk = 0;             // disable clock for en=0
+          @(posedge en);           // wait for enable
+          #0.1;                    // ? let tvco math settle
+      end
+      // PLL is enabled
+      else begin
+          #(t_vco_period/2.0);
+          if (en) begin            // toggle vco when pllen=1
+              vco_clk = ~vco_clk;
+          end
+      end
    end
 
-   // output assignment
    assign clkvco = vco_clk;
 
    //####################################
-   // Feedback Clock
+   // Feedback Divider ("N")
    //####################################
 
-   // calculate feedback clock period
-   real t_fb;
-   initial begin
-      t_fb  = t_vco * divfb;
-   end
-
-   // N/M feedback loop
    reg fb_clk;
-   initial fb_clk = 0;
-   always begin
-      #(t_fb/2.0) fb_clk = ~fb_clk;
+   integer fb_cnt;
+
+   always @(posedge vco_clk or negedge en) begin
+      if (~en) begin
+         fb_cnt <= 0;
+         fb_clk <= 0;
+      end
+      else if (fb_cnt == (divfb-1)) begin
+         fb_cnt <= 0;
+         fb_clk <= ~fb_clk;
+      end
+      else begin
+         fb_cnt <= fb_cnt + 1;
+      end
    end
 
-   // output assignment
    assign clkfbout = fb_clk;
 
    //####################################
    // Output Dividers
    //####################################
 
-   // Output dividers
    genvar j;
    generate
-      for (j=0; j<NOUT; j=j+1) begin : gen_div
-         reg div_clk;
+      for (j=0; j<NOUT; j=j+1) begin : gen_out
+         reg out_clk;
          integer cnt;
-         always @(posedge vco_clk or posedge reset) begin
-            if (reset) begin
+
+         wire [DIVOUTW-1:0] div = divout[j*DIVOUTW +: DIVOUTW];
+
+         // Added negedge en to the sensitivity list
+         always @(posedge vco_clk or posedge reset or negedge en) begin
+            if (reset || !en) begin
                cnt <= 0;
-               div_clk <= 0;
-            end else if (bypass) begin
-               div_clk <= sel_clk;
-            end else if (divout[j*DIVOUTW +: DIVOUTW] <= 1) begin
-               div_clk <= vco_clk;
-            end else if (cnt == (divout[j*DIVOUTW +: DIVOUTW]/2 - 1)) begin
-               div_clk <= ~div_clk;
+               out_clk <= 0;
+            end
+            else if (div <= 1) begin
+               out_clk <= vco_clk;
+            end
+            else if (cnt >= (div/2-1)) begin
                cnt <= 0;
-            end else begin
+               out_clk <= ~out_clk;
+            end
+            else begin
                cnt <= cnt + 1;
             end
          end
-         assign clkout[j] = div_clk;
+         assign clkout[j] = bypass ? sel_clk : freqlock & out_clk;
       end
    endgenerate
 
-    // Lock signals (behavioral)
-    integer lock_cnt;
-    reg freqlock_r, phaselock_r;
-    always @(posedge clkfb or posedge reset) begin
-        if (reset) begin
-            lock_cnt <= 0;
-            freqlock_r <= 0;
-            phaselock_r <= 0;
-        end else if (lock_cnt < 16) begin
-            lock_cnt <= lock_cnt + 1;
-            freqlock_r <= 0;
-            phaselock_r <= 0;
-        end else begin
-            freqlock_r <= 1;
-            phaselock_r <= 1;
-        end
-    end
-
-    assign freqlock = freqlock_r;
-    assign phaselock = phaselock_r;
-
-    // Status (user-defined)
-    assign status = {SW{1'b0}};
-
-
    //####################################
-   // Output signal assignment
+   // Phase shift
    //####################################
 
+   // TODO
 
+   //####################################
+   // PLL LOCK
+   //####################################
+
+   integer lock_cnt;
+   reg freqlock_r, phaselock_r;
+
+   always @(posedge clkfbout or negedge en) begin
+      if (!en) begin
+         lock_cnt    <= 0;
+         freqlock_r  <= 0;
+         phaselock_r <= 0;
+      end
+      else if (lock_cnt < LOCKTIME) begin
+         lock_cnt <= lock_cnt + 1;
+      end
+      else begin
+         freqlock_r  <= 1;
+         phaselock_r <= 1;
+      end
+   end
+
+   assign freqlock  = freqlock_r;
+   assign phaselock = phaselock_r;
+   assign status    = {SW{1'b0}};
 
 endmodule
