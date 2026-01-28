@@ -127,8 +127,7 @@ module la_pll
                 .DIVOUTW(DIVOUTW),
                 .PHASEW(PHASEW),
                 .CW(CW),
-                .SW(CW),
-                .FREF(FREF),
+                .SW(SW),
                 .PROP(PROP),
                 .FREF(FREF))
    ipll (/*AUTOINST*/
