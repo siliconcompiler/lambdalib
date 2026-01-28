@@ -19,6 +19,7 @@ module tb_la_pll;
     reg             en;
     reg             bypass;
     reg [NIN-1:0]   clksel;
+    reg             lock_timeout;
 
     reg [DIVINW-1:0]  divin;
     reg [DIVFBW-1:0]  divfb;
@@ -68,39 +69,54 @@ module tb_la_pll;
 
     // 2. Stimulus Block
     initial begin
-        // Setup Waveform Dumping
-        $dumpfile("pll_sim.vcd");
-        $dumpvars(0, tb_la_pll);
+       // Setup Waveform Dumping
+       $dumpfile("pll_sim.vcd");
+       $dumpvars(0, tb_la_pll);
 
-        // Initialize Controls
-        reset   = 1;
-        en      = 0;
-        bypass  = 0;
-        clksel  = 1'b1; // Select clkin[0]
+       // Initialize Controls
+       reset   = 1;
+       en      = 0;
+       bypass  = 0;
+       clksel  = 1'b1; // Select clkin[0]
 
-        // Configure for 100MHz output from 25MHz ref
-        // Fvco = Fref * (divfb / divin) = 25 * (40 / 1) = 1000 MHz
-        // Fout = Fvco / divout = 1000 / 10 = 100 MHz
-        divin   = 8'd1;
-        divfb   = 8'd40;
-        divout  = 8'd10;
+       // Configure for 100MHz output from 25MHz ref
+       // Fvco = Fref * (divfb / divin) = 25 * (40 / 1) = 1000 MHz
+       // Fout = Fvco / divout = 1000 / 10 = 100 MHz
+       divin   = 8'd1;
+       divfb   = 8'd40;
+       divout  = 8'd10;
 
-        #100;
-        reset = 0;
-        #50;
+       #100;
+       reset = 0;
+       #50;
 
-        $display("[%0t] Enabling PLL...", $time);
-        en = 1;
+       $display("[%0t] Enabling PLL...", $time);
+       en = 1;
 
-        // Wait for Lock
-        wait(freqlock);
-        $display("[%0t] PLL Frequency Locked!", $time);
+       lock_timeout = 0;
+       fork
+          // Thread A: Wait for lock
+          begin : a_thread
+             wait(freqlock);
+          end
+          // Thread B: Wait for timeout
+          begin : b_thread
+             #10000;
+             lock_timeout = 1;
+          end
+       join
 
-        // Let it run for a while to see the stable clockout
-        #500;
+       if (lock_timeout && !freqlock) begin
+          $display("[%0t] ERROR: PLL failed to lock!", $time);
+          $finish;
+       end
+       $display("[%0t] PLL Frequency Locked!", $time);
 
-        // Test Bypass Mode
-        $display("[%0t] Testing Bypass Mode (Output should match 25MHz Ref)...", $time);
+
+       #500;
+
+       // Test Bypass Mode
+       $display("[%0t] Testing Bypass Mode (Output should match 25MHz Ref)...", $time);
         bypass = 1;
         #200;
         bypass = 0;
@@ -109,6 +125,5 @@ module tb_la_pll;
         $display("[%0t] Simulation Complete.", $time);
         $finish;
     end
-
 
 endmodule
