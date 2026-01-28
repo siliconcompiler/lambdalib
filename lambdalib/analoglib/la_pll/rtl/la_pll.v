@@ -19,7 +19,7 @@
  * mixed signal simulation model.
  *
  * DIVIN corresponds exactly to "N" (0 is an illegal value).
- * DIVFB correspons exactly to "M" (0 is an illegal value).
+ * DIVFB corresponds exactly to "M" (0 is an illegal value).
  *
  *******************************************************************************/
 `timescale 1ns/1ps
