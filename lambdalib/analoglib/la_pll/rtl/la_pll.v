@@ -22,6 +22,7 @@
  * clkin[0].
  *
  *******************************************************************************/
+`timescale 1ns/1ps
 module la_pll
   #(parameter      NIN = 1,      // number of input reference clocks
     parameter      NOUT = 1,     // number of output clocks
@@ -74,6 +75,7 @@ module la_pll
    /* verilator lint_off UNUSEDPARAM */
    /* verilator lint_off UNUSEDSIGNAL */
 
+
    localparam real NO_FREF = FREF;
    localparam      NO_PROP = PROP;
    localparam      NCW = (1 + DIVINW + DIVFBW + DIVFRACW +
@@ -115,7 +117,6 @@ module la_pll
    // not modeling status (PLL specific)
    assign status = 'b0;
 
-
 `else
 
    la_pll_sim #(.NIN(NIN),
@@ -127,7 +128,7 @@ module la_pll
                 .PHASEW(PHASEW),
                 .CW(CW),
                 .SW(CW),
-                .FREF(FREF)
+                .FREF(FREF),
                 .PROP(PROP),
                 .FREF(FREF))
    ipll (/*AUTOINST*/
