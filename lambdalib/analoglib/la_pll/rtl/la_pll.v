@@ -18,21 +18,23 @@
  * between PLLs. For exact simulation behavior, use the actual designer supplied
  * mixed signal simulation model.
  *
- * Without LAMBDASIM all output clocks are modeled as zero delay copies of
- * clkin[0].
+ * DIVIN corresponds exactly to "N" (0 is an illegal value).
+ * DIVFB corresponds exactly to "M" (0 is an illegal value).
  *
- ******************************************************************************/
+ *******************************************************************************/
+`timescale 1ns/1ps
 module la_pll
-  #(parameter NIN = 1,      // number of input reference clocks
-    parameter NOUT = 1,     // number of output clocks
-    parameter DIVINW = 8,   // input divider width
-    parameter DIVFBW = 8,   // feedback divider width
-    parameter DIVFRACW = 8, // fractional feedback divider width
-    parameter DIVOUTW = 8,  // output divider width
-    parameter PHASEW = 8,   // phase shift adjust width
-    parameter CW = 1,       // control vector width
-    parameter SW = 1,       // status vector width
-    parameter PROP = ""     // cell property
+  #(parameter      NIN = 1,      // number of input reference clocks
+    parameter      NOUT = 1,     // number of output clocks
+    parameter      DIVINW = 8,   // input divider width
+    parameter      DIVFBW = 8,   // feedback divider width
+    parameter      DIVFRACW = 8, // fractional feedback divider width
+    parameter      DIVOUTW = 8,  // output divider width
+    parameter      PHASEW = 8,   // phase shift adjust width
+    parameter      CW = 1,       // control vector width
+    parameter      SW = 1,       // status vector width
+    parameter      PROP = "",    // cell property
+    parameter real FREF = 25.0   // clkin frequency (MHz)
     )
    (
     // supplies
@@ -63,7 +65,59 @@ module la_pll
     output [SW-1:0]          status     // status
     );
 
-`ifdef LAMBDASIM
+`ifdef VERILATOR
+
+   //#######################################################################
+   // Ignore lint warnings for signals that aren't implemented
+   // in the limited verilator model.
+   //#######################################################################
+
+   /* verilator lint_off UNUSEDPARAM */
+   /* verilator lint_off UNUSEDSIGNAL */
+
+
+   localparam real NO_FREF = FREF;
+   localparam      NO_PROP = PROP;
+   localparam      NCW = (1 + DIVINW + DIVFBW + DIVFRACW +
+                          NOUT * (DIVOUTW + PHASEW)+CW);
+
+
+   // inputs are not modeled!!
+   wire [NCW-1:0] unconnected = {clkfbin,
+                                 divin,
+                                 divfb,
+                                 divfrac,
+                                 divout,
+                                 phase,
+                                 ctrl};
+
+   //###############################################
+   // Limited verilator safe model
+   //###############################################
+
+   wire clk;
+
+   // Input clock mux
+   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
+
+   // N/M=1 mode
+   assign clkvco   = clk & en & ~reset;
+   assign clkfbout = clkvco;
+
+   // Minimal bypass mode model
+   genvar i;
+   for (i = 0; i < NOUT; i = i + 1) begin : gen_out
+      assign clkout[i] = bypass ? clk : clkvco;
+   end
+
+   // Lock model
+   assign freqlock = en;
+   assign phaselock = en;
+
+   // not modeling status (PLL specific)
+   assign status = 'b0;
+
+`else
 
    la_pll_sim #(.NIN(NIN),
                 .NOUT(NOUT),
@@ -73,8 +127,9 @@ module la_pll
                 .DIVOUTW(DIVOUTW),
                 .PHASEW(PHASEW),
                 .CW(CW),
-                .SW(CW),
-                .PROP(PROP))
+                .SW(SW),
+                .PROP(PROP),
+                .FREF(FREF))
    ipll (/*AUTOINST*/
          // Outputs
          .clkout                (clkout[NOUT-1:0]),
@@ -102,26 +157,6 @@ module la_pll
          .phase                 (phase[NOUT*PHASEW-1:0]),
          .ctrl                  (ctrl[CW-1:0]));
 
-`else
-
-   //##################################################
-   // Basic PLL Bypass Model
-   //#################################################
-
-   // Input clock mux
-   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
-
-   genvar i;
-   // Bypass mode model
-   for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clk & en;
-   end
-
-   // Lock model
-   assign freqlock = en;
-   assign phaselock = en;
-
 `endif
-
 
 endmodule
