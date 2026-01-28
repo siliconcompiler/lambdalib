@@ -23,16 +23,17 @@
  *
  ******************************************************************************/
 module la_pll
-  #(parameter NIN = 1,      // number of input reference clocks
-    parameter NOUT = 1,     // number of output clocks
-    parameter DIVINW = 8,   // input divider width
-    parameter DIVFBW = 8,   // feedback divider width
-    parameter DIVFRACW = 8, // fractional feedback divider width
-    parameter DIVOUTW = 8,  // output divider width
-    parameter PHASEW = 8,   // phase shift adjust width
-    parameter CW = 1,       // control vector width
-    parameter SW = 1,       // status vector width
-    parameter PROP = ""     // cell property
+  #(parameter      NIN = 1,      // number of input reference clocks
+    parameter      NOUT = 1,     // number of output clocks
+    parameter      DIVINW = 8,   // input divider width
+    parameter      DIVFBW = 8,   // feedback divider width
+    parameter      DIVFRACW = 8, // fractional feedback divider width
+    parameter      DIVOUTW = 8,  // output divider width
+    parameter      PHASEW = 8,   // phase shift adjust width
+    parameter      CW = 1,       // control vector width
+    parameter      SW = 1,       // status vector width
+    parameter      PROP = "",    // cell property
+    parameter real FREF = 25.0   // clkin frequency (MHz)
     )
    (
     // supplies
@@ -63,7 +64,26 @@ module la_pll
     output [SW-1:0]          status     // status
     );
 
-`ifdef LAMBDASIM
+`ifdef VERILATOR
+
+   //###############################################
+   // Limited verilator safe model
+   //###############################################
+
+   // Input clock mux
+   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
+
+   genvar i;
+   // Bypass mode model
+   for (i = 0; i < NOUT; i = i + 1) begin : gen_out
+      assign clkout[i] = bypass ? clk : clk & en;
+   end
+
+   // Lock model
+   assign freqlock = en;
+   assign phaselock = en;
+
+`else
 
    la_pll_sim #(.NIN(NIN),
                 .NOUT(NOUT),
@@ -102,26 +122,6 @@ module la_pll
          .phase                 (phase[NOUT*PHASEW-1:0]),
          .ctrl                  (ctrl[CW-1:0]));
 
-`else
-
-   //##################################################
-   // Basic PLL Bypass Model
-   //#################################################
-
-   // Input clock mux
-   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
-
-   genvar i;
-   // Bypass mode model
-   for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clk & en;
-   end
-
-   // Lock model
-   assign freqlock = en;
-   assign phaselock = en;
-
 `endif
-
 
 endmodule
