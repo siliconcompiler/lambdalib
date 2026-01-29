@@ -52,7 +52,8 @@ module la_pll
     input                    reset,     // active high async reset
     input                    en,        // pll enable
     input                    bypass,    // pll bypass
-    input [NIN-1:0]          clksel,    // one hot clock selector
+    input [NIN-1:0]          clksel,    // one hot input clock selector
+    input [NOUT-1:0]         clken,     // output clock enable(s)
     input [DIVINW-1:0]       divin,     // reference divider
     input [DIVFBW-1:0]       divfb,     // feedback divider
     input [DIVFRACW-1:0]     divfrac,   // fractional feedback divider
@@ -67,22 +68,19 @@ module la_pll
 
 `ifdef VERILATOR
 
-   //#######################################################################
-   // Ignore lint warnings for signals that aren't implemented
-   // in the limited verilator model.
-   //#######################################################################
+   //###############################################
+   // Limited model (Verilator compatible)
+   //###############################################
 
    /* verilator lint_off UNUSEDPARAM */
    /* verilator lint_off UNUSEDSIGNAL */
-
 
    localparam real NO_FREF = FREF;
    localparam      NO_PROP = PROP;
    localparam      NCW = (1 + DIVINW + DIVFBW + DIVFRACW +
                           NOUT * (DIVOUTW + PHASEW)+CW);
 
-
-   // inputs are not modeled!!
+   // these inputs are not modeled!!
    wire [NCW-1:0] unconnected = {clkfbin,
                                  divin,
                                  divfb,
@@ -90,10 +88,6 @@ module la_pll
                                  divout,
                                  phase,
                                  ctrl};
-
-   //###############################################
-   // Limited verilator safe model
-   //###############################################
 
    wire clk;
 
@@ -107,7 +101,7 @@ module la_pll
    // Minimal bypass mode model
    genvar i;
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clkvco;
+      assign clkout[i] = bypass ? clk : clkvco & clken[i];
    end
 
    // Lock model
@@ -118,6 +112,10 @@ module la_pll
    assign status = 'b0;
 
 `else
+
+   //###############################################
+   // Timed Verilog model (Icarus compatible)
+   //###############################################
 
    la_pll_sim #(.NIN(NIN),
                 .NOUT(NOUT),
@@ -150,6 +148,7 @@ module la_pll
          .en                    (en),
          .bypass                (bypass),
          .clksel                (clksel[NIN-1:0]),
+         .clken                 (clken[NOUT-1:0]),
          .divin                 (divin[DIVINW-1:0]),
          .divfb                 (divfb[DIVFBW-1:0]),
          .divfrac               (divfrac[DIVFRACW-1:0]),

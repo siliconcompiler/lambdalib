@@ -38,7 +38,8 @@ module la_pll_sim
     input                    reset,     // active high async reset
     input                    en,        // pll enable
     input                    bypass,    // pll bypass
-    input [NIN-1:0]          clksel,    // one hot clock selector
+    input [NIN-1:0]          clksel,    // one hot input clock selector
+    input [NOUT-1:0]         clken,     // output clock enable(s)
     input [DIVINW-1:0]       divin,     // reference divider
     input [DIVFBW-1:0]       divfb,     // feedback divider
     input [DIVFRACW-1:0]     divfrac,   // fractional feedback divider
@@ -178,7 +179,7 @@ module la_pll_sim
                cnt <= cnt + 1;
             end
          end
-         assign clkout[j] = bypass ? sel_clk : freqlock & out_clk;
+         assign clkout[j] = bypass ? sel_clk : freqlock & out_clk & clken[j];
       end
    endgenerate
 

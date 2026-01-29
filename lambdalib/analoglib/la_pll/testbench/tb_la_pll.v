@@ -38,7 +38,7 @@ module tb_la_pll;
              .FREF(FREF))
    dut (
         .clkin(clkin),
-        .clkout(clkout),
+        .clkout(clkout[NOUT-1:0]),
         .clkfbin(1'b0),     // Internal feedback mode
         .clkfbout(),
         .clkvco(clkvco),
@@ -46,6 +46,7 @@ module tb_la_pll;
         .en(en),
         .bypass(bypass),
         .clksel(clksel),
+        .clken({NOUT{1'b1}}),
         .divin(divin),
         .divfb(divfb),
         .divfrac(8'b0),
@@ -112,18 +113,17 @@ module tb_la_pll;
        end
        $display("[%0t] PLL Frequency Locked!", $time);
 
-
        #500;
 
        // Test Bypass Mode
        $display("[%0t] Testing Bypass Mode (Output should match 25MHz Ref)...", $time);
-        bypass = 1;
-        #200;
-        bypass = 0;
-        #200;
+       bypass = 1;
+       #200;
+       bypass = 0;
+       #200;
 
-        $display("[%0t] Simulation Complete.", $time);
-        $finish;
+       $display("[%0t] Simulation Complete.", $time);
+       $finish;
     end
 
 endmodule
