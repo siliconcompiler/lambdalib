@@ -9,7 +9,8 @@
  *
  * Basic operation of all output clocks:
  *
- * FOUT(clkout[n]) = (FREF(clkin) / divin) * (divfb / divout)
+ * freq_vco = freq_clkin * (divfb / divin)
+ * freq_clkout = freq_vco / (divout)
  *
  * In real ASIC design the la_pll is replaced by an actual PLL implementation.
  *
