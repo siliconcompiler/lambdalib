@@ -386,15 +386,10 @@ Complete I/O pad library for chip periphery.
 | [`Iobidir`](lambdalib/iolib/la_iobidir/la_iobidir.v) | Bidirectional I/O pad |
 | [`Ioinput`](lambdalib/iolib/la_ioinput/la_ioinput.v) | Input-only pad |
 | [`Ioxtal`](lambdalib/iolib/la_ioxtal/la_ioxtal.v) | Crystal oscillator pad |
-
-#### Differential I/O
-
-| Cell | Description |
-|------|-------------|
 | [`Iorxdiff`](lambdalib/iolib/la_iorxdiff/la_iorxdiff.v) | Differential receiver (LVDS) |
 | [`Iotxdiff`](lambdalib/iolib/la_iotxdiff/la_iotxdiff.v) | Differential transmitter (LVDS) |
 
-#### Analog
+#### Analog I/O
 
 | Cell | Description |
 |------|-------------|
@@ -410,11 +405,6 @@ Complete I/O pad library for chip periphery.
 | [`Iovssio`](lambdalib/iolib/la_iovssio/la_iovssio.v) | I/O ground (VSSIO) |
 | [`Iovdda`](lambdalib/iolib/la_iovdda/la_iovdda.v) | Analog power (VDDA) |
 | [`Iovssa`](lambdalib/iolib/la_iovssa/la_iovssa.v) | Analog ground (VSSA) |
-
-#### Special
-
-| Cell | Description |
-|------|-------------|
 | [`Iopoc`](lambdalib/iolib/la_iopoc/la_iopoc.v) | Power-on control |
 | [`Iocorner`](lambdalib/iolib/la_iocorner/la_iocorner.v) | Corner cell |
 | [`Ioclamp`](lambdalib/iolib/la_ioclamp/la_ioclamp.v) | ESD clamp |
@@ -433,8 +423,6 @@ Automated padring generation with pure Verilog output.
 | Module | Description |
 |--------|-------------|
 | [`Padring`](lambdalib/padring/la_padring/la_padring.v) | Main padring generator |
-| [`IOAlias`](lambdalib/padring/la_ioalias/la_ioalias.v) | I/O pad aliasing |
-| [`IOShort`](lambdalib/padring/la_ioshort/la_ioshort.v) | I/O pad shorting for test |
 
 **Features:**
 - Pure Verilog parameterizable generator
@@ -453,17 +441,12 @@ Bus-width scalable cells for efficient datapath design.
 ![Vectorized Cells](docs/images/veclib-concept.png)
 -->
 
-#### Vectorized Logic
+#### Vectorized Logic Gates
 
 | Cell | Description |
 |------|-------------|
 | [`Vbuf`](lambdalib/veclib/la_vbuf/la_vbuf.v) | Vector buffer |
 | [`Vinv`](lambdalib/veclib/la_vinv/la_vinv.v) | Vector inverter |
-
-#### Vectorized Multiplexers
-
-| Cell | Description |
-|------|-------------|
 | [`Vmux`](lambdalib/veclib/la_vmux/la_vmux.v) | General vector multiplexer |
 | [`Vmux2`](lambdalib/veclib/la_vmux2/la_vmux2.v) | 2:1 vector multiplexer |
 | [`Vmux2b`](lambdalib/veclib/la_vmux2b/la_vmux2b.v) | 2:1 buffered vector multiplexer |
