@@ -39,32 +39,32 @@ module la_pll
     )
    (
     // supplies
-    inout                    vdda,      // analog supply
-    inout                    vdd,       // digital core supply
-    inout                    vddaux,    // aux core supply
-    inout                    vss,       // common ground
+    inout                             vdda,      // analog supply
+    inout                             vdd,       // digital core supply
+    inout                             vddaux,    // aux core supply
+    inout                             vss,       // common ground
     // clocks
-    input [NIN-1:0]          clkin,     // input reference clock
-    output [NOUT-1:0]        clkout,    // output clocks (post divided)
-    input                    clkfbin,   // input feedback clock (optional)
-    output                   clkfbout,  // output feedback clock (optional)
-    output                   clkvco,    // high frequency vco clock
+    input [NIN-1:0]                   clkin,     // input reference clock(s)
+    output [NOUT-1:0]                 clkout,    // output clocks (post divided)
+    input                             clkfbin,   // feedback clock (optional)
+    output                            clkfbout,  // feedback clock (optional)
+    output                            clkvco,    // high frequency vco clock
     // standard controls
-    input                    reset,     // active high async reset
-    input                    en,        // pll enable
-    input                    bypass,    // pll bypass
-    input [NIN-1:0]          clksel,    // one hot input clock selector
-    input [NOUT-1:0]         clken,     // output clock enable(s)
-    input [DIVINW-1:0]       divin,     // reference divider
-    input [DIVFBW-1:0]       divfb,     // feedback divider
-    input [DIVFRACW-1:0]     divfrac,   // fractional feedback divider
-    input [NOUT*DIVOUTW-1:0] divout,    // output divider
-    input [NOUT*PHASEW-1:0]  phase,     // output phase shift
-    output                   freqlock,  // pll frequency lock
-    output                   phaselock, // pll phase lock
-    // user defined signals (defined per unique PLL)
-    input [CW-1:0]           ctrl,      // controls
-    output [SW-1:0]          status     // status
+    input                             reset,     // active high async reset
+    input                             en,        // pll enable
+    input                             bypass,    // pll bypass
+    input [(NIN>1?$clog2(NIN):1)-1:0] clksel,    // clock select
+    input [NOUT-1:0]                  clken,     // output clock enable(s)
+    input [DIVINW-1:0]                divin,     // reference divider
+    input [DIVFBW-1:0]                divfb,     // feedback divider
+    input [DIVFRACW-1:0]              divfrac,   // fractional feedback divider
+    input [NOUT*DIVOUTW-1:0]          divout,    // output divider
+    input [NOUT*PHASEW-1:0]           phase,     // output phase shift
+    output                            freqlock,  // pll frequency lock
+    output                            phaselock, // pll phase lock
+    // user defined signals (unique to PLL)
+    input [CW-1:0]                    ctrl,      // controls
+    output [SW-1:0]                   status     // status
     );
 
 `ifdef VERILATOR
@@ -90,10 +90,9 @@ module la_pll
                                  phase,
                                  ctrl};
 
-   wire clk;
-
    // Input clock mux
-   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
+   wire           clk;
+   assign clk = clkin[(NIN == 1) ? 0 : clksel];
 
    // N/M=1 mode
    assign clkvco   = clk & en & ~reset;
