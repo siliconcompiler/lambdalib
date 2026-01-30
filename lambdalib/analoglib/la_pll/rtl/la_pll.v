@@ -9,7 +9,8 @@
  *
  * Basic operation of all output clocks:
  *
- * FOUT(clkout[n]) = (FREF(clkin) / divin) * (divfb / divout)
+ * freq_vco = freq_clkin * (divfb / divin)
+ * freq_clkout = freq_vco / (divout)
  *
  * In real ASIC design the la_pll is replaced by an actual PLL implementation.
  *
@@ -38,51 +39,49 @@ module la_pll
     )
    (
     // supplies
-    inout                    vdda,      // analog supply
-    inout                    vdd,       // digital core supply
-    inout                    vddaux,    // aux core supply
-    inout                    vss,       // common ground
+    inout                             vdda,      // analog supply
+    inout                             vdd,       // digital core supply
+    inout                             vddaux,    // aux core supply
+    inout                             vss,       // common ground
     // clocks
-    input [NIN-1:0]          clkin,     // input reference clock
-    output [NOUT-1:0]        clkout,    // output clocks (post divided)
-    input                    clkfbin,   // input feedback clock (optional)
-    output                   clkfbout,  // output feedback clock (optional)
-    output                   clkvco,    // high frequency vco clock
+    input [NIN-1:0]                   clkin,     // input reference clock(s)
+    output [NOUT-1:0]                 clkout,    // output clocks (post divided)
+    input                             clkfbin,   // feedback clock (optional)
+    output                            clkfbout,  // feedback clock (optional)
+    output                            clkvco,    // high frequency vco clock
     // standard controls
-    input                    reset,     // active high async reset
-    input                    en,        // pll enable
-    input                    bypass,    // pll bypass
-    input [NIN-1:0]          clksel,    // one hot clock selector
-    input [DIVINW-1:0]       divin,     // reference divider
-    input [DIVFBW-1:0]       divfb,     // feedback divider
-    input [DIVFRACW-1:0]     divfrac,   // fractional feedback divider
-    input [NOUT*DIVOUTW-1:0] divout,    // output divider
-    input [NOUT*PHASEW-1:0]  phase,     // output phase shift
-    output                   freqlock,  // pll frequency lock
-    output                   phaselock, // pll phase lock
-    // user defined signals (defined per unique PLL)
-    input [CW-1:0]           ctrl,      // controls
-    output [SW-1:0]          status     // status
+    input                             reset,     // active high async reset
+    input                             en,        // pll enable
+    input                             bypass,    // pll bypass
+    input [(NIN>1?$clog2(NIN):1)-1:0] clksel,    // clock select
+    input [NOUT-1:0]                  clken,     // output clock enable(s)
+    input [DIVINW-1:0]                divin,     // reference divider
+    input [DIVFBW-1:0]                divfb,     // feedback divider
+    input [DIVFRACW-1:0]              divfrac,   // fractional feedback divider
+    input [NOUT*DIVOUTW-1:0]          divout,    // output divider
+    input [NOUT*PHASEW-1:0]           phase,     // output phase shift
+    output                            freqlock,  // pll frequency lock
+    output                            phaselock, // pll phase lock
+    // user defined signals (unique to PLL)
+    input [CW-1:0]                    ctrl,      // controls
+    output [SW-1:0]                   status     // status
     );
 
 `ifdef VERILATOR
 
-   //#######################################################################
-   // Ignore lint warnings for signals that aren't implemented
-   // in the limited verilator model.
-   //#######################################################################
+   //###############################################
+   // Limited model (Verilator compatible)
+   //###############################################
 
    /* verilator lint_off UNUSEDPARAM */
    /* verilator lint_off UNUSEDSIGNAL */
-
 
    localparam real NO_FREF = FREF;
    localparam      NO_PROP = PROP;
    localparam      NCW = (1 + DIVINW + DIVFBW + DIVFRACW +
                           NOUT * (DIVOUTW + PHASEW)+CW);
 
-
-   // inputs are not modeled!!
+   // these inputs are not modeled!!
    wire [NCW-1:0] unconnected = {clkfbin,
                                  divin,
                                  divfb,
@@ -91,14 +90,9 @@ module la_pll
                                  phase,
                                  ctrl};
 
-   //###############################################
-   // Limited verilator safe model
-   //###############################################
-
-   wire clk;
-
    // Input clock mux
-   assign clk = |(clkin[NIN-1:0] & clksel[NIN-1:0]);
+   wire           clk;
+   assign clk = clkin[(NIN == 1) ? 0 : clksel];
 
    // N/M=1 mode
    assign clkvco   = clk & en & ~reset;
@@ -107,7 +101,7 @@ module la_pll
    // Minimal bypass mode model
    genvar i;
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clkvco;
+      assign clkout[i] = bypass ? clk : clkvco & clken[i];
    end
 
    // Lock model
@@ -118,6 +112,10 @@ module la_pll
    assign status = 'b0;
 
 `else
+
+   //###############################################
+   // Timed Verilog model (Icarus compatible)
+   //###############################################
 
    la_pll_sim #(.NIN(NIN),
                 .NOUT(NOUT),
@@ -130,8 +128,7 @@ module la_pll
                 .SW(SW),
                 .PROP(PROP),
                 .FREF(FREF))
-   ipll (/*AUTOINST*/
-         // Outputs
+   ipll (// Outputs
          .clkout                (clkout[NOUT-1:0]),
          .clkfbout              (clkfbout),
          .clkvco                (clkvco),
@@ -149,7 +146,8 @@ module la_pll
          .reset                 (reset),
          .en                    (en),
          .bypass                (bypass),
-         .clksel                (clksel[NIN-1:0]),
+         .clksel                (clksel[(NIN>1?$clog2(NIN):1)-1:0]),
+         .clken                 (clken[NOUT-1:0]),
          .divin                 (divin[DIVINW-1:0]),
          .divfb                 (divfb[DIVFBW-1:0]),
          .divfrac               (divfrac[DIVFRACW-1:0]),
