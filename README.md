@@ -182,111 +182,111 @@ The foundation of digital logic design with optimized implementations for each t
 
 | Cell | Description | Cell | Description |
 |------|-------------|------|-------------|
-| `And2` | 2-input AND | `Nand2` | 2-input NAND |
-| `And3` | 3-input AND | `Nand3` | 3-input NAND |
-| `And4` | 4-input AND | `Nand4` | 4-input NAND |
-| `Or2` | 2-input OR | `Nor2` | 2-input NOR |
-| `Or3` | 3-input OR | `Nor3` | 3-input NOR |
-| `Or4` | 4-input OR | `Nor4` | 4-input NOR |
-| `Xor2` | 2-input XOR | `Xnor2` | 2-input XNOR |
-| `Xor3` | 3-input XOR | `Xnor3` | 3-input XNOR |
-| `Xor4` | 4-input XOR | `Xnor4` | 4-input XNOR |
+| [`And2`](lambdalib/stdlib/la_and2/la_and2.v) | 2-input AND | [`Nand2`](lambdalib/stdlib/la_nand2/la_nand2.v) | 2-input NAND |
+| [`And3`](lambdalib/stdlib/la_and3/la_and3.v) | 3-input AND | [`Nand3`](lambdalib/stdlib/la_nand3/la_nand3.v) | 3-input NAND |
+| [`And4`](lambdalib/stdlib/la_and4/la_and4.v) | 4-input AND | [`Nand4`](lambdalib/stdlib/la_nand4/la_nand4.v) | 4-input NAND |
+| [`Or2`](lambdalib/stdlib/la_or2/la_or2.v) | 2-input OR | [`Nor2`](lambdalib/stdlib/la_nor2/la_nor2.v) | 2-input NOR |
+| [`Or3`](lambdalib/stdlib/la_or3/la_or3.v) | 3-input OR | [`Nor3`](lambdalib/stdlib/la_nor3/la_nor3.v) | 3-input NOR |
+| [`Or4`](lambdalib/stdlib/la_or4/la_or4.v) | 4-input OR | [`Nor4`](lambdalib/stdlib/la_nor4/la_nor4.v) | 4-input NOR |
+| [`Xor2`](lambdalib/stdlib/la_xor2/la_xor2.v) | 2-input XOR | [`Xnor2`](lambdalib/stdlib/la_xnor2/la_xnor2.v) | 2-input XNOR |
+| [`Xor3`](lambdalib/stdlib/la_xor3/la_xor3.v) | 3-input XOR | [`Xnor3`](lambdalib/stdlib/la_xnor3/la_xnor3.v) | 3-input XNOR |
+| [`Xor4`](lambdalib/stdlib/la_xor4/la_xor4.v) | 4-input XOR | [`Xnor4`](lambdalib/stdlib/la_xnor4/la_xnor4.v) | 4-input XNOR |
 
 #### Buffers and Inverters
 
 | Cell | Description |
 |------|-------------|
-| `Buf` | Non-inverting buffer |
-| `Inv` | Inverter |
-| `Delay` | Delay element |
+| [`Buf`](lambdalib/stdlib/la_buf/la_buf.v) | Non-inverting buffer |
+| [`Inv`](lambdalib/stdlib/la_inv/la_inv.v) | Inverter |
+| [`Delay`](lambdalib/stdlib/la_delay/la_delay.v) | Delay element |
 
 #### Complex Logic (AOI/OAI)
 
 | Cell | Description | Cell | Description |
 |------|-------------|------|-------------|
-| `Ao21` | AND-OR (2-1) | `Aoi21` | AND-OR-Invert (2-1) |
-| `Ao211` | AND-OR (2-1-1) | `Aoi211` | AND-OR-Invert (2-1-1) |
-| `Ao22` | AND-OR (2-2) | `Aoi22` | AND-OR-Invert (2-2) |
-| `Ao221` | AND-OR (2-2-1) | `Aoi221` | AND-OR-Invert (2-2-1) |
-| `Ao222` | AND-OR (2-2-2) | `Aoi222` | AND-OR-Invert (2-2-2) |
-| `Ao31` | AND-OR (3-1) | `Aoi31` | AND-OR-Invert (3-1) |
-| `Ao311` | AND-OR (3-1-1) | `Aoi311` | AND-OR-Invert (3-1-1) |
-| `Ao32` | AND-OR (3-2) | `Aoi32` | AND-OR-Invert (3-2) |
-| `Ao33` | AND-OR (3-3) | `Aoi33` | AND-OR-Invert (3-3) |
-| `Oa21` | OR-AND (2-1) | `Oai21` | OR-AND-Invert (2-1) |
-| `Oa211` | OR-AND (2-1-1) | `Oai211` | OR-AND-Invert (2-1-1) |
-| `Oa22` | OR-AND (2-2) | `Oai22` | OR-AND-Invert (2-2) |
-| `Oa221` | OR-AND (2-2-1) | `Oai221` | OR-AND-Invert (2-2-1) |
-| `Oa222` | OR-AND (2-2-2) | `Oai222` | OR-AND-Invert (2-2-2) |
-| `Oa31` | OR-AND (3-1) | `Oai31` | OR-AND-Invert (3-1) |
-| `Oa311` | OR-AND (3-1-1) | `Oai311` | OR-AND-Invert (3-1-1) |
-| `Oa32` | OR-AND (3-2) | `Oai32` | OR-AND-Invert (3-2) |
-| `Oa33` | OR-AND (3-3) | `Oai33` | OR-AND-Invert (3-3) |
+| [`Ao21`](lambdalib/stdlib/la_ao21/la_ao21.v) | AND-OR (2-1) | [`Aoi21`](lambdalib/stdlib/la_aoi21/la_aoi21.v) | AND-OR-Invert (2-1) |
+| [`Ao211`](lambdalib/stdlib/la_ao211/la_ao211.v) | AND-OR (2-1-1) | [`Aoi211`](lambdalib/stdlib/la_aoi211/la_aoi211.v) | AND-OR-Invert (2-1-1) |
+| [`Ao22`](lambdalib/stdlib/la_ao22/la_ao22.v) | AND-OR (2-2) | [`Aoi22`](lambdalib/stdlib/la_aoi22/la_aoi22.v) | AND-OR-Invert (2-2) |
+| [`Ao221`](lambdalib/stdlib/la_ao221/la_ao221.v) | AND-OR (2-2-1) | [`Aoi221`](lambdalib/stdlib/la_aoi221/la_aoi221.v) | AND-OR-Invert (2-2-1) |
+| [`Ao222`](lambdalib/stdlib/la_ao222/la_ao222.v) | AND-OR (2-2-2) | [`Aoi222`](lambdalib/stdlib/la_aoi222/la_aoi222.v) | AND-OR-Invert (2-2-2) |
+| [`Ao31`](lambdalib/stdlib/la_ao31/la_ao31.v) | AND-OR (3-1) | [`Aoi31`](lambdalib/stdlib/la_aoi31/la_aoi31.v) | AND-OR-Invert (3-1) |
+| [`Ao311`](lambdalib/stdlib/la_ao311/la_ao311.v) | AND-OR (3-1-1) | [`Aoi311`](lambdalib/stdlib/la_aoi311/la_aoi311.v) | AND-OR-Invert (3-1-1) |
+| [`Ao32`](lambdalib/stdlib/la_ao32/la_ao32.v) | AND-OR (3-2) | [`Aoi32`](lambdalib/stdlib/la_aoi32/la_aoi32.v) | AND-OR-Invert (3-2) |
+| [`Ao33`](lambdalib/stdlib/la_ao33/la_ao33.v) | AND-OR (3-3) | [`Aoi33`](lambdalib/stdlib/la_aoi33/la_aoi33.v) | AND-OR-Invert (3-3) |
+| [`Oa21`](lambdalib/stdlib/la_oa21/la_oa21.v) | OR-AND (2-1) | [`Oai21`](lambdalib/stdlib/la_oai21/la_oai21.v) | OR-AND-Invert (2-1) |
+| [`Oa211`](lambdalib/stdlib/la_oa211/la_oa211.v) | OR-AND (2-1-1) | [`Oai211`](lambdalib/stdlib/la_oai211/la_oai211.v) | OR-AND-Invert (2-1-1) |
+| [`Oa22`](lambdalib/stdlib/la_oa22/la_oa22.v) | OR-AND (2-2) | [`Oai22`](lambdalib/stdlib/la_oai22/la_oai22.v) | OR-AND-Invert (2-2) |
+| [`Oa221`](lambdalib/stdlib/la_oa221/la_oa221.v) | OR-AND (2-2-1) | [`Oai221`](lambdalib/stdlib/la_oai221/la_oai221.v) | OR-AND-Invert (2-2-1) |
+| [`Oa222`](lambdalib/stdlib/la_oa222/la_oa222.v) | OR-AND (2-2-2) | [`Oai222`](lambdalib/stdlib/la_oai222/la_oai222.v) | OR-AND-Invert (2-2-2) |
+| [`Oa31`](lambdalib/stdlib/la_oa31/la_oa31.v) | OR-AND (3-1) | [`Oai31`](lambdalib/stdlib/la_oai31/la_oai31.v) | OR-AND-Invert (3-1) |
+| [`Oa311`](lambdalib/stdlib/la_oa311/la_oa311.v) | OR-AND (3-1-1) | [`Oai311`](lambdalib/stdlib/la_oai311/la_oai311.v) | OR-AND-Invert (3-1-1) |
+| [`Oa32`](lambdalib/stdlib/la_oa32/la_oa32.v) | OR-AND (3-2) | [`Oai32`](lambdalib/stdlib/la_oai32/la_oai32.v) | OR-AND-Invert (3-2) |
+| [`Oa33`](lambdalib/stdlib/la_oa33/la_oa33.v) | OR-AND (3-3) | [`Oai33`](lambdalib/stdlib/la_oai33/la_oai33.v) | OR-AND-Invert (3-3) |
 
 #### Multiplexers
 
 | Cell | Description |
 |------|-------------|
-| `Mux2` | 2:1 multiplexer |
-| `Mux3` | 3:1 multiplexer |
-| `Mux4` | 4:1 multiplexer |
-| `Muxi2` | 2:1 inverting multiplexer |
-| `Muxi3` | 3:1 inverting multiplexer |
-| `Muxi4` | 4:1 inverting multiplexer |
-| `Dmux2` | 1:2 demultiplexer |
-| `Dmux3` | 1:3 demultiplexer |
-| `Dmux4` | 1:4 demultiplexer |
-| `Dmux5` | 1:5 demultiplexer |
-| `Dmux6` | 1:6 demultiplexer |
-| `Dmux7` | 1:7 demultiplexer |
-| `Dmux8` | 1:8 demultiplexer |
+| [`Mux2`](lambdalib/stdlib/la_mux2/la_mux2.v) | 2:1 multiplexer |
+| [`Mux3`](lambdalib/stdlib/la_mux3/la_mux3.v) | 3:1 multiplexer |
+| [`Mux4`](lambdalib/stdlib/la_mux4/la_mux4.v) | 4:1 multiplexer |
+| [`Muxi2`](lambdalib/stdlib/la_muxi2/la_muxi2.v) | 2:1 inverting multiplexer |
+| [`Muxi3`](lambdalib/stdlib/la_muxi3/la_muxi3.v) | 3:1 inverting multiplexer |
+| [`Muxi4`](lambdalib/stdlib/la_muxi4/la_muxi4.v) | 4:1 inverting multiplexer |
+| [`Dmux2`](lambdalib/stdlib/la_dmux2/la_dmux2.v) | 1:2 demultiplexer |
+| [`Dmux3`](lambdalib/stdlib/la_dmux3/la_dmux3.v) | 1:3 demultiplexer |
+| [`Dmux4`](lambdalib/stdlib/la_dmux4/la_dmux4.v) | 1:4 demultiplexer |
+| [`Dmux5`](lambdalib/stdlib/la_dmux5/la_dmux5.v) | 1:5 demultiplexer |
+| [`Dmux6`](lambdalib/stdlib/la_dmux6/la_dmux6.v) | 1:6 demultiplexer |
+| [`Dmux7`](lambdalib/stdlib/la_dmux7/la_dmux7.v) | 1:7 demultiplexer |
+| [`Dmux8`](lambdalib/stdlib/la_dmux8/la_dmux8.v) | 1:8 demultiplexer |
 
 #### Flip-Flops and Latches
 
 | Cell | Description |
 |------|-------------|
-| `Dffq` | D flip-flop (Q output) |
-| `Dffqn` | D flip-flop (Q and QN outputs) |
-| `Dffnq` | D flip-flop (negative edge) |
-| `Dffrq` | D flip-flop with async reset |
-| `Dffrqn` | D flip-flop with async reset (Q and QN) |
-| `Dffsq` | D flip-flop with async set |
-| `Dffsqn` | D flip-flop with async set (Q and QN) |
-| `Sdffq` | Scan D flip-flop |
-| `Sdffqn` | Scan D flip-flop (Q and QN) |
-| `Sdffrq` | Scan D flip-flop with reset |
-| `Sdffrqn` | Scan D flip-flop with reset (Q and QN) |
-| `Sdffsq` | Scan D flip-flop with set |
-| `Sdffsqn` | Scan D flip-flop with set (Q and QN) |
-| `Latq` | Transparent latch |
-| `Latnq` | Transparent latch (inverted enable) |
+| [`Dffq`](lambdalib/stdlib/la_dffq/la_dffq.v) | D flip-flop (Q output) |
+| [`Dffqn`](lambdalib/stdlib/la_dffqn/la_dffqn.v) | D flip-flop (Q and QN outputs) |
+| [`Dffnq`](lambdalib/stdlib/la_dffnq/la_dffnq.v) | D flip-flop (negative edge) |
+| [`Dffrq`](lambdalib/stdlib/la_dffrq/la_dffrq.v) | D flip-flop with async reset |
+| [`Dffrqn`](lambdalib/stdlib/la_dffrqn/la_dffrqn.v) | D flip-flop with async reset (Q and QN) |
+| [`Dffsq`](lambdalib/stdlib/la_dffsq/la_dffsq.v) | D flip-flop with async set |
+| [`Dffsqn`](lambdalib/stdlib/la_dffsqn/la_dffsqn.v) | D flip-flop with async set (Q and QN) |
+| [`Sdffq`](lambdalib/stdlib/la_sdffq/la_sdffq.v) | Scan D flip-flop |
+| [`Sdffqn`](lambdalib/stdlib/la_sdffqn/la_sdffqn.v) | Scan D flip-flop (Q and QN) |
+| [`Sdffrq`](lambdalib/stdlib/la_sdffrq/la_sdffrq.v) | Scan D flip-flop with reset |
+| [`Sdffrqn`](lambdalib/stdlib/la_sdffrqn/la_sdffrqn.v) | Scan D flip-flop with reset (Q and QN) |
+| [`Sdffsq`](lambdalib/stdlib/la_sdffsq/la_sdffsq.v) | Scan D flip-flop with set |
+| [`Sdffsqn`](lambdalib/stdlib/la_sdffsqn/la_sdffsqn.v) | Scan D flip-flop with set (Q and QN) |
+| [`Latq`](lambdalib/stdlib/la_latq/la_latq.v) | Transparent latch |
+| [`Latnq`](lambdalib/stdlib/la_latnq/la_latnq.v) | Transparent latch (inverted enable) |
 
 #### Clock Tree Cells
 
 | Cell | Description |
 |------|-------------|
-| `Clkbuf` | Clock buffer (balanced rise/fall) |
-| `Clkinv` | Clock inverter |
-| `Clkand2` | Clock AND gate |
-| `Clknand2` | Clock NAND gate |
-| `Clkor2` | Clock OR gate (2-input) |
-| `Clkor4` | Clock OR gate (4-input) |
-| `Clknor2` | Clock NOR gate |
-| `Clkxor2` | Clock XOR gate |
+| [`Clkbuf`](lambdalib/stdlib/la_clkbuf/la_clkbuf.v) | Clock buffer (balanced rise/fall) |
+| [`Clkinv`](lambdalib/stdlib/la_clkinv/la_clkinv.v) | Clock inverter |
+| [`Clkand2`](lambdalib/stdlib/la_clkand2/la_clkand2.v) | Clock AND gate |
+| [`Clknand2`](lambdalib/stdlib/la_clknand2/la_clknand2.v) | Clock NAND gate |
+| [`Clkor2`](lambdalib/stdlib/la_clkor2/la_clkor2.v) | Clock OR gate (2-input) |
+| [`Clkor4`](lambdalib/stdlib/la_clkor4/la_clkor4.v) | Clock OR gate (4-input) |
+| [`Clknor2`](lambdalib/stdlib/la_clknor2/la_clknor2.v) | Clock NOR gate |
+| [`Clkxor2`](lambdalib/stdlib/la_clkxor2/la_clkxor2.v) | Clock XOR gate |
 
 #### Arithmetic
 
 | Cell | Description |
 |------|-------------|
-| `Csa32` | 3:2 carry-save adder |
-| `Csa42` | 4:2 carry-save adder |
+| [`Csa32`](lambdalib/stdlib/la_csa32/la_csa32.v) | 3:2 carry-save adder |
+| [`Csa42`](lambdalib/stdlib/la_csa42/la_csa42.v) | 4:2 carry-save adder |
 
 #### Tie Cells
 
 | Cell | Description |
 |------|-------------|
-| `Tiehi` | Tie to VDD |
-| `Tielo` | Tie to VSS |
+| [`Tiehi`](lambdalib/stdlib/la_tiehi/la_tiehi.v) | Tie to VDD |
+| [`Tielo`](lambdalib/stdlib/la_tielo/la_tielo.v) | Tie to VSS |
 
 ---
 
@@ -302,53 +302,53 @@ Special-purpose cells for clock management, synchronization, and power control.
 
 | Cell | Description |
 |------|-------------|
-| `Dsync` | Double-stage synchronizer for CDC |
-| `Rsync` | Reset synchronizer |
-| `Drsync` | Double reset synchronizer |
+| [`Dsync`](lambdalib/auxlib/la_dsync/la_dsync.v) | Double-stage synchronizer for CDC |
+| [`Rsync`](lambdalib/auxlib/la_rsync/la_rsync.v) | Reset synchronizer |
+| [`Drsync`](lambdalib/auxlib/la_drsync/la_drsync.v) | Double reset synchronizer |
 
 #### Clock Management
 
 | Cell | Description |
 |------|-------------|
-| `Clkmux2` | Glitchless 2:1 clock multiplexer |
-| `Clkmux4` | Glitchless 4:1 clock multiplexer |
-| `Clkicgand` | Integrated clock gate (AND-based) |
-| `Clkicgor` | Integrated clock gate (OR-based) |
+| [`Clkmux2`](lambdalib/auxlib/la_clkmux2/la_clkmux2.v) | Glitchless 2:1 clock multiplexer |
+| [`Clkmux4`](lambdalib/auxlib/la_clkmux4/la_clkmux4.v) | Glitchless 4:1 clock multiplexer |
+| [`Clkicgand`](lambdalib/auxlib/la_clkicgand/la_clkicgand.v) | Integrated clock gate (AND-based) |
+| [`Clkicgor`](lambdalib/auxlib/la_clkicgor/la_clkicgor.v) | Integrated clock gate (OR-based) |
 
 #### I/O Buffers
 
 | Cell | Description |
 |------|-------------|
-| `Ibuf` | Input buffer |
-| `Obuf` | Output buffer |
-| `Tbuf` | Tri-state buffer |
-| `Idiff` | Differential input buffer |
-| `Odiff` | Differential output buffer |
+| [`Ibuf`](lambdalib/auxlib/la_ibuf/la_ibuf.v) | Input buffer |
+| [`Obuf`](lambdalib/auxlib/la_obuf/la_obuf.v) | Output buffer |
+| [`Tbuf`](lambdalib/auxlib/la_tbuf/la_tbuf.v) | Tri-state buffer |
+| [`Idiff`](lambdalib/auxlib/la_idiff/la_idiff.v) | Differential input buffer |
+| [`Odiff`](lambdalib/auxlib/la_odiff/la_odiff.v) | Differential output buffer |
 
 #### DDR Cells
 
 | Cell | Description |
 |------|-------------|
-| `Iddr` | Input DDR register |
-| `Oddr` | Output DDR register |
+| [`Iddr`](lambdalib/auxlib/la_iddr/la_iddr.v) | Input DDR register |
+| [`Oddr`](lambdalib/auxlib/la_oddr/la_oddr.v) | Output DDR register |
 
 #### Power Management
 
 | Cell | Description |
 |------|-------------|
-| `Isohi` | Isolation cell (output high) |
-| `Isolo` | Isolation cell (output low) |
-| `Header` | Power header switch |
-| `Footer` | Power footer switch |
-| `Pwrbuf` | Power distribution buffer |
+| [`Isohi`](lambdalib/auxlib/la_isohi/la_isohi.v) | Isolation cell (output high) |
+| [`Isolo`](lambdalib/auxlib/la_isolo/la_isolo.v) | Isolation cell (output low) |
+| [`Header`](lambdalib/auxlib/la_header/la_header.v) | Power header switch |
+| [`Footer`](lambdalib/auxlib/la_footer/la_footer.v) | Power footer switch |
+| [`Pwrbuf`](lambdalib/auxlib/la_pwrbuf/la_pwrbuf.v) | Power distribution buffer |
 
 #### Physical Cells
 
 | Cell | Description |
 |------|-------------|
-| `Antenna` | Antenna diode for process protection |
-| `Decap` | Decoupling capacitor |
-| `Keeper` | State keeper cell |
+| [`Antenna`](lambdalib/auxlib/la_antenna/la_antenna.v) | Antenna diode for process protection |
+| [`Decap`](lambdalib/auxlib/la_decap/la_decap.v) | Decoupling capacitor |
+| [`Keeper`](lambdalib/auxlib/la_keeper/la_keeper.v) | State keeper cell |
 
 ---
 
@@ -362,12 +362,12 @@ Parameterizable memory generators with consistent interfaces across technologies
 
 | Module | Description | Key Parameters |
 |--------|-------------|----------------|
-| `Spram` | Single-port RAM | width, depth |
-| `Dpram` | Dual-port RAM | width, depth |
-| `Tdpram` | True dual-port RAM | width, depth |
-| `Spregfile` | Single-port register file | width, depth |
-| `Syncfifo` | Synchronous FIFO | width, depth |
-| `Asyncfifo` | Asynchronous FIFO (CDC-safe) | width, depth |
+| [`Spram`](lambdalib/ramlib/la_spram/la_spram.v) | Single-port RAM | width, depth |
+| [`Dpram`](lambdalib/ramlib/la_dpram/la_dpram.v) | Dual-port RAM | width, depth |
+| [`Tdpram`](lambdalib/ramlib/la_tdpram/la_tdpram.v) | True dual-port RAM | width, depth |
+| [`Spregfile`](lambdalib/ramlib/la_spregfile/la_spregfile.v) | Single-port register file | width, depth |
+| [`Syncfifo`](lambdalib/ramlib/la_syncfifo/la_syncfifo.v) | Synchronous FIFO | width, depth |
+| [`Asyncfifo`](lambdalib/ramlib/la_asyncfifo/la_asyncfifo.v) | Asynchronous FIFO (CDC-safe) | width, depth |
 
 ---
 
@@ -383,42 +383,32 @@ Complete I/O pad library for chip periphery.
 
 | Cell | Description |
 |------|-------------|
-| `Iobidir` | Bidirectional I/O pad |
-| `Ioinput` | Input-only pad |
-| `Ioxtal` | Crystal oscillator pad |
+| [`Iobidir`](lambdalib/iolib/la_iobidir/la_iobidir.v) | Bidirectional I/O pad |
+| [`Ioinput`](lambdalib/iolib/la_ioinput/la_ioinput.v) | Input-only pad |
+| [`Ioxtal`](lambdalib/iolib/la_ioxtal/la_ioxtal.v) | Crystal oscillator pad |
+| [`Iorxdiff`](lambdalib/iolib/la_iorxdiff/la_iorxdiff.v) | Differential receiver (LVDS) |
+| [`Iotxdiff`](lambdalib/iolib/la_iotxdiff/la_iotxdiff.v) | Differential transmitter (LVDS) |
 
-#### Differential I/O
-
-| Cell | Description |
-|------|-------------|
-| `Iorxdiff` | Differential receiver (LVDS) |
-| `Iotxdiff` | Differential transmitter (LVDS) |
-
-#### Analog
+#### Analog I/O
 
 | Cell | Description |
 |------|-------------|
-| `Ioanalog` | Analog pass-through with ESD |
+| [`Ioanalog`](lambdalib/iolib/la_ioanalog/la_ioanalog.v) | Analog pass-through with ESD |
 
 #### Power Pads
 
 | Cell | Description |
 |------|-------------|
-| `Iovdd` | Core power (VDD) |
-| `Iovss` | Core ground (VSS) |
-| `Iovddio` | I/O power (VDDIO) |
-| `Iovssio` | I/O ground (VSSIO) |
-| `Iovdda` | Analog power (VDDA) |
-| `Iovssa` | Analog ground (VSSA) |
-
-#### Special
-
-| Cell | Description |
-|------|-------------|
-| `Iopoc` | Power-on control |
-| `Iocorner` | Corner cell |
-| `Ioclamp` | ESD clamp |
-| `Iocut` | Power ring cut |
+| [`Iovdd`](lambdalib/iolib/la_iovdd/la_iovdd.v) | Core power (VDD) |
+| [`Iovss`](lambdalib/iolib/la_iovss/la_iovss.v) | Core ground (VSS) |
+| [`Iovddio`](lambdalib/iolib/la_iovddio/la_iovddio.v) | I/O power (VDDIO) |
+| [`Iovssio`](lambdalib/iolib/la_iovssio/la_iovssio.v) | I/O ground (VSSIO) |
+| [`Iovdda`](lambdalib/iolib/la_iovdda/la_iovdda.v) | Analog power (VDDA) |
+| [`Iovssa`](lambdalib/iolib/la_iovssa/la_iovssa.v) | Analog ground (VSSA) |
+| [`Iopoc`](lambdalib/iolib/la_iopoc/la_iopoc.v) | Power-on control |
+| [`Iocorner`](lambdalib/iolib/la_iocorner/la_iocorner.v) | Corner cell |
+| [`Ioclamp`](lambdalib/iolib/la_ioclamp/la_ioclamp.v) | ESD clamp |
+| [`Iocut`](lambdalib/iolib/la_iocut/la_iocut.v) | Power ring cut |
 
 ---
 
@@ -432,9 +422,7 @@ Automated padring generation with pure Verilog output.
 
 | Module | Description |
 |--------|-------------|
-| `Padring` | Main padring generator |
-| `IOAlias` | I/O pad aliasing |
-| `IOShort` | I/O pad shorting for test |
+| [`Padring`](lambdalib/padring/la_padring/la_padring.v) | Main padring generator |
 
 **Features:**
 - Pure Verilog parameterizable generator
@@ -453,35 +441,30 @@ Bus-width scalable cells for efficient datapath design.
 ![Vectorized Cells](docs/images/veclib-concept.png)
 -->
 
-#### Vectorized Logic
+#### Vectorized Logic Gates
 
 | Cell | Description |
 |------|-------------|
-| `Vbuf` | Vector buffer |
-| `Vinv` | Vector inverter |
-
-#### Vectorized Multiplexers
-
-| Cell | Description |
-|------|-------------|
-| `Vmux` | General vector multiplexer |
-| `Vmux2` | 2:1 vector multiplexer |
-| `Vmux2b` | 2:1 buffered vector multiplexer |
-| `Vmux3` | 3:1 vector multiplexer |
-| `Vmux4` | 4:1 vector multiplexer |
-| `Vmux5` | 5:1 vector multiplexer |
-| `Vmux6` | 6:1 vector multiplexer |
-| `Vmux7` | 7:1 vector multiplexer |
-| `Vmux8` | 8:1 vector multiplexer |
+| [`Vbuf`](lambdalib/veclib/la_vbuf/la_vbuf.v) | Vector buffer |
+| [`Vinv`](lambdalib/veclib/la_vinv/la_vinv.v) | Vector inverter |
+| [`Vmux`](lambdalib/veclib/la_vmux/la_vmux.v) | General vector multiplexer |
+| [`Vmux2`](lambdalib/veclib/la_vmux2/la_vmux2.v) | 2:1 vector multiplexer |
+| [`Vmux2b`](lambdalib/veclib/la_vmux2b/la_vmux2b.v) | 2:1 buffered vector multiplexer |
+| [`Vmux3`](lambdalib/veclib/la_vmux3/la_vmux3.v) | 3:1 vector multiplexer |
+| [`Vmux4`](lambdalib/veclib/la_vmux4/la_vmux4.v) | 4:1 vector multiplexer |
+| [`Vmux5`](lambdalib/veclib/la_vmux5/la_vmux5.v) | 5:1 vector multiplexer |
+| [`Vmux6`](lambdalib/veclib/la_vmux6/la_vmux6.v) | 6:1 vector multiplexer |
+| [`Vmux7`](lambdalib/veclib/la_vmux7/la_vmux7.v) | 7:1 vector multiplexer |
+| [`Vmux8`](lambdalib/veclib/la_vmux8/la_vmux8.v) | 8:1 vector multiplexer |
 
 #### Vectorized Registers
 
 | Cell | Description |
 |------|-------------|
-| `Vdffq` | Vector D flip-flop |
-| `Vdffnq` | Vector D flip-flop (negative edge) |
-| `Vlatq` | Vector latch |
-| `Vlatnq` | Vector latch (inverted enable) |
+| [`Vdffq`](lambdalib/veclib/la_vdffq/la_vdffq.v) | Vector D flip-flop |
+| [`Vdffnq`](lambdalib/veclib/la_vdffnq/la_vdffnq.v) | Vector D flip-flop (negative edge) |
+| [`Vlatq`](lambdalib/veclib/la_vlatq/la_vlatq.v) | Vector latch |
+| [`Vlatnq`](lambdalib/veclib/la_vlatnq/la_vlatnq.v) | Vector latch (inverted enable) |
 
 ---
 
@@ -495,9 +478,9 @@ Building blocks for FPGA architectures.
 
 | Cell | Description |
 |------|-------------|
-| `Lut4` | 4-input lookup table |
-| `Ble4p0` | Basic logic element |
-| `Clb4p0` | Configurable logic block (4 BLEs) |
+| [`Lut4`](lambdalib/fpgalib/la_lut4/la_lut4.v) | 4-input lookup table |
+| [`Ble4p0`](lambdalib/fpgalib/la_ble4p0/la_ble4p0.v) | Basic logic element |
+| [`Clb4p0`](lambdalib/fpgalib/la_clb4p0/la_clb4p0.v) | Configurable logic block (4 BLEs) |
 
 ---
 
@@ -511,8 +494,8 @@ Analog and mixed-signal building blocks.
 
 | Module | Description |
 |--------|-------------|
-| `PLL` | Phase-locked loop |
-| `Ring` | Ring oscillator |
+| [`PLL`](lambdalib/analoglib/la_pll/la_pll.v) | Phase-locked loop |
+| [`Ring`](lambdalib/analoglib/la_ring/la_ring.v) | Ring oscillator |
 
 
 ## Contributing
