@@ -18,7 +18,7 @@ module tb_la_pll;
     reg             reset;
     reg             en;
     reg             bypass;
-    reg [NIN-1:0]   clksel;
+    reg [(NIN>1?$clog2(NIN):1)-1:0]  clksel;
     reg             lock_timeout;
 
     reg [DIVINW-1:0]  divin;

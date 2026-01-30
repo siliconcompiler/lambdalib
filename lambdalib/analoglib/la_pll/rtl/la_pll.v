@@ -128,8 +128,7 @@ module la_pll
                 .SW(SW),
                 .PROP(PROP),
                 .FREF(FREF))
-   ipll (/*AUTOINST*/
-         // Outputs
+   ipll (// Outputs
          .clkout                (clkout[NOUT-1:0]),
          .clkfbout              (clkfbout),
          .clkvco                (clkvco),
@@ -147,7 +146,7 @@ module la_pll
          .reset                 (reset),
          .en                    (en),
          .bypass                (bypass),
-         .clksel                (clksel[NIN-1:0]),
+         .clksel                (clksel[(NIN>1?$clog2(NIN):1)-1:0]),
          .clken                 (clken[NOUT-1:0]),
          .divin                 (divin[DIVINW-1:0]),
          .divfb                 (divfb[DIVFBW-1:0]),
