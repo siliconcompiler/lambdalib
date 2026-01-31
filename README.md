@@ -233,13 +233,13 @@ The foundation of digital logic design with optimized implementations for each t
 | [`Muxi2`](lambdalib/stdlib/la_muxi2/rtl/la_muxi2.v) | 2:1 inverting multiplexer |
 | [`Muxi3`](lambdalib/stdlib/la_muxi3/rtl/la_muxi3.v) | 3:1 inverting multiplexer |
 | [`Muxi4`](lambdalib/stdlib/la_muxi4/rtl/la_muxi4.v) | 4:1 inverting multiplexer |
-| [`Dmux2`](lambdalib/stdlib/la_dmux2/rtl/la_dmux2.v) | 1:2 demultiplexer |
-| [`Dmux3`](lambdalib/stdlib/la_dmux3/rtl/la_dmux3.v) | 1:3 demultiplexer |
-| [`Dmux4`](lambdalib/stdlib/la_dmux4/rtl/la_dmux4.v) | 1:4 demultiplexer |
-| [`Dmux5`](lambdalib/stdlib/la_dmux5/rtl/la_dmux5.v) | 1:5 demultiplexer |
-| [`Dmux6`](lambdalib/stdlib/la_dmux6/rtl/la_dmux6.v) | 1:6 demultiplexer |
-| [`Dmux7`](lambdalib/stdlib/la_dmux7/rtl/la_dmux7.v) | 1:7 demultiplexer |
-| [`Dmux8`](lambdalib/stdlib/la_dmux8/rtl/la_dmux8.v) | 1:8 demultiplexer |
+| [`Dmux2`](lambdalib/stdlib/la_dmux2/rtl/la_dmux2.v) | 1:2 one-hot multipliexer |
+| [`Dmux3`](lambdalib/stdlib/la_dmux3/rtl/la_dmux3.v) | 1:3 one-hot multipliexer |
+| [`Dmux4`](lambdalib/stdlib/la_dmux4/rtl/la_dmux4.v) | 1:4 one-hot multipliexer |
+| [`Dmux5`](lambdalib/stdlib/la_dmux5/rtl/la_dmux5.v) | 1:5 one-hot multipliexer |
+| [`Dmux6`](lambdalib/stdlib/la_dmux6/rtl/la_dmux6.v) | 1:6 one-hot multipliexer |
+| [`Dmux7`](lambdalib/stdlib/la_dmux7/rtl/la_dmux7.v) | 1:7 one-hot multipliexer |
+| [`Dmux8`](lambdalib/stdlib/la_dmux8/rtl/la_dmux8.v) | 1:8 one-hot multipliexer |
 
 #### Flip-Flops and Latches
 
@@ -292,7 +292,7 @@ The foundation of digital logic design with optimized implementations for each t
 
 ### auxlib - Auxiliary Cells (22 cells)
 
-Special-purpose cells for clock management, synchronization, and power control.
+Special-purpose standard cells for clock management, synchronization, and power control.
 
 <!-- FIGURE PLACEHOLDER: Add auxiliary cell diagrams
 ![Auxiliary Cells](docs/images/auxlib-diagrams.png)
@@ -447,15 +447,15 @@ Bus-width scalable cells for efficient datapath design.
 |------|-------------|
 | [`Vbuf`](lambdalib/veclib/la_vbuf/rtl/la_vbuf.v) | Vector buffer |
 | [`Vinv`](lambdalib/veclib/la_vinv/rtl/la_vinv.v) | Vector inverter |
-| [`Vmux`](lambdalib/veclib/la_vmux/rtl/la_vmux.v) | General vector multiplexer |
+| [`Vmux`](lambdalib/veclib/la_vmux/rtl/la_vmux.v) | General one-hot vector multiplexer |
 | [`Vmux2`](lambdalib/veclib/la_vmux2/rtl/la_vmux2.v) | 2:1 vector multiplexer |
-| [`Vmux2b`](lambdalib/veclib/la_vmux2b/rtl/la_vmux2b.v) | 2:1 buffered vector multiplexer |
-| [`Vmux3`](lambdalib/veclib/la_vmux3/rtl/la_vmux3.v) | 3:1 vector multiplexer |
-| [`Vmux4`](lambdalib/veclib/la_vmux4/rtl/la_vmux4.v) | 4:1 vector multiplexer |
-| [`Vmux5`](lambdalib/veclib/la_vmux5/rtl/la_vmux5.v) | 5:1 vector multiplexer |
-| [`Vmux6`](lambdalib/veclib/la_vmux6/rtl/la_vmux6.v) | 6:1 vector multiplexer |
-| [`Vmux7`](lambdalib/veclib/la_vmux7/rtl/la_vmux7.v) | 7:1 vector multiplexer |
-| [`Vmux8`](lambdalib/veclib/la_vmux8/rtl/la_vmux8.v) | 8:1 vector multiplexer |
+| [`Vmux2b`](lambdalib/veclib/la_vmux2b/rtl/la_vmux2b.v) | 2:1 binary vector multiplexer |
+| [`Vmux3`](lambdalib/veclib/la_vmux3/rtl/la_vmux3.v) | 3:1 one-hot vector multiplexer |
+| [`Vmux4`](lambdalib/veclib/la_vmux4/rtl/la_vmux4.v) | 4:1 one-hot vector multiplexer |
+| [`Vmux5`](lambdalib/veclib/la_vmux5/rtl/la_vmux5.v) | 5:1 one-hot vector multiplexer |
+| [`Vmux6`](lambdalib/veclib/la_vmux6/rtl/la_vmux6.v) | 6:1 one-hot vector multiplexer |
+| [`Vmux7`](lambdalib/veclib/la_vmux7/rtl/la_vmux7.v) | 7:1 one-hot vector multiplexer |
+| [`Vmux8`](lambdalib/veclib/la_vmux8/rtl/la_vmux8.v) | 8:1 one-hot vector multiplexer |
 
 #### Vectorized Registers
 
