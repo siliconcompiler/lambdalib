@@ -14,7 +14,7 @@
  *
  * In real ASIC design the la_pll is replaced by an actual PLL implementation.
  *
- * A coarse first order simulation model can be run by setting `LAMBDASIM
+ * A coarse first order simulation model can be run by setting `LAMBDA_ACCURATE
  * during compilation. Behavior of control signals such as divpost may differ
  * between PLLs. For exact simulation behavior, use the actual designer supplied
  * mixed signal simulation model.
@@ -23,7 +23,6 @@
  * DIVFB corresponds exactly to "M" (0 is an illegal value).
  *
  *******************************************************************************/
-`timescale 1ns/1ps
 module la_pll
   #(parameter      NIN = 1,      // number of input reference clocks
     parameter      NOUT = 1,     // number of output clocks
@@ -67,7 +66,30 @@ module la_pll
     output [SW-1:0]                   status     // status
     );
 
+   //###############################################
+   // Simulation model selection
+   //###############################################
+
+   // Using standard VERILATOR define (cycle accurate)
+   // Standardizing
 `ifdef VERILATOR
+   `define LA_PLL_FAST_MODEL
+`else
+   `ifndef LAMBDA_ACCURATE
+      `define LA_PLL_FAST_MODEL
+   `endif
+`endif
+
+
+   initial begin
+`ifdef LA_PLL_FAST_MODEL
+      $display("[LA_PLL] Using coarse & fast sim model.");
+`else
+      $display("[LA_PLL]: Using accurate & slow sim model.");
+`endif
+end
+
+`ifdef LA_PLL_FAST_MODEL
 
    //###############################################
    // Limited model (Verilator compatible)
