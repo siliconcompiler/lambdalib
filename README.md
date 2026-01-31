@@ -233,13 +233,13 @@ The foundation of digital logic design with optimized implementations for each t
 | [`Muxi2`](lambdalib/stdlib/la_muxi2/rtl/la_muxi2.v) | 2:1 inverting multiplexer |
 | [`Muxi3`](lambdalib/stdlib/la_muxi3/rtl/la_muxi3.v) | 3:1 inverting multiplexer |
 | [`Muxi4`](lambdalib/stdlib/la_muxi4/rtl/la_muxi4.v) | 4:1 inverting multiplexer |
-| [`Dmux2`](lambdalib/stdlib/la_dmux2/rtl/la_dmux2.v) | 1:2 one-hot multipliexer |
-| [`Dmux3`](lambdalib/stdlib/la_dmux3/rtl/la_dmux3.v) | 1:3 one-hot multipliexer |
-| [`Dmux4`](lambdalib/stdlib/la_dmux4/rtl/la_dmux4.v) | 1:4 one-hot multipliexer |
-| [`Dmux5`](lambdalib/stdlib/la_dmux5/rtl/la_dmux5.v) | 1:5 one-hot multipliexer |
-| [`Dmux6`](lambdalib/stdlib/la_dmux6/rtl/la_dmux6.v) | 1:6 one-hot multipliexer |
-| [`Dmux7`](lambdalib/stdlib/la_dmux7/rtl/la_dmux7.v) | 1:7 one-hot multipliexer |
-| [`Dmux8`](lambdalib/stdlib/la_dmux8/rtl/la_dmux8.v) | 1:8 one-hot multipliexer |
+| [`Dmux2`](lambdalib/stdlib/la_dmux2/rtl/la_dmux2.v) | 1:2 one-hot multiplexer |
+| [`Dmux3`](lambdalib/stdlib/la_dmux3/rtl/la_dmux3.v) | 1:3 one-hot multiplexer |
+| [`Dmux4`](lambdalib/stdlib/la_dmux4/rtl/la_dmux4.v) | 1:4 one-hot multiplexer |
+| [`Dmux5`](lambdalib/stdlib/la_dmux5/rtl/la_dmux5.v) | 1:5 one-hot multiplexer |
+| [`Dmux6`](lambdalib/stdlib/la_dmux6/rtl/la_dmux6.v) | 1:6 one-hot multiplexer |
+| [`Dmux7`](lambdalib/stdlib/la_dmux7/rtl/la_dmux7.v) | 1:7 one-hot multiplexer |
+| [`Dmux8`](lambdalib/stdlib/la_dmux8/rtl/la_dmux8.v) | 1:8 one-hot multiplexer |
 
 #### Flip-Flops and Latches
 
