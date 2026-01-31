@@ -14,9 +14,8 @@
  *
  * In real ASIC design the la_pll is replaced by an actual PLL implementation.
  *
- * A coarse first order simulation model can be run by setting `LAMBDA_ACCURATE
- * during compilation. Behavior of control signals such as divpost may differ
- * between PLLs. For exact simulation behavior, use the actual designer supplied
+ * A coarse simulation model is available in testbench/la_pll_model.v
+ * For exact simulation behavior, use the actual designer supplied
  * mixed signal simulation model.
  *
  * DIVIN corresponds exactly to "N" (0 is an illegal value).
@@ -61,35 +60,10 @@ module la_pll
     input [NOUT*PHASEW-1:0]           phase,     // output phase shift
     output                            freqlock,  // pll frequency lock
     output                            phaselock, // pll phase lock
-    // user defined signals (unique to PLL)
+    // per PLL defined signals
     input [CW-1:0]                    ctrl,      // controls
     output [SW-1:0]                   status     // status
     );
-
-   //###############################################
-   // Simulation model selection
-   //###############################################
-
-   // Using standard VERILATOR define (cycle accurate)
-   // Standardizing
-`ifdef VERILATOR
-   `define LA_PLL_FAST_MODEL
-`else
-   `ifndef LAMBDA_ACCURATE
-      `define LA_PLL_FAST_MODEL
-   `endif
-`endif
-
-
-   initial begin
-`ifdef LA_PLL_FAST_MODEL
-      $display("[LA_PLL] Using coarse & fast sim model.");
-`else
-      $display("[LA_PLL]: Using accurate & slow sim model.");
-`endif
-end
-
-`ifdef LA_PLL_FAST_MODEL
 
    //###############################################
    // Limited model (Verilator compatible)
@@ -114,6 +88,7 @@ end
 
    // Input clock mux
    wire           clk;
+
    assign clk = clkin[(NIN == 1) ? 0 : clksel];
 
    // N/M=1 mode
@@ -132,51 +107,5 @@ end
 
    // not modeling status (PLL specific)
    assign status = 'b0;
-
-`else
-
-   //###############################################
-   // Timed Verilog model (Icarus compatible)
-   //###############################################
-
-   la_pll_sim #(.NIN(NIN),
-                .NOUT(NOUT),
-                .DIVINW(DIVINW),
-                .DIVFBW(DIVFBW),
-                .DIVFRACW(DIVFRACW),
-                .DIVOUTW(DIVOUTW),
-                .PHASEW(PHASEW),
-                .CW(CW),
-                .SW(SW),
-                .PROP(PROP),
-                .FREF(FREF))
-   ipll (// Outputs
-         .clkout                (clkout[NOUT-1:0]),
-         .clkfbout              (clkfbout),
-         .clkvco                (clkvco),
-         .freqlock              (freqlock),
-         .phaselock             (phaselock),
-         .status                (status[SW-1:0]),
-         // Inouts
-         .vdda                  (vdda),
-         .vdd                   (vdd),
-         .vddaux                (vddaux),
-         .vss                   (vss),
-         // Inputs
-         .clkin                 (clkin[NIN-1:0]),
-         .clkfbin               (clkfbin),
-         .reset                 (reset),
-         .en                    (en),
-         .bypass                (bypass),
-         .clksel                (clksel[(NIN>1?$clog2(NIN):1)-1:0]),
-         .clken                 (clken[NOUT-1:0]),
-         .divin                 (divin[DIVINW-1:0]),
-         .divfb                 (divfb[DIVFBW-1:0]),
-         .divfrac               (divfrac[DIVFRACW-1:0]),
-         .divout                (divout[NOUT*DIVOUTW-1:0]),
-         .phase                 (phase[NOUT*PHASEW-1:0]),
-         .ctrl                  (ctrl[CW-1:0]));
-
-`endif
 
 endmodule
