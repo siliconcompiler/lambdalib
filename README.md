@@ -4,8 +4,12 @@
 
 [![CI Tests](https://github.com/siliconcompiler/lambdalib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/siliconcompiler/lambdalib/actions/workflows/ci.yml)
 [![Wheels](https://github.com/siliconcompiler/lambdalib/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/siliconcompiler/lambdalib/actions/workflows/wheels.yml)
+[![PyPI](https://img.shields.io/pypi/v/lambdalib)](https://pypi.org/project/lambdalib/)
+[![Downloads](https://static.pepy.tech/badge/lambdalib)](https://pepy.tech/project/lambdalib)
+[![GitHub stars](https://img.shields.io/github/stars/siliconcompiler/lambdalib)](https://github.com/siliconcompiler/lambdalib/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/siliconcompiler/lambdalib)](https://github.com/siliconcompiler/lambdalib/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
 
 <!-- FIGURE PLACEHOLDER: Add a hero banner image showing the abstraction concept
 ![Lambdalib Overview](docs/images/lambdalib-banner.png)
