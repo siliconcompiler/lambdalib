@@ -1,5 +1,5 @@
 //############################################################################
-//# Function: 2-Input one-hot vectorized mux                                 #
+//# Function: 2-Input binary select vectorized mux                           #
 //# Copyright: Lambda Project Authors. All rights Reserved.                  #
 //# License:  MIT (see LICENSE file in Lambda repository)                    #
 //############################################################################

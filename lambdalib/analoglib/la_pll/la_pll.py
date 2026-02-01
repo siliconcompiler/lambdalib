@@ -4,8 +4,7 @@ from lambdalib.lambdalib import Lambda
 class PLL(Lambda):
     def __init__(self):
         name = 'la_pll'
-        super().__init__(name, __file__,
-                         extrasources=["testbench/la_pll_sim.v"])
+        super().__init__(name, __file__)
 
 
 if __name__ == "__main__":

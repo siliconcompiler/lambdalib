@@ -8,8 +8,9 @@
  * !!! DISCLAIMER: DO NOT USE THIS MODEL FOR ASIC SIGNOFF SIMULATIONS !!!!
  *
  ******************************************************************************/
+
 `timescale 1ns/1ps
-module la_pll_sim
+module la_pll
   #(parameter      NIN = 1,      // number of input reference clocks
     parameter      NOUT = 1,     // number of output clocks
     parameter      DIVINW = 8,   // input divider width
