@@ -2,6 +2,8 @@
 
 **A Modular Hardware Abstraction Library for Portable ASIC Design**
 
+[![CI Tests](https://github.com/siliconcompiler/lambdalib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/siliconcompiler/lambdalib/actions/workflows/ci.yml)
+[![Wheels](https://github.com/siliconcompiler/lambdalib/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/siliconcompiler/lambdalib/actions/workflows/wheels.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
