@@ -4,14 +4,12 @@
 //# License:  MIT (see LICENSE file in Lambda repository)                     #
 //#############################################################################
 
-module la_clkmux2 #(
-                    parameter PROP = "DEFAULT" // cell property
+module la_clkmux2 #(parameter PROP = "DEFAULT" // cell property
                     )
    (
     input  clk0,
     input  clk1,
-    input  sel, // sel ==0, clk0 is active
-    input  nreset,
+    input  sel, // 1=clk1, 0=clk0
     output out
     );
 
@@ -41,15 +39,13 @@ module la_clkmux2 #(
                  .z(en[1]));
 
    // syncing logic to each clock domain
-   la_drsync isync0 (.clk    (clk0),
-                     .nreset (nreset),
-                     .in     (en[0]),
-                     .out    (ensync[0]));
+   la_dsync isync0 (.clk    (clk0),
+                    .in     (en[0]),
+                    .out    (ensync[0]));
 
-   la_drsync isync1 (.clk    (clk1),
-                     .nreset (nreset),
-                     .in     (en[1]),
-                     .out    (ensync[1]));
+   la_dsync isync1 (.clk    (clk1),
+                    .in     (en[1]),
+                    .out    (ensync[1]));
 
    // glitch free clock gating
    la_clkicgand igate0 (.clk  (clk0),
