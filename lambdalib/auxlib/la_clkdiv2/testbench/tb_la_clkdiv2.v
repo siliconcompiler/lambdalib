@@ -21,9 +21,8 @@ module tb_la_clkdiv2();
       $dumpvars(0, tb_la_clkdiv2);
       // startup
       nreset = 0;
-      // Wait for synchronization (usually 2-3 cycles of clk0)
       #107;
-      nreset = 1; // Switch to clk1
+      nreset = 1; // release reset
       #300;
       $display("Test Finished Successfully");
       $finish;
