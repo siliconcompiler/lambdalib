@@ -13,7 +13,7 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.10.2"
+__version__ = "0.10.3"
 
 
 class LambalibTechLibrary(Design):
