@@ -5,7 +5,7 @@
  * ****************************************************************************
  *
  * This a vectorized N input clock mux that allows for safe glitch-less
- * selection of an arbitraty number of input clocks using asynchronous
+ * selection of an arbitrary number of input clocks using asynchronous
  * inputs 'nreset' and 'sel'. The circuit is safe as long as the following
  * sequence is followed:
  *
