@@ -1,8 +1,11 @@
 from siliconcompiler import Design
 
+# TODO: circular dependency, needs fixing
 from .la_drsync.la_drsync import Drsync
 from .la_dsync.la_dsync import Dsync
+
 from .la_antenna.la_antenna import Antenna
+from .la_clkdiv2.la_clkdiv2 import Clkdiv2
 from .la_clkicgand.la_clkicgand import Clkicgand
 from .la_clkicgor.la_clkicgor import Clkicgor
 from .la_clkmux2.la_clkmux2 import Clkmux2
@@ -24,6 +27,7 @@ from .la_rsync.la_rsync import Rsync
 from .la_tbuf.la_tbuf import Tbuf
 
 __all__ = ['Antenna',
+           'Clkdiv2',
            'Clkicgand',
            'Clkicgor',
            'Clkmux2',
@@ -53,6 +57,7 @@ class AUXLib(Design):
 
         with self.active_fileset("rtl"):
             self.add_depfileset(Antenna(), depfileset="rtl")
+            self.add_depfileset(Clkdiv2(), depfileset="rtl")
             self.add_depfileset(Clkicgand(), depfileset="rtl")
             self.add_depfileset(Clkicgor(), depfileset="rtl")
             self.add_depfileset(Clkmux2(), depfileset="rtl")
