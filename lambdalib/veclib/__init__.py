@@ -1,6 +1,7 @@
 from siliconcompiler import Design
 
 from .la_vbuf.la_vbuf import Vbuf
+from .la_vclkmux.la_vclkmux import Vclkmux
 from .la_vdffnq.la_vdffnq import Vdffnq
 from .la_vdffq.la_vdffq import Vdffq
 from .la_vinv.la_vinv import Vinv
@@ -17,6 +18,7 @@ from .la_vmux7.la_vmux7 import Vmux7
 from .la_vmux8.la_vmux8 import Vmux8
 
 __all__ = ['Vbuf',
+           'Vclkmux',
            'Vdffnq',
            'Vdffq',
            'Vinv',
@@ -40,6 +42,7 @@ class STDLib(Design):
 
         with self.active_fileset("rtl"):
             self.add_depfileset(Vbuf(), depfileset="rtl")
+            self.add_depfileset(Vclkmux(), depfileset="rtl")
             self.add_depfileset(Vdffnq(), depfileset="rtl")
             self.add_depfileset(Vdffq(), depfileset="rtl")
             self.add_depfileset(Vinv(), depfileset="rtl")
