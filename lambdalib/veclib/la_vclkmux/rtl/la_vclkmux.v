@@ -35,7 +35,7 @@ module la_vclkmux
 
    genvar i;
 
-   for (i = 0; i < N; i = i + 1) begin : isync
+   for (i = 0; i < N; i = i + 1) begin : imux
 
       // 1. Asynchronous Reset, Synchronous Release if reset
       // 2. Non-glitching guaranteed via nreset sequence
