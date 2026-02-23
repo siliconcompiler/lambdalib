@@ -30,7 +30,6 @@ module la_vclkmux
     output        clkout  // gated clock output
     );
 
-   wire [N-1:0] clk;
    wire [N-1:0] clken;
    wire [N-1:0] gatedclk;
 
@@ -40,16 +39,19 @@ module la_vclkmux
 
       // 1. Asynchronous Reset, Synchronous Release if reset
       // 2. Non-glitching guaranteed via nreset sequence
-      la_drsync isync (.clk(clkin[i]),
-                       .nreset(nreset),
-                       .in(sel[i]),
-                       .out(clken[i]));
+      la_drsync #(.STAGES(STAGES),
+                  .PROP(PROP))
+      isync (.clk(clkin[i]),
+             .nreset(nreset),
+             .in(sel[i]),
+             .out(clken[i]));
 
       // Gate each clock separately
-      la_clkicgand iicg (.clk(clkin[i]),
-                         .en(clken[i]),
-                         .te(1'b0),
-                         .eclk(gatedclk[i]));
+      la_clkicgand #(.PROP(PROP))
+      igate (.clk(clkin[i]),
+             .en(clken[i]),
+             .te(1'b0),
+             .eclk(gatedclk[i]));
    end
 
    // Safe or tree of all clocks
