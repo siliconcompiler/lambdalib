@@ -5,16 +5,16 @@
  * ****************************************************************************
  *
  * This a vectorized N input clock mux that allows for safe glitch-less
- * selection of an arbitraty number of input clocks using the asynchronous
- * signals 'nreset' and 'sel'. The circuit is safe as long as the following
+ * selection of an arbitraty number of input clocks using asynchronous
+ * inputs 'nreset' and 'sel'. The circuit is safe as long as the following
  * sequence is followed:
  *
  * 1. Assert async reset (nreset==0), usually by setting a bit in a register
- * controlling the CLKOUT (ie CLKLKOUTEN=0).
+ * (ie CLKEN=0).
  *
- * 2. Change the 'sel' value, usually by changing a register like 'CLKSEL'.
+ * 2. Change the async 'sel' value, usually by changing a register like 'CLKSEL'.
  *
- * 3. Deassert reset (nreset==1) to reneabled clockout.
+ * 3. Deassert async reset (nreset==1) to reneable clkout.
  *
  *******************************************************************************/
 
