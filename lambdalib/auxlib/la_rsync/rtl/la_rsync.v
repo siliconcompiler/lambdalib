@@ -22,11 +22,14 @@ module la_rsync #(parameter PROP = "DEFAULT",
        sync_pipe[STAGES:0] <= {sync_pipe[STAGES-1:0], 1'b1};
 
 `ifdef SIM
+ `ifndef VERILATOR
    integer            sync_delay;
    always @(posedge clk)
      sync_delay <= {$random} % 2;
-
    assign nrst_out = (|sync_delay & (|RND)) ? sync_pipe[STAGES] : sync_pipe[STAGES-1];
+ `else
+   assign nrst_out = sync_pipe[STAGES-1];
+ `endif
 `else
    assign nrst_out = sync_pipe[STAGES-1];
 `endif
