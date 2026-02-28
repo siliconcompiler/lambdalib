@@ -16,7 +16,7 @@ module la_clkicgor #(
     reg en_stable;
 
 `ifdef VERILATOR
-   // Verilator-safe: posedge flop model instead of latch
+   // Posedge flop model instead of latch (verilator safe)
    always @(posedge clk) begin
       en_stable <= en | te;
    end

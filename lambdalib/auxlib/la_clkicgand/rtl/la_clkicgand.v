@@ -16,7 +16,7 @@ module la_clkicgand #(
     reg en_stable;
 
 `ifdef VERILATOR
-   // Verilator-safe: use edge-triggered model instead of a latch
+   // Edge-triggered model instead of a latch (verilator safe)
    always @(negedge clk) begin
       en_stable <= en | te;
    end
