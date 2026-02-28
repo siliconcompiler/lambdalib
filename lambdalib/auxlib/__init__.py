@@ -59,7 +59,6 @@ class AUXLib(Design):
             self.add_depfileset(Clkicgand(), depfileset="rtl")
             self.add_depfileset(Clkicgor(), depfileset="rtl")
             self.add_depfileset(Clkmux2(), depfileset="rtl")
-            self.add_depfileset(Clkmux4(), depfileset="rtl")
             self.add_depfileset(Decap(), depfileset="rtl")
             self.add_depfileset(Drsync(), depfileset="rtl")
             self.add_depfileset(Dsync(), depfileset="rtl")
