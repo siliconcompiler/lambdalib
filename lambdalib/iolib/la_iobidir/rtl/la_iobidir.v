@@ -35,10 +35,17 @@ module la_iobidir
     input [CFGW-1:0]  cfg      // generic config interface
     );
 
-   assign z   = ie ? pad : 1'b0;
    assign pad = oe ? a : 1'bz;
 
-`ifndef VERILATOR
+`ifdef VERILATOR
+   // Break bidirectional combinational loop for Verilator.
+   // When OE active, input reads 0 (no self-loopback).
+   // Sampling input while driving is not a recommended feature.
+   // Use `a` signal before pad if you want that functionality.
+   // Real pads have propagation delay that breaks the loop.
+   assign z   = (ie & ~oe) ? pad : 1'b0;
+`else
+   assign z   = ie ? pad : 1'b0;
    rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown
    rnmos #1 (pad, vddio, pe & ps); // weak pullup
 `endif

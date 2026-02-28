@@ -13,6 +13,15 @@ module la_clkmux2 #(parameter PROP = "DEFAULT" // cell property
     output out
     );
 
+`ifdef VERILATOR
+   // Dual-edge register breaks combinational clk→out dependency.
+   // In real silicon, the glitch-free clock mux uses ICG standard cells
+   // with no combinational clock-to-output path in static timing analysis.
+   reg out_reg;
+   always @(posedge clk0 or negedge clk0 or posedge clk1 or negedge clk1)
+     out_reg <= sel ? clk1 : clk0;
+   assign out = out_reg;
+`else
    // local wires
    wire       selb;
    wire [1:0] en;
@@ -62,5 +71,6 @@ module la_clkmux2 #(parameter PROP = "DEFAULT" // cell property
    la_clkor2 iorclk (.a(clkg[0]),
                      .b(clkg[1]),
                      .z(out));
+`endif
 
 endmodule

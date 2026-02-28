@@ -12,7 +12,11 @@ module la_header #(
     output vddout  // gated output supply
 );
 
-    // Primitive Device
+`ifdef VERILATOR
+    // pmos: passes when gate=0; when off, supply rail drops
+    assign vddout = vddin & ~sleep;
+`else
     pmos m0 (vddout, vddin, sleep);  //d,s,g
+`endif
 
 endmodule

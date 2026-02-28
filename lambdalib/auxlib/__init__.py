@@ -9,7 +9,6 @@ from .la_clkdiv2.la_clkdiv2 import Clkdiv2
 from .la_clkicgand.la_clkicgand import Clkicgand
 from .la_clkicgor.la_clkicgor import Clkicgor
 from .la_clkmux2.la_clkmux2 import Clkmux2
-from .la_clkmux4.la_clkmux4 import Clkmux4
 from .la_decap.la_decap import Decap
 from .la_footer.la_footer import Footer
 from .la_header.la_header import Header
@@ -31,7 +30,6 @@ __all__ = ['Antenna',
            'Clkicgand',
            'Clkicgor',
            'Clkmux2',
-           'Clkmux4',
            'Decap',
            'Drsync',
            'Dsync',
@@ -61,7 +59,6 @@ class AUXLib(Design):
             self.add_depfileset(Clkicgand(), depfileset="rtl")
             self.add_depfileset(Clkicgor(), depfileset="rtl")
             self.add_depfileset(Clkmux2(), depfileset="rtl")
-            self.add_depfileset(Clkmux4(), depfileset="rtl")
             self.add_depfileset(Decap(), depfileset="rtl")
             self.add_depfileset(Drsync(), depfileset="rtl")
             self.add_depfileset(Dsync(), depfileset="rtl")

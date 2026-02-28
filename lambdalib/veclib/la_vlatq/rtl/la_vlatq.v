@@ -13,8 +13,12 @@ module la_vlatq #(parameter W = 1,    // width of mux
     output reg [W-1:0] q
     );
 
-   always @ (clk or d)
+`ifdef VERILATOR
+   always @(posedge clk) q <= d;
+`else
+   always @(clk or d)
      if (clk)
        q <= d;
+`endif
 
 endmodule
