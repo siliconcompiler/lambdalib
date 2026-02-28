@@ -12,6 +12,10 @@ module la_latnq #(
     output reg q
 );
 
+`ifdef VERILATOR
+    always @(negedge clk) q <= d;
+`else
     always @(clk or d) if (~clk) q <= d;
+`endif
 
 endmodule
