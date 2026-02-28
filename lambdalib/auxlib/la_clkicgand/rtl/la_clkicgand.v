@@ -15,7 +15,18 @@ module la_clkicgand #(
 
     reg en_stable;
 
-    always @(clk or en or te) if (~clk) en_stable <= en | te;
+`ifdef VERILATOR
+   // Verilator-safe: use edge-triggered model instead of a latch
+   always @(negedge clk) begin
+      en_stable <= en | te;
+   end
+`else
+   // Synthesis: (ASIC-style transparent latch)
+   always @(clk or en or te) begin
+      if (~clk)
+        en_stable <= en | te;
+   end
+`endif
 
     assign eclk = clk & en_stable;
 

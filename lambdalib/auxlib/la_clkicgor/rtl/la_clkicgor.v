@@ -15,8 +15,19 @@ module la_clkicgor #(
 
     reg en_stable;
 
-    always @(clk or en or te) if (clk) en_stable <= en | te;
+`ifdef VERILATOR
+   // Verilator-safe: posedge flop model instead of latch
+   always @(posedge clk) begin
+      en_stable <= en | te;
+   end
+`else
+   // Synthesis: preserve latch-on-high style
+   always @(clk or en or te) begin
+      if (clk)
+        en_stable <= en | te;
+   end
+`endif
 
-    assign eclk = clk | ~en_stable;
+   assign eclk = clk | ~en_stable;
 
 endmodule
