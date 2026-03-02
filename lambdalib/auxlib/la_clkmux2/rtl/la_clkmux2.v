@@ -14,9 +14,15 @@ module la_clkmux2 #(parameter PROP = "DEFAULT" // cell property
     );
 
 `ifdef VERILATOR
-   // Dual-edge register breaks combinational clk→out dependency.
+
+   // Dual-edge register breaks combinational clk to out dependency.
    // In real silicon, the glitch-free clock mux uses ICG standard cells
    // with no combinational clock-to-output path in static timing analysis.
+   // This is a reduced order model, so we give a warning at startp
+  initial
+    $display("WARNING: Reduced order model used for la_clkmux2 for verilator. A fully functional Verilog simulator must be used for chip signoff.");
+
+
    reg out_reg;
    always @(posedge clk0 or negedge clk0 or posedge clk1 or negedge clk1)
      out_reg <= sel ? clk1 : clk0;

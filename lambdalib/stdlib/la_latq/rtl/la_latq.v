@@ -13,7 +13,14 @@ module la_latq #(
 );
 
 `ifdef VERILATOR
-    always @(posedge clk) q <= d;
+   /* We model the latch as a posedge flip-flop sampling on the opening
+    * edge of the latch enable*/
+
+   initial
+     $display("WARNING: Reduced order model used for la_latq for verilator. A fully functional Verilog simulator must be used for chip signoff.");
+
+   always @(posedge clk) q <= d;
+
 `else
     always @(clk or d) if (clk) q <= d;
 `endif
