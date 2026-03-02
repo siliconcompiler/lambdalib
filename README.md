@@ -162,6 +162,18 @@ module mychip (
 endmodule
 ```
 
+### Simulation
+
+> **DISCLAIMER:** Lambdalib is a reduced order abstraction libary useful for fast technology agnostic RTL verifiations. For chip tapeouts, designer's MUST run signoff quality simulations using target specific implementation of lambdalib using a fully featured four-state verilog simulator (ie. not Verilator).
+
+```python
+if __name__ == "__main__":
+    chip = MyChip()
+    chip.write_fileset("mychip.f", fileset="rtl")
+    # Run: iverilog -f mychip.f
+```
+
+
 ### Running Synthesis
 
 Generate a fileset and run synthesis with yosys. (or ideally, you should use the free and open source SiliconCompiler, but you do you;-).
