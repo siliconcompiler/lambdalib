@@ -164,7 +164,7 @@ endmodule
 
 ### Simulation
 
-> **DISCLAIMER:** Lambdalib is a reduced order abstraction libary useful for fast technology agnostic RTL design and verifiation. For actual chip tapeouts, designers MUST run signoff quality simulations using target specific implementations of lambdalib and a fully featured four-state verilog simulator (ie. not Verilator).
+> **DISCLAIMER:** Lambdalib is a reduced order abstraction library useful for fast technology agnostic RTL design and verifiation. For actual chip tapeouts, designers MUST run signoff quality simulations using target specific implementations of lambdalib and a fully featured four-state verilog simulator (ie. not Verilator).
 
 ```python
 if __name__ == "__main__":
