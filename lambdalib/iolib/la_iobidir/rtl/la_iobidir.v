@@ -36,16 +36,9 @@ module la_iobidir
     );
 
    assign pad = oe ? a : 1'bz;
-
-`ifdef VERILATOR
-   // Break bidirectional combinational loop for Verilator.
-   // When OE active, input reads 0 (no self-loopback).
-   // Sampling input while driving is not a recommended feature.
-   // Use `a` signal before pad if you want that functionality.
-   // Real pads have propagation delay that breaks the loop.
-   assign z   = (ie & ~oe) ? pad : 1'b0;
-`else
    assign z   = ie ? pad : 1'b0;
+
+`ifndef VERILATOR
    rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown
    rnmos #1 (pad, vddio, pe & ps); // weak pullup
 `endif
