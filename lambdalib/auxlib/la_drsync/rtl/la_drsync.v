@@ -22,10 +22,14 @@ module la_drsync #(parameter PROP = "DEFAULT",
           shiftreg[STAGES:0] <= {shiftreg[STAGES-1:0], in};
 
 `ifdef SIM
+ `ifndef VERILATOR
    integer        sync_delay;
    always @(posedge clk)
      sync_delay <= {$random} % 2;
    assign out = (|sync_delay & (|RND)) ? shiftreg[STAGES] : shiftreg[STAGES-1];
+ `else
+   assign out = shiftreg[STAGES-1];
+ `endif
 `else
    assign out = shiftreg[STAGES-1];
 `endif

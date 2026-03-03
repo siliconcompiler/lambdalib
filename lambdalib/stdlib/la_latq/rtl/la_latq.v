@@ -12,6 +12,16 @@ module la_latq #(
     output reg q
 );
 
+`ifdef VERILATOR
+   /* We model the latch as a posedge flip-flop sampling on the opening
+    * edge of the latch enable*/
+   initial
+     $display("WARNING: Reduced order verilator safe model used for la_latq.");
+
+   always @(posedge clk) q <= d;
+
+`else
     always @(clk or d) if (clk) q <= d;
+`endif
 
 endmodule

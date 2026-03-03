@@ -91,14 +91,27 @@ module la_pll
 
    assign clk = clkin[(NIN == 1) ? 0 : clksel];
 
+`ifdef VERILATOR
+   // Dual-edge register breaks combinational clkin→clkout path.
+   // In real silicon the PLL VCO is inherently non-combinational.
+   // Without this, Verilator reports false UNOPTFLAT loops through
+   // any design that feeds PLL clkout back to clkin via IO pads.
+   reg clk_d;
+   always @(posedge clk or negedge clk)
+     clk_d <= clk;
+`else
+   wire clk_d;
+   assign clk_d = clk;
+`endif
+
    // N/M=1 mode
-   assign clkvco   = clk & en & ~reset;
+   assign clkvco   = clk_d & en & ~reset;
    assign clkfbout = clkvco;
 
    // Minimal bypass mode model
    genvar i;
    for (i = 0; i < NOUT; i = i + 1) begin : gen_out
-      assign clkout[i] = bypass ? clk : clkvco & clken[i];
+      assign clkout[i] = bypass ? clk_d : clkvco & clken[i];
    end
 
    // Lock model

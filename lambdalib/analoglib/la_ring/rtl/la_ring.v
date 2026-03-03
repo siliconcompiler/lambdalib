@@ -12,6 +12,11 @@ module la_ring  #(parameter PROP = "",   // cell property (vt, strength, ..)
     output out
     );
 
+`ifdef VERILATOR
+   // Ring oscillator is inherently analog (combinatorial loop).
+   // Ring oscillator cannot be simulated (combo loop). Stub output = enable.
+   assign out = en;
+`else
    wire [STAGES-1:0] stage;
 
    genvar       i;
@@ -50,6 +55,7 @@ module la_ring  #(parameter PROP = "",   // cell property (vt, strength, ..)
    endgenerate
 
    la_buf #(.PROP(PROP)) ibuf (.a(stage[STAGES-1]), .z(out));
+`endif
 
    // ERROR CHECKING
    initial

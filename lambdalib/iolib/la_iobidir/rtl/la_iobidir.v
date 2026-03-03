@@ -35,8 +35,8 @@ module la_iobidir
     input [CFGW-1:0]  cfg      // generic config interface
     );
 
-   assign z   = ie ? pad : 1'b0;
    assign pad = oe ? a : 1'bz;
+   assign z   = ie ? pad : 1'b0;
 
 `ifndef VERILATOR
    rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown

@@ -12,7 +12,11 @@ module la_footer #(
     output vssout   // gated output supply
 );
 
-    // Primitive Device
+`ifdef VERILATOR
+    // nmos: passes when gate=1; when off, ground rail floats high
+    assign vssout = vssin | ~nsleep;
+`else
     nmos m0 (vssout, vssin, nsleep);  //d,s,g
+`endif
 
 endmodule
