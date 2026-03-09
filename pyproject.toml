@@ -42,7 +42,7 @@ cocotb = [
 
 lint = [
     "flake8 == 7.3.0",
-    "codespell == 2.4.1"
+    "codespell == 2.4.2"
 ]
 
 [tool.pytest.ini_options]
