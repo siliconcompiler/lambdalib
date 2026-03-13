@@ -1,19 +1,19 @@
-import os
 import math
 import random
 import string
 from decimal import Decimal
 
-from pathlib import Path
-from typing import List, Tuple, Optional, Mapping, Union
-
-from siliconcompiler import Sim
-
 from cocotb.triggers import Timer
 from cocotb.handle import SimHandleBase
 
-from cocotb_tools.runner import get_runner, VerilatorControlFile
-from cocotb_tools.check_results import get_results
+from siliconcompiler import Design, Sim
+from siliconcompiler.flows.dvflow import DVFlow
+
+from siliconcompiler.tools.icarus.compile import CompileTask as IcarusCompileTask
+from siliconcompiler.tools.icarus.cocotb_exec import CocotbExecTask as IcarusCocotbExecTask
+
+from siliconcompiler.tools.verilator.cocotb_compile import CocotbCompileTask as VerilatorCompileTask
+from siliconcompiler.tools.verilator.cocotb_exec import CocotbExecTask as VerilatorCocotbExecTask
 
 
 async def do_reset(
@@ -27,106 +27,6 @@ async def do_reset(
     await Timer(time_ns, "ns")
     reset.value = not active_level
     await Timer(1, unit="step")
-
-
-def run_cocotb(
-        project: Sim,
-        test_module_name: str,
-        output_dir_name: Optional[str] = None,
-        simulator_name: str = "icarus",
-        build_args: Optional[List] = None,
-        timescale: Optional[Tuple[str, str]] = None,
-        parameters: Optional[Mapping[str, object]] = None,
-        seed: Optional[Union[str, int]] = None,
-        waves: bool = True):
-    """Launch cocotb given a SC Project"""
-
-    if parameters is None:
-        parameters = {}
-
-    if build_args is None:
-        build_args = []
-
-    if output_dir_name is None:
-        output_dir_name = test_module_name
-
-    pytest_current_test = os.getenv("PYTEST_CURRENT_TEST", None)
-
-    rootpath = Path(__file__).resolve().parent.parent
-    top_level_dir = rootpath
-    build_dir = rootpath / "build" / output_dir_name
-    test_dir = None
-
-    results_xml = None
-    if not pytest_current_test:
-        results_xml = build_dir / "results.xml"
-        test_dir = top_level_dir
-
-    # Get top level module name
-    top_lvl_module_name = None
-    main_filesets = project.get("option", "fileset")
-    if main_filesets and len(main_filesets) != 0:
-        main_fileset = main_filesets[0]
-        top_lvl_module_name = project.design.get_topmodule(
-            fileset=main_fileset
-        )
-
-    filesets = project.get_filesets()
-    idirs = []
-    sc_defines = []
-    for lib, fileset in filesets:
-        idirs.extend(lib.find_files("fileset", fileset, "idir"))
-        sc_defines.extend(lib.get("fileset", fileset, "define"))
-
-    defines = {}
-    for define in sc_defines:
-        parts = define.split("=", 1)
-        if len(parts) == 2:
-            defines[parts[0]] = parts[1]
-        elif len(parts) == 1:
-            defines[parts[0]] = "1"
-
-    sources = []
-    for lib, fileset in filesets:
-        for value in lib.get_file(fileset=fileset, filetype="systemverilog"):
-            sources.append(value)
-    for lib, fileset in filesets:
-        for value in lib.get_file(fileset=fileset, filetype="verilog"):
-            sources.append(value)
-
-    vlt_files = []
-    if simulator_name == "verilator":
-        for lib, fileset in filesets:
-            for value in lib.get_file(fileset=fileset, filetype="verilatorctrlfile"):
-                vlt_files.append(VerilatorControlFile(value))
-
-    # Build HDL in chosen simulator
-    runner = get_runner(simulator_name)
-    runner.build(
-        sources=vlt_files + sources,
-        includes=idirs,
-        hdl_toplevel=top_lvl_module_name,
-        build_args=build_args,
-        waves=waves,
-        timescale=timescale,
-        build_dir=build_dir,
-        parameters=parameters,
-        defines=defines
-    )
-
-    # Run test
-    _, tests_failed = get_results(runner.test(
-        hdl_toplevel=top_lvl_module_name,
-        test_module=test_module_name,
-        test_dir=test_dir,
-        test_args=build_args,
-        results_xml=results_xml,
-        build_dir=build_dir,
-        seed=seed,
-        waves=waves
-    ))
-
-    return tests_failed
 
 
 def random_decimal(max: int, min: int, decimal_places=2) -> Decimal:
@@ -156,3 +56,136 @@ def bit_toggler_generator(gen_on, gen_off):
 def wave_generator(on_ampl=30, on_freq=200, off_ampl=10, off_freq=100):
     return bit_toggler_generator(sine_wave_generator(on_ampl, on_freq),
                                  sine_wave_generator(off_ampl, off_freq))
+
+
+class IcarusDesign(Design):
+    def __init__(self, design: Design):
+        super().__init__()
+
+        name = f"{design.name}_icarus_sim"
+
+        self.set_dataroot("icarus_tb", __file__)
+
+        with self.active_dataroot("icarus_tb"):
+            with self.active_fileset("icarus_sim"):
+                self.add_file("sim_cmd_files/icarus_cmd_file.f", filetype="commandfile")
+                self.add_depfileset(design, "testbench.cocotb")
+                self.set_topmodule(design.get_topmodule("testbench.cocotb"))
+                name_suffix = ""
+                for param in design.getkeys("fileset", "testbench.cocotb", "param"):
+                    pval = design.get_param(param, "testbench.cocotb")
+                    self.set_param(param, pval)
+                    name_suffix += f"_{param}_{pval}"
+
+        name += name_suffix
+        self.set_name(name)
+
+
+class VerilatorDesign(Design):
+    def __init__(self, design: Design):
+        super().__init__()
+
+        name = f"{design.name}_verilator_sim"
+
+        self.set_dataroot("verilator_tb", __file__)
+
+        with self.active_dataroot("verilator_tb"):
+            with self.active_fileset("verilator_sim"):
+                self.add_file("sim_cmd_files/verilator_cmd_file.vc", filetype="commandfile")
+                self.add_depfileset(design, "testbench.cocotb")
+                self.set_topmodule(design.get_topmodule("testbench.cocotb"))
+                name_suffix = ""
+                for param in design.getkeys("fileset", "testbench.cocotb", "param"):
+                    pval = design.get_param(param, "testbench.cocotb")
+                    self.set_param(param, pval)
+                    name_suffix += f"_{param}_{pval}"
+
+        name += name_suffix
+        self.set_name(name)
+
+
+def load_cocotb_test(
+    design: Design,
+    simulator="icarus",
+    trace=True,
+    seed=None
+):
+
+    supported = ("icarus", "verilator")
+    if simulator == "icarus":
+        load_cocotb_icarus_sim(design, trace=trace, seed=seed)
+    elif simulator == "verilator":
+        load_cocotb_verilator_sim(design, trace=trace, seed=seed, trace_type="vcd")
+    else:
+        raise ValueError(
+            f"Unsupported simulator '{simulator}'. Supported: {supported}"
+        )
+
+
+def load_cocotb_icarus_sim(
+    design: Design,
+    trace=True,
+    seed=None
+):
+    project = Sim()
+    project.set_design(IcarusDesign(design))
+    project.add_fileset("icarus_sim")
+    project.set_flow(DVFlow(tool="icarus-cocotb"))
+
+    IcarusCompileTask.find_task(project).set_trace_enabled(trace)
+
+    if seed is not None:
+        IcarusCocotbExecTask.find_task(project).set_cocotb_randomseed(seed)
+
+    project.run()
+    project.summary()
+
+    results = project.find_result(
+        step='simulate',
+        index='0',
+        directory="outputs",
+        filename="results.xml"
+    )
+    if results:
+        print(f"\nCocotb results file: {results}")
+
+
+def load_cocotb_verilator_sim(
+    design: Design,
+    trace=True,
+    seed=None,
+    trace_type="vcd"
+):
+    project = Sim()
+    project.set_design(VerilatorDesign(design))
+    project.add_fileset("verilator_sim")
+    project.set_flow(DVFlow(tool="verilator-cocotb"))
+
+    # Enable waveform tracing (must be enabled on both compile and simulate tasks)
+    compile_task = VerilatorCompileTask.find_task(project)
+    compile_task.set_verilator_trace(trace)
+    compile_task.set_verilator_tracetype(trace_type)
+
+    cocotb_task = VerilatorCocotbExecTask.find_task(project)
+    cocotb_task.set_cocotb_trace(
+        enable=trace,
+        trace_type=trace_type
+    )
+
+    # Optionally set a random seed for reproducibility
+    if seed is not None:
+        cocotb_task.set_cocotb_randomseed(seed)
+
+    # Run the simulation
+    project.run()
+    project.summary()
+
+    # Find and display the results file
+    results = project.find_result(
+        step='simulate',
+        index='0',
+        directory="outputs",
+        filename="results.xml"
+    )
+    if results:
+        print(f"\nCocotb results file: {results}")
