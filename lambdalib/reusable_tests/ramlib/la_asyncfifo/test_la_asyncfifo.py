@@ -122,17 +122,25 @@ if _has_cocotb:
     @cocotb.parametrize(
         wr_clk_period_ns=[MIN_PERIOD_NS, RAND_WR_CLK_PERIOD_NS, MAX_PERIOD_NS],
         rd_clk_period_ns=[MIN_PERIOD_NS, RAND_RD_CLK_PERIOD_NS, MAX_PERIOD_NS],
-        wr_en_generator=[None, random_toggle_generator(), wave_generator()],
-        rd_en_generator=[None, random_toggle_generator(), wave_generator()]
+        wr_en_factory=[None, random_toggle_generator, wave_generator],
+        rd_en_factory=[None, random_toggle_generator, wave_generator]
     )
     async def fifo_rd_wr_test(
         dut,
         wr_clk_period_ns=10,
         rd_clk_period_ns=10,
-        wr_en_generator=None,
-        rd_en_generator=None,
+        wr_en_factory=None,
+        rd_en_factory=None,
         test_n_trans=256
     ):
+        # Create fresh generators per test to avoid exhaustion across permutations
+        wr_en_generator = None
+        if wr_en_factory:
+            wr_en_generator = wr_en_factory()
+
+        rd_en_generator = None
+        if rd_en_factory:
+            rd_en_generator = rd_en_factory()
 
         ####################################
         # Create BFMs

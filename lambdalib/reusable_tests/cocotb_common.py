@@ -111,10 +111,15 @@ def load_cocotb_test(
     seed=None
 ):
 
+    supported = ("icarus", "verilator")
     if simulator == "icarus":
         load_cocotb_icarus_sim(design, trace=trace, seed=seed)
     elif simulator == "verilator":
         load_cocotb_verilator_sim(design, trace=trace, seed=seed, trace_type="vcd")
+    else:
+        raise ValueError(
+            f"Unsupported simulator '{simulator}'. Supported: {supported}"
+        )
 
 
 def load_cocotb_icarus_sim(
