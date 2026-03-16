@@ -2,12 +2,12 @@ try:
     import cocotb
 
     from cocotb.triggers import Timer, ValueChange
-    from lambdalib.reusable_tests.cocotb_common import load_cocotb_test
+    from lambdalib.reusable_tests.cocotb_common import SimCmdFiles, use_cocotb
     _has_cocotb = True
 except ModuleNotFoundError:
     _has_cocotb = False
 
-from siliconcompiler import Design
+from siliconcompiler import Design, Sim
 from lambdalib.auxlib import Rsync
 
 
@@ -81,12 +81,13 @@ class TbDesign(Design):
     def __init__(
         self,
         stages: int,
-        rsync: Design = None,
-        rsync_fileset="rtl"
+        simulator: str = "icarus",
+        name: str = None
     ):
         super().__init__()
 
-        name = f"tb_{rsync.name}"
+        if name is None:
+            name = f"cocotb_test_la_rsync_stages_{stages}_sim_{simulator}"
 
         # Set the design's name
         self.set_name(name)
@@ -97,31 +98,26 @@ class TbDesign(Design):
         with self.active_dataroot(name):
             with self.active_fileset("testbench.cocotb"):
                 self.set_topmodule("la_rsync")
-                self.add_file("la_rsync_test.py", filetype="python")
-                self.add_depfileset(rsync, rsync_fileset)
+                self.add_depfileset(Rsync(), "rtl")
                 self.set_param("STAGES", str(stages))
+
+                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+
+                self.add_file("la_rsync_test.py", filetype="python")
 
 
 def run_test(
     stages: int,
     simulator: str,
-    output_wave: bool,
-    rsync: Design = None,
-    rsync_fileset: str = "rtl"
+    output_wave: bool
 ):
     if not _has_cocotb:
         raise RuntimeError("Cocotb is not installed; cannot run test.")
 
-    if rsync is None:
-        rsync = Rsync()
+    project = Sim(TbDesign(stages, simulator))
+    project.add_fileset("testbench.cocotb")
+    use_cocotb(project=project, trace=output_wave)
+    project.set_flow(f"dvflow-{simulator}-cocotb")
 
-    load_cocotb_test(
-        design=TbDesign(
-            stages=stages,
-            rsync=rsync,
-            rsync_fileset=rsync_fileset
-        ),
-        simulator=simulator,
-        trace=output_wave,
-        seed=None
-    )
+    project.run()
+    project.summary()

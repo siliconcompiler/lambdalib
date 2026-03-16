@@ -17,7 +17,8 @@ try:
     )
 
     from lambdalib.reusable_tests.cocotb_common import (
-        load_cocotb_test,
+        use_cocotb,
+        SimCmdFiles,
         do_reset,
         random_decimal,
         random_toggle_generator,
@@ -28,7 +29,7 @@ try:
 except ModuleNotFoundError:
     _has_cocotb = False
 
-from siliconcompiler import Design
+from siliconcompiler import Design, Sim
 from lambdalib.ramlib import Asyncfifo
 
 
@@ -220,12 +221,13 @@ class TbDesign(Design):
     def __init__(
         self,
         depth: int,
-        asyncfifo: Design = None,
-        asyncfifo_fileset="rtl"
+        simulator: str = "icarus",
+        name: str = None
     ):
         super().__init__()
 
-        name = f"tb_{asyncfifo.name}"
+        if name is None:
+            name = f"cocotb_test_la_asyncfifo_depth_{depth}_sim_{simulator}"
 
         # Set the design's name
         self.set_name(name)
@@ -236,33 +238,28 @@ class TbDesign(Design):
         with self.active_dataroot(name):
             with self.active_fileset("testbench.cocotb"):
                 self.set_topmodule("la_asyncfifo")
+                self.add_depfileset(Asyncfifo(), "rtl")
+                self.set_param("DEPTH", str(depth))
+
+                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+
                 self.add_file("test_la_asyncfifo.py", filetype="python")
                 self.add_file("la_asyncfifo_wr_driver.py", filetype="python")
                 self.add_file("la_asyncfifo_rd_monitor.py", filetype="python")
-                self.add_depfileset(asyncfifo, asyncfifo_fileset)
-                self.set_param("DEPTH", str(depth))
 
 
 def run_test(
     depth: int,
     simulator: str,
-    output_wave: bool,
-    asyncfifo: Design = None,
-    asyncfifo_fileset: str = "rtl"
+    output_wave: bool
 ):
     if not _has_cocotb:
         raise RuntimeError("Cocotb is not installed; cannot run test.")
 
-    if asyncfifo is None:
-        asyncfifo = Asyncfifo()
+    project = Sim(TbDesign(depth, simulator))
+    project.add_fileset("testbench.cocotb")
+    use_cocotb(project=project, trace=output_wave)
+    project.set_flow(f"dvflow-{simulator}-cocotb")
 
-    load_cocotb_test(
-        design=TbDesign(
-            depth=depth,
-            asyncfifo=asyncfifo,
-            asyncfifo_fileset=asyncfifo_fileset
-        ),
-        simulator=simulator,
-        trace=output_wave,
-        seed=None
-    )
+    project.run()
+    project.summary()
