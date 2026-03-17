@@ -2,12 +2,12 @@ try:
     import cocotb
 
     from cocotb.triggers import Timer, ValueChange
-    from lambdalib.reusable_tests.cocotb_common import run_cocotb
+    from lambdalib.reusable_tests.cocotb_common import SimCmdFiles, use_cocotb
     _has_cocotb = True
 except ModuleNotFoundError:
     _has_cocotb = False
 
-from siliconcompiler import Sim, Project
+from siliconcompiler import Design, Sim
 from lambdalib.auxlib import Rsync
 
 
@@ -76,32 +76,48 @@ else:
         pass
 
 
+class TbDesign(Design):
+
+    def __init__(
+        self,
+        stages: int,
+        simulator: str = "icarus",
+        name: str = None
+    ):
+        super().__init__()
+
+        if name is None:
+            name = f"cocotb_test_la_rsync_stages_{stages}_sim_{simulator}"
+
+        # Set the design's name
+        self.set_name(name)
+
+        # Establish the root directory for all design-related files
+        self.set_dataroot(name, __file__)
+
+        with self.active_dataroot(name):
+            with self.active_fileset("testbench.cocotb"):
+                self.set_topmodule("la_rsync")
+                self.add_depfileset(Rsync(), "rtl")
+                self.set_param("STAGES", str(stages))
+
+                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+
+                self.add_file("la_rsync_test.py", filetype="python")
+
+
 def run_test(
     stages: int,
     simulator: str,
-    output_wave: bool,
-    project: Project = None
+    output_wave: bool
 ):
     if not _has_cocotb:
         raise RuntimeError("Cocotb is not installed; cannot run test.")
 
-    if project is None:
-        project = Sim(Rsync())
-        project.add_fileset("rtl")
+    project = Sim(TbDesign(stages, simulator))
+    project.add_fileset("testbench.cocotb")
+    use_cocotb(project=project, trace=output_wave)
+    project.set_flow(f"dvflow-{simulator}-cocotb")
 
-    test_inst_name = f"stages_{stages}_sim_{simulator}_output_wave{output_wave}"
-
-    test_module_name = __name__
-    test_name = f"{test_module_name}_{test_inst_name}"
-    tests_failed = run_cocotb(
-        project=project,
-        test_module_name=test_module_name,
-        simulator_name=simulator,
-        timescale=("1ns", "1ps"),
-        parameters={
-            "STAGES": stages
-        },
-        output_dir_name=test_name,
-        waves=output_wave
-    )
-    assert (tests_failed == 0), f"Error test {test_name} failed!"
+    project.run()
+    project.summary()
