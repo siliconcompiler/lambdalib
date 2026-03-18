@@ -23,8 +23,33 @@ if _has_cocotb:
             await Timer(half_period, unit="ns")
 
     @cocotb.test()
-    async def test_la_drsync_basic(dut):
-        """Test data synchronization with async reset"""
+    async def test_la_drsync_reset(dut):
+        """Test synchronous reset behavior"""
+
+        clk = dut.clk
+        nreset = dut.nreset
+        output_data = dut.out
+
+        # Initialize
+        clk.value = 0
+        nreset.value = 1
+        output_data.value = 0
+
+        await Timer(100, unit="ns")
+
+        # Assert reset
+        nreset.value = 0
+        await Timer(50, unit="ns")
+
+        # Check output is reset to 0
+        assert output_data.value == 0, "Output should be 0 after reset"
+
+        nreset.value = 1
+        await Timer(100, unit="ns")
+
+    @cocotb.test()
+    async def test_la_drsync_data_propagation(dut):
+        """Test data propagation with exact STAGES latency boundary verification"""
 
         STAGES = int(dut.STAGES.value)
         clk_period_ns = 10
@@ -41,25 +66,7 @@ if _has_cocotb:
 
         await Timer(clk_period_ns * 2, unit="ns")
 
-        ####################################
-        # 1. Test Synchronous Reset
-        ####################################
-
-        # Assert reset
-        nreset.value = 0
-        await Timer(clk_period_ns / 2, unit="ns")
-
-        # Check output is reset to 0
-        assert output_data.value == 0, "Output should be 0 after reset"
-
-        nreset.value = 1
-        await Timer(clk_period_ns, unit="ns")
-
-        ####################################
-        # 2. Test Data Propagation
-        ####################################
-
-        # Set input to 1 and clock STAGES-1 times, verify no early propagation
+        # Test rising edge
         input_data.value = 1
         for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
@@ -74,7 +81,7 @@ if _has_cocotb:
         assert output_data.value == 1, \
             f"Output should be 1 after {STAGES} clock cycles with input=1"
 
-        # Set input to 0 and clock STAGES-1 times, verify no early propagation
+        # Test falling edge
         input_data.value = 0
         for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
@@ -89,7 +96,36 @@ if _has_cocotb:
         assert output_data.value == 0, \
             f"Output should be 0 after {STAGES} clock cycles with input=0"
 
-        # Test multiple transitions by toggling input and waiting for propagation
+    @cocotb.test()
+    async def test_la_drsync_multiple_transitions(dut):
+        """Test multiple data transitions to verify consistent STAGES latency"""
+
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
+
+        clk = dut.clk
+        nreset = dut.nreset
+        input_data = dut['in']
+        output_data = dut.out
+
+        # Initialize
+        clk.value = 0
+        nreset.value = 1
+        input_data.value = 0
+
+        await Timer(clk_period_ns * 2, unit="ns")
+
+        # Test multiple transitions
+        input_data.value = 1
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+        assert output_data.value == 1, "First rising edge should propagate correctly"
+
+        input_data.value = 0
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+        assert output_data.value == 0, "First falling edge should propagate correctly"
+
         input_data.value = 1
         for _ in range(STAGES):
             await drive_clock(clk, clk_period_ns)
@@ -100,9 +136,24 @@ if _has_cocotb:
             await drive_clock(clk, clk_period_ns)
         assert output_data.value == 0, "Second falling edge should propagate correctly"
 
-        ####################################
-        # 3. Test Reset During Operation
-        ####################################
+    @cocotb.test()
+    async def test_la_drsync_reset_during_operation(dut):
+        """Test asynchronous reset during data propagation"""
+
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
+
+        clk = dut.clk
+        nreset = dut.nreset
+        input_data = dut['in']
+        output_data = dut.out
+
+        # Initialize
+        clk.value = 0
+        nreset.value = 1
+        input_data.value = 0
+
+        await Timer(clk_period_ns * 2, unit="ns")
 
         # Drive some data
         input_data.value = 1

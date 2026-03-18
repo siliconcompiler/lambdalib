@@ -23,8 +23,8 @@ if _has_cocotb:
             await Timer(half_period, unit="ns")
 
     @cocotb.test()
-    async def test_la_dsync_basic(dut):
-        """Test basic data synchronization across clock domains"""
+    async def test_la_dsync_rising_edge(dut):
+        """Test rising edge data propagation with exact STAGES boundary verification"""
 
         STAGES = int(dut.STAGES.value)
         clk_period_ns = 10
@@ -38,10 +38,6 @@ if _has_cocotb:
         input_data.value = 0
 
         await Timer(clk_period_ns * 2, unit="ns")
-
-        ####################################
-        # 1. Test Data Propagation - Rising Edge
-        ####################################
 
         # Set input to 1
         input_data.value = 1
@@ -58,11 +54,30 @@ if _has_cocotb:
         # After STAGES cycles, output should be 1
         assert output_data.value == 1, f"Output should be 1 after {STAGES} cycles with input=1"
 
-        ####################################
-        # 2. Test Data Propagation - Falling Edge
-        ####################################
+    @cocotb.test()
+    async def test_la_dsync_falling_edge(dut):
+        """Test falling edge data propagation with exact STAGES boundary verification"""
 
-        # Set input to 0
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
+
+        clk = dut.clk
+        input_data = dut['in']
+        output_data = dut.out
+
+        # Initialize and set up initial state
+        clk.value = 0
+        input_data.value = 0
+
+        await Timer(clk_period_ns * 2, unit="ns")
+
+        # First, establish a known state with input=1
+        input_data.value = 1
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+        assert output_data.value == 1, "Initial setup: output should be 1"
+
+        # Now test falling edge - set input to 0
         input_data.value = 0
 
         # Clock through STAGES-1 cycles and verify no early propagation
@@ -77,29 +92,64 @@ if _has_cocotb:
         # After STAGES cycles, output should be 0
         assert output_data.value == 0, f"Output should be 0 after {STAGES} cycles with input=0"
 
-        ####################################
-        # 3. Test Multiple Transitions
-        ####################################
+    @cocotb.test()
+    async def test_la_dsync_multiple_transitions(dut):
+        """Test multiple rapid transitions to verify consistent STAGES latency"""
+
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
+
+        clk = dut.clk
+        input_data = dut['in']
+        output_data = dut.out
+
+        # Initialize
+        clk.value = 0
+        input_data.value = 0
+
+        await Timer(clk_period_ns * 2, unit="ns")
 
         # Test another rising edge
         input_data.value = 1
         for _ in range(STAGES):
             await drive_clock(clk, clk_period_ns)
-        assert output_data.value == 1, "Second rising edge should propagate correctly"
+        assert output_data.value == 1, "First rising edge should propagate correctly"
 
         # Test another falling edge
         input_data.value = 0
         for _ in range(STAGES):
             await drive_clock(clk, clk_period_ns)
+        assert output_data.value == 0, "First falling edge should propagate correctly"
+
+        # Test second rising edge
+        input_data.value = 1
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+        assert output_data.value == 1, "Second rising edge should propagate correctly"
+
+        # Test second falling edge
+        input_data.value = 0
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
         assert output_data.value == 0, "Second falling edge should propagate correctly"
 
-        ####################################
-        # 4. Test Stability
-        ####################################
+    @cocotb.test()
+    async def test_la_dsync_stability(dut):
+        """Test output stability with constant input"""
+
+        clk = dut.clk
+        input_data = dut['in']
+        output_data = dut.out
+
+        # Initialize
+        clk.value = 0
+        input_data.value = 0
+
+        await Timer(100, unit="ns")
 
         # Keep input stable and verify output remains stable
         for _ in range(10):
-            await drive_clock(clk, clk_period_ns)
+            await drive_clock(clk, 10)
         assert output_data.value == 0, "Output should remain stable at 0"
 
 
