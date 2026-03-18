@@ -7,6 +7,7 @@ try:
 except ModuleNotFoundError:
     _has_cocotb = False
 
+from typing import Optional
 from siliconcompiler import Design, Sim
 from lambdalib.auxlib import Drsync
 
@@ -58,19 +59,31 @@ if _has_cocotb:
         # 2. Test Data Propagation
         ####################################
 
-        # Set input to 1 and clock STAGES times to propagate through synchronizer
+        # Set input to 1 and clock STAGES-1 times, verify no early propagation
         input_data.value = 1
-        for _ in range(STAGES):
+        for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
+        # Output should not yet be 1 (hasn't propagated yet)
+        assert output_data.value != 1, \
+            f"Output changed too early before {STAGES} cycles"
+
+        # Clock the final cycle
+        await drive_clock(clk, clk_period_ns)
 
         # Now output should be 1
         assert output_data.value == 1, \
             f"Output should be 1 after {STAGES} clock cycles with input=1"
 
-        # Set input to 0 and clock STAGES times
+        # Set input to 0 and clock STAGES-1 times, verify no early propagation
         input_data.value = 0
-        for _ in range(STAGES):
+        for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
+        # Output should not yet be 0 (hasn't propagated yet)
+        assert output_data.value != 0, \
+            f"Output changed too early before {STAGES} cycles"
+
+        # Clock the final cycle
+        await drive_clock(clk, clk_period_ns)
 
         # Now output should be 0
         assert output_data.value == 0, \
@@ -118,7 +131,7 @@ class TbDesign(Design):
         self,
         stages: int,
         simulator: str = "icarus",
-        name: str = None
+        name: Optional[str] = None
     ):
         super().__init__()
 

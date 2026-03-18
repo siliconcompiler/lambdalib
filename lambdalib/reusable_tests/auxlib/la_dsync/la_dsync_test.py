@@ -7,6 +7,7 @@ try:
 except ModuleNotFoundError:
     _has_cocotb = False
 
+from typing import Optional
 from siliconcompiler import Design, Sim
 from lambdalib.auxlib import Dsync
 
@@ -45,9 +46,14 @@ if _has_cocotb:
         # Set input to 1
         input_data.value = 1
 
-        # Clock through STAGES cycles to propagate
-        for _ in range(STAGES):
+        # Clock through STAGES-1 cycles and verify no early propagation
+        for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
+        # Output should not yet be 1 (hasn't propagated yet)
+        assert output_data.value != 1, f"Output changed too early before {STAGES} cycles"
+
+        # Clock the final cycle
+        await drive_clock(clk, clk_period_ns)
 
         # After STAGES cycles, output should be 1
         assert output_data.value == 1, f"Output should be 1 after {STAGES} cycles with input=1"
@@ -59,9 +65,14 @@ if _has_cocotb:
         # Set input to 0
         input_data.value = 0
 
-        # Clock through STAGES cycles
-        for _ in range(STAGES):
+        # Clock through STAGES-1 cycles and verify no early propagation
+        for _ in range(STAGES - 1):
             await drive_clock(clk, clk_period_ns)
+        # Output should not yet be 0 (hasn't propagated yet)
+        assert output_data.value != 0, f"Output changed too early before {STAGES} cycles"
+
+        # Clock the final cycle
+        await drive_clock(clk, clk_period_ns)
 
         # After STAGES cycles, output should be 0
         assert output_data.value == 0, f"Output should be 0 after {STAGES} cycles with input=0"
@@ -104,7 +115,7 @@ class TbDesign(Design):
         self,
         stages: int,
         simulator: str = "icarus",
-        name: str = None
+        name: Optional[str] = None
     ):
         super().__init__()
 
