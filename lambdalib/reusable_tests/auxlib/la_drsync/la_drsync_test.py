@@ -140,7 +140,6 @@ if _has_cocotb:
     async def test_la_drsync_reset_during_operation(dut):
         """Test asynchronous reset during data propagation"""
 
-        STAGES = int(dut.STAGES.value)
         clk_period_ns = 10
 
         clk = dut.clk
