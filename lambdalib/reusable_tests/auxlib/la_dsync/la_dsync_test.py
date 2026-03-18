@@ -147,10 +147,35 @@ if _has_cocotb:
 
         await Timer(100, unit="ns")
 
-        # Keep input stable and verify output remains stable
+        # Set input to 1 and let it stabilize
+        input_data.value = 1
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
+
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+
+        # Now input is stable at 1 and output should be 1
+        initial_output = output_data.value
+        assert initial_output == 1, "Output should be 1 after stabilization"
+
+        # Verify output remains stable across multiple clock cycles
         for _ in range(10):
-            await drive_clock(clk, 10)
-        assert output_data.value == 0, "Output should remain stable at 0"
+            await drive_clock(clk, clk_period_ns)
+            assert output_data.value == initial_output, "Output should remain stable when input is constant"
+
+        # Now test stability with output at 0
+        input_data.value = 0
+        for _ in range(STAGES):
+            await drive_clock(clk, clk_period_ns)
+
+        # Verify output is now 0 and remains stable
+        initial_output = output_data.value
+        assert initial_output == 0, "Output should be 0 after input change stabilization"
+
+        for _ in range(10):
+            await drive_clock(clk, clk_period_ns)
+            assert output_data.value == initial_output, "Output should remain stable when input is constant"
 
 
 else:

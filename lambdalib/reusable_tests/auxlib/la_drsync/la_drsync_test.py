@@ -24,28 +24,47 @@ if _has_cocotb:
 
     @cocotb.test()
     async def test_la_drsync_reset(dut):
-        """Test synchronous reset behavior"""
+        """Test asynchronous reset behavior with data propagation"""
+
+        STAGES = int(dut.STAGES.value)
+        clk_period_ns = 10
 
         clk = dut.clk
         nreset = dut.nreset
+        input_data = dut['in']
         output_data = dut.out
 
         # Initialize
         clk.value = 0
         nreset.value = 1
-        output_data.value = 0
+        input_data.value = 0
 
-        await Timer(100, unit="ns")
+        await Timer(clk_period_ns * 2, unit="ns")
 
-        # Assert reset
+        # Clock 1'b1 into the input until output_data is 1
+        input_data.value = 1
+        cycles = 0
+        while output_data.value != 1:
+            await drive_clock(clk, clk_period_ns)
+            cycles += 1
+            assert cycles <= STAGES + 2, "Output should propagate within STAGES+2 cycles"
+
+        assert output_data.value == 1, "Output should be 1 after propagation"
+
+        # Pause the clock at value 0
+        clk.value = 0
+        await Timer(clk_period_ns / 2, unit="ns")
+
+        # Assert the asynchronous reset
         nreset.value = 0
-        await Timer(50, unit="ns")
+        await Timer(clk_period_ns / 2, unit="ns")
 
-        # Check output is reset to 0
-        assert output_data.value == 0, "Output should be 0 after reset"
+        # Verify that reset cleared the output without clocking
+        assert output_data.value == 0, "Output should be immediately reset to 0 by async reset"
 
+        # Release reset
         nreset.value = 1
-        await Timer(100, unit="ns")
+        await Timer(clk_period_ns, unit="ns")
 
     @cocotb.test()
     async def test_la_drsync_data_propagation(dut):
