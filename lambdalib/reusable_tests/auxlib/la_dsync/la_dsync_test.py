@@ -162,7 +162,8 @@ if _has_cocotb:
         # Verify output remains stable across multiple clock cycles
         for _ in range(10):
             await drive_clock(clk, clk_period_ns)
-            assert output_data.value == initial_output, "Output should remain stable when input is constant"
+            assert output_data.value == initial_output, \
+                "Output should remain stable when input is constant"
 
         # Now test stability with output at 0
         input_data.value = 0
@@ -175,7 +176,8 @@ if _has_cocotb:
 
         for _ in range(10):
             await drive_clock(clk, clk_period_ns)
-            assert output_data.value == initial_output, "Output should remain stable when input is constant"
+            assert output_data.value == initial_output, \
+                "Output should remain stable when input is constant"
 
 
 else:
