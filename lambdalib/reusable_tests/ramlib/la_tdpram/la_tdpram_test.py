@@ -33,7 +33,7 @@ if _has_cocotb:
         ce_a.value = 1
         wmask_a.value = (1 << DW) - 1
         we_a.value = 1
-        
+
         # Write 0xAAAA to address 0 on port A
         addr_a.value = 0
         din_a.value = 0xAAAA & ((1 << DW) - 1)
@@ -90,12 +90,14 @@ if _has_cocotb:
 
         # Read from address 0 on port A
         await wait_cycles(clk_a, 2)
-        assert dout_a.value == (0xAAAA & ((1 << DW) - 1)), f"Port A read addr 0 failed: {hex(dout_a.value)}"
+        assert dout_a.value == (0xAAAA & ((1 << DW) - 1)), \
+            f"Port A read addr 0 failed: {hex(dout_a.value)}"
 
         # Read from address 1 on port A
         addr_a.value = 1
         await wait_cycles(clk_a, 2)
-        assert dout_a.value == (0x5555 & ((1 << DW) - 1)), f"Port A read addr 1 failed: {hex(dout_a.value)}"
+        assert dout_a.value == (0x5555 & ((1 << DW) - 1)), \
+            f"Port A read addr 1 failed: {hex(dout_a.value)}"
 
     async def test_port_b_read(dut, DW):
         """Test Port B read operations"""
@@ -113,12 +115,14 @@ if _has_cocotb:
 
         # Read from address 2 on port B
         await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0x3333 & ((1 << DW) - 1)), f"Port B read addr 2 failed: {hex(dout_b.value)}"
+        assert dout_b.value == (0x3333 & ((1 << DW) - 1)), \
+            f"Port B read addr 2 failed: {hex(dout_b.value)}"
 
         # Read from address 3 on port B
         addr_b.value = 3
         await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0x7777 & ((1 << DW) - 1)), f"Port B read addr 3 failed: {hex(dout_b.value)}"
+        assert dout_b.value == (0x7777 & ((1 << DW) - 1)), \
+            f"Port B read addr 3 failed: {hex(dout_b.value)}"
 
     async def test_all_addresses(dut, DW, AW):
         """Test write and read from all addresses on both ports"""
@@ -135,7 +139,6 @@ if _has_cocotb:
         we_b = dut.we_b
         wmask_b = dut.wmask_b
         addr_b = dut.addr_b
-        din_b = dut.din_b
         dout_b = dut.dout_b
 
         depth = 2 ** AW
@@ -148,14 +151,14 @@ if _has_cocotb:
         ce_b.value = 1
         wmask_a.value = data_mask
         wmask_b.value = data_mask
-        
+
         # Clear entire memory from Port A only (simplifies data handling)
         we_a.value = 1
         for clear_addr in range(depth):
             addr_a.value = clear_addr
             din_a.value = 0
             await wait_cycles(clk_a, 1)
-        
+
         # Disable Port A writes and wait
         we_a.value = 0
         await wait_cycles(clk_a, 2)
@@ -180,7 +183,8 @@ if _has_cocotb:
             await wait_cycles(clk_a, 2)
             expected_pattern = (test_addr * 0x1111) & data_mask
             assert dout_a.value == expected_pattern, \
-                f"Port A address {test_addr} mismatch: got {hex(dout_a.value)}, expected {hex(expected_pattern)}"
+                f"Port A address {test_addr} mismatch: got {hex(dout_a.value)}, " \
+                f"expected {hex(expected_pattern)}"
 
         # Also verify all addresses can be read from Port B
         addr_b.value = 0
@@ -190,13 +194,13 @@ if _has_cocotb:
             await wait_cycles(clk_b, 2)
             expected_pattern = (test_addr * 0x1111) & data_mask
             assert dout_b.value == expected_pattern, \
-                f"Port B address {test_addr} mismatch: got {hex(dout_b.value)}, expected {hex(expected_pattern)}"
+                f"Port B address {test_addr} mismatch: got {hex(dout_b.value)}, " \
+                f"expected {hex(expected_pattern)}"
 
     @cocotb.test()
     async def test_la_tdpram_basic(dut):
         """Test basic read/write operations of true dual-port RAM"""
         DW = int(dut.DW.value)
-        AW = int(dut.AW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
 
@@ -235,11 +239,11 @@ if _has_cocotb:
         cocotb.start_soon(Clock(clk_b, clk_period_ns, unit="ns").start())
         await Timer(clk_period_ns, unit="ns")
 
-        # Run tests
+        # Test basic Port A and B write and read operations
         await test_port_a_write(dut, DW)
+        await test_port_a_read(dut, DW)    # Verify Port A write and read functionality
         await test_port_b_write(dut, DW)
-        # Note: test_all_addresses provides comprehensive read/write coverage
-        # Port-specific read tests are omitted due to independent clock synchronization
+        await test_port_b_read(dut, DW)    # Verify Port B write and read functionality
 
     @cocotb.test()
     async def test_la_tdpram_all_addresses(dut):

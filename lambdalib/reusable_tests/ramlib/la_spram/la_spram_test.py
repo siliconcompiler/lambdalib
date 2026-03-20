@@ -60,17 +60,20 @@ if _has_cocotb:
         # Read from address 0
         addr.value = 0
         await wait_cycles(clk, 2)
-        assert dout.value == (0xAAAA & ((1 << DW) - 1)), f"Read from addr 0 failed: {hex(dout.value)}"
+        assert dout.value == (0xAAAA & ((1 << DW) - 1)), \
+            f"Read from addr 0 failed: {hex(dout.value)}"
 
         # Read from address 1
         addr.value = 1
         await wait_cycles(clk, 2)
-        assert dout.value == (0x5555 & ((1 << DW) - 1)), f"Read from addr 1 failed: {hex(dout.value)}"
+        assert dout.value == (0x5555 & ((1 << DW) - 1)), \
+            f"Read from addr 1 failed: {hex(dout.value)}"
 
         # Read from address 2
         addr.value = 2
         await wait_cycles(clk, 2)
-        assert dout.value == ((1 << DW) - 1), f"Read from addr 2 failed: {hex(dout.value)}"
+        assert dout.value == ((1 << DW) - 1), \
+            f"Read from addr 2 failed: {hex(dout.value)}"
 
     async def test_all_addresses(dut, DW, AW, clk_period_ns):
         """Test write and read from all addresses"""
@@ -101,13 +104,13 @@ if _has_cocotb:
             await wait_cycles(clk, 2)
             expected_pattern = (test_addr * 0x1111) & ((1 << DW) - 1)
             assert dout.value == expected_pattern, \
-                f"Address {test_addr} mismatch: got {hex(dout.value)}, expected {hex(expected_pattern)}"
+                f"Address {test_addr} mismatch: got {hex(dout.value)}, " \
+                f"expected {hex(expected_pattern)}"
 
     @cocotb.test()
     async def test_la_spram_basic(dut):
         """Test basic read/write operations of single-port RAM"""
         DW = int(dut.DW.value)
-        AW = int(dut.AW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
 

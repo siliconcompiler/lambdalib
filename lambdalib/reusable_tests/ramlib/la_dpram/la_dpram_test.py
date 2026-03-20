@@ -49,7 +49,6 @@ if _has_cocotb:
 
     async def test_read_operations(dut, DW):
         """Test read port operations"""
-        wr_clk = dut.wr_clk
         wr_we = dut.wr_we
         rd_clk = dut.rd_clk
         rd_ce = dut.rd_ce
@@ -63,12 +62,14 @@ if _has_cocotb:
         rd_ce.value = 1
         rd_addr.value = 0
         await wait_cycles(rd_clk, 3)  # Extra cycle to ensure rd_dout is valid
-        assert rd_dout.value == (0xAAAA & ((1 << DW) - 1)), f"Read from addr 0 failed: {hex(rd_dout.value)}"
+        assert rd_dout.value == (0xAAAA & ((1 << DW) - 1)), \
+            f"Read from addr 0 failed: {hex(rd_dout.value)}"
 
         # Read from address 1
         rd_addr.value = 1
         await wait_cycles(rd_clk, 2)
-        assert rd_dout.value == (0x5555 & ((1 << DW) - 1)), f"Read from addr 1 failed: {hex(rd_dout.value)}"
+        assert rd_dout.value == (0x5555 & ((1 << DW) - 1)), \
+            f"Read from addr 1 failed: {hex(rd_dout.value)}"
 
         # Read from address 2
         rd_addr.value = 2
@@ -119,19 +120,19 @@ if _has_cocotb:
         rd_ce.value = 1
         rd_addr.value = 0
         await wait_cycles(rd_clk, 3)  # Prime the first read with extra cycle
-        
+
         for test_addr in range(depth):
             rd_addr.value = test_addr
             await wait_cycles(rd_clk, 2)
             expected_pattern = (test_addr * 0x1111) & data_mask
             assert rd_dout.value == expected_pattern, \
-                f"Address {test_addr} mismatch: got {hex(rd_dout.value)}, expected {hex(expected_pattern)}"
+                f"Address {test_addr} mismatch: got {hex(rd_dout.value)}, " \
+                f"expected {hex(expected_pattern)}"
 
     @cocotb.test()
     async def test_la_dpram_basic(dut):
         """Test basic read/write operations of dual-port RAM"""
         DW = int(dut.DW.value)
-        AW = int(dut.AW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
 
