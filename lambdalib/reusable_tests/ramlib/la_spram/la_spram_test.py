@@ -20,8 +20,8 @@ if _has_cocotb:
         for _ in range(n):
             await cocotb.triggers.RisingEdge(clk)
 
-    async def test_write_operations(dut, DW, clk_period_ns):
-        """Test write operations"""
+    async def write_operations(dut, DW, clk_period_ns):
+        """Write operations"""
         clk = dut.clk
         ce = dut.ce
         we = dut.we
@@ -47,8 +47,8 @@ if _has_cocotb:
         din.value = (1 << DW) - 1
         await wait_cycles(clk, 1)
 
-    async def test_read_operations(dut, DW, clk_period_ns):
-        """Test read operations"""
+    async def read_operations(dut, DW, clk_period_ns):
+        """Read operations"""
         clk = dut.clk
         we = dut.we
         addr = dut.addr
@@ -75,8 +75,8 @@ if _has_cocotb:
         assert dout.value == ((1 << DW) - 1), \
             f"Read from addr 2 failed: {hex(dout.value)}"
 
-    async def test_all_addresses(dut, DW, AW, clk_period_ns):
-        """Test write and read from all addresses"""
+    async def all_addresses(dut, DW, AW, clk_period_ns):
+        """Write and read from all addresses"""
         clk = dut.clk
         ce = dut.ce
         we = dut.we
@@ -135,8 +135,8 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Run tests
-        await test_write_operations(dut, DW, clk_period_ns)
-        await test_read_operations(dut, DW, clk_period_ns)
+        await write_operations(dut, DW, clk_period_ns)
+        await read_operations(dut, DW, clk_period_ns)
 
     @cocotb.test()
     async def test_la_spram_all_addresses(dut):
@@ -167,7 +167,7 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Run comprehensive test
-        await test_all_addresses(dut, DW, AW, clk_period_ns)
+        await all_addresses(dut, DW, AW, clk_period_ns)
 
 
 else:

@@ -20,8 +20,8 @@ if _has_cocotb:
         for _ in range(n):
             await cocotb.triggers.RisingEdge(clk)
 
-    async def test_port_a_write(dut, DW):
-        """Test Port A write operations"""
+    async def port_a_write(dut, DW):
+        """Port A write operations"""
         clk_a = dut.clk_a
         ce_a = dut.ce_a
         we_a = dut.we_a
@@ -47,8 +47,8 @@ if _has_cocotb:
         # Disable writes before returning
         we_a.value = 0
 
-    async def test_port_b_write(dut, DW):
-        """Test Port B write operations"""
+    async def port_b_write(dut, DW):
+        """Port B write operations"""
         clk_b = dut.clk_b
         ce_b = dut.ce_b
         we_b = dut.we_b
@@ -74,8 +74,8 @@ if _has_cocotb:
         # Disable writes before returning
         we_b.value = 0
 
-    async def test_port_a_read(dut, DW):
-        """Test Port A read operations"""
+    async def port_a_read(dut, DW):
+        """Port A read operations"""
         clk_a = dut.clk_a
         ce_a = dut.ce_a
         we_a = dut.we_a
@@ -99,8 +99,8 @@ if _has_cocotb:
         assert dout_a.value == (0x5555 & ((1 << DW) - 1)), \
             f"Port A read addr 1 failed: {hex(dout_a.value)}"
 
-    async def test_port_b_read(dut, DW):
-        """Test Port B read operations"""
+    async def port_b_read(dut, DW):
+        """Port B read operations"""
         clk_b = dut.clk_b
         ce_b = dut.ce_b
         we_b = dut.we_b
@@ -124,8 +124,8 @@ if _has_cocotb:
         assert dout_b.value == (0x7777 & ((1 << DW) - 1)), \
             f"Port B read addr 3 failed: {hex(dout_b.value)}"
 
-    async def test_port_b_write_and_read(dut, DW):
-        """Test Port B write-and-read sequence within Port B clock domain"""
+    async def port_b_write_and_read(dut, DW):
+        """Port B write-and-read sequence within Port B clock domain"""
         clk_b = dut.clk_b
         ce_b = dut.ce_b
         we_b = dut.we_b
@@ -176,8 +176,8 @@ if _has_cocotb:
         assert dout_b.value == (0xDEAD & data_mask), \
             f"Port B write-read addr 5 failed: {hex(dout_b.value)}"
 
-    async def test_all_addresses(dut, DW, AW):
-        """Test write and read from all addresses on both ports"""
+    async def all_addresses(dut, DW, AW):
+        """Write and read from all addresses on both ports"""
         clk_a = dut.clk_a
         ce_a = dut.ce_a
         we_a = dut.we_a
@@ -292,11 +292,11 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Test basic Port A write operation
-        await test_port_a_write(dut, DW)
+        await port_a_write(dut, DW)
 
         # Test Port B write and read-back within Port B's clock domain
         # This exercises we_b, din_b, data_out_b and verifies data integrity
-        await test_port_b_write_and_read(dut, DW)
+        await port_b_write_and_read(dut, DW)
 
     @cocotb.test()
     async def test_la_tdpram_all_addresses(dut):
@@ -342,7 +342,7 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Run comprehensive test
-        await test_all_addresses(dut, DW, AW)
+        await all_addresses(dut, DW, AW)
 
 
 else:

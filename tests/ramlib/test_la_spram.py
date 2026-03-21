@@ -3,6 +3,7 @@ import pytest
 
 
 @pytest.mark.eda
+@pytest.mark.timeout(240)
 @pytest.mark.parametrize("dw, aw, simulator, output_wave", list(itertools.product(
     [8, 16, 32],
     [4, 8],

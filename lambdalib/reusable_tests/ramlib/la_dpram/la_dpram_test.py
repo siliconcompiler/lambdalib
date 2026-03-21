@@ -20,8 +20,8 @@ if _has_cocotb:
         for _ in range(n):
             await cocotb.triggers.RisingEdge(clk)
 
-    async def test_write_operations(dut, DW):
-        """Test write port operations"""
+    async def write_operations(dut, DW):
+        """Write port operations"""
         wr_clk = dut.wr_clk
         wr_ce = dut.wr_ce
         wr_we = dut.wr_we
@@ -47,8 +47,8 @@ if _has_cocotb:
         wr_din.value = (1 << DW) - 1
         await wait_cycles(wr_clk, 1)
 
-    async def test_read_operations(dut, DW):
-        """Test read port operations"""
+    async def read_operations(dut, DW):
+        """Read port operations"""
         wr_we = dut.wr_we
         rd_clk = dut.rd_clk
         rd_ce = dut.rd_ce
@@ -76,8 +76,8 @@ if _has_cocotb:
         await wait_cycles(rd_clk, 2)
         assert rd_dout.value == ((1 << DW) - 1), f"Read from addr 2 failed: {hex(rd_dout.value)}"
 
-    async def test_all_addresses(dut, DW, AW):
-        """Test write and read from all addresses"""
+    async def all_addresses(dut, DW, AW):
+        """Write and read from all addresses"""
         wr_clk = dut.wr_clk
         wr_ce = dut.wr_ce
         wr_we = dut.wr_we
@@ -163,8 +163,8 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Run tests
-        await test_write_operations(dut, DW)
-        await test_read_operations(dut, DW)
+        await write_operations(dut, DW)
+        await read_operations(dut, DW)
 
     @cocotb.test()
     async def test_la_dpram_all_addresses(dut):
@@ -201,7 +201,7 @@ if _has_cocotb:
         await Timer(clk_period_ns, unit="ns")
 
         # Run comprehensive test
-        await test_all_addresses(dut, DW, AW)
+        await all_addresses(dut, DW, AW)
 
 
 else:
