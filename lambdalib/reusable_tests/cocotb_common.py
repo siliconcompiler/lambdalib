@@ -17,14 +17,12 @@ from siliconcompiler.tools.verilator.cocotb_exec import CocotbExecTask as Verila
 
 
 async def do_reset(
-        reset,  # SimHandleBase type
+        reset,
         time_ns: int,
         active_level: bool = False):
     """Perform a async reset"""
-    # Import cocotb triggers only when this function is actually called
-    # (which is inside cocotb simulations where cocotb is available)
     from cocotb.triggers import Timer
-    
+
     reset.value = not active_level
     await Timer(1, unit="step")
     reset.value = active_level
