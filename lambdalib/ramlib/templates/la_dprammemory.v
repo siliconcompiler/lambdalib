@@ -74,13 +74,19 @@ module {{ type }}
             .CTRLW(CTRLW),
             .TESTW(TESTW)
         ) memory(
-            .clk(clk),
-            .ce(ce),
-            .we(we),
-            .wmask(wmask),
-            .addr(addr),
-            .din(din),
-            .dout(dout),
+            // Write port
+            .wr_clk(wr_clk),
+            .wr_ce(wr_ce),
+            .wr_we(wr_we),
+            .wr_wmask(wr_wmask),
+            .wr_addr(wr_addr),
+            .wr_din(wr_din),
+            // Read port
+            .rd_clk(rd_clk),
+            .rd_ce(rd_ce),
+            .rd_addr(rd_addr),
+            .rd_dout(rd_dout),
+            // Power/control
             .vss(vss),
             .vdd(vdd),
             .vddio(vddio),
