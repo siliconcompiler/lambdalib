@@ -108,6 +108,7 @@ module {{ type }}
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin: ADDR
           wire we_selected;
           wire re_selected;
+          reg re_selected_reg;
           wire [MEM_DEPTH-1:0] wr_mem_addr;
           wire [MEM_DEPTH-1:0] rd_mem_addr;
 
@@ -123,6 +124,10 @@ module {{ type }}
             assign rd_mem_addr = rd_addr[MEM_DEPTH-1:0];
           end
 
+          always @(posedge rd_clk) begin
+            re_selected_reg <= re_selected;
+          end
+
           genvar n;
           for (n = 0; n < DW; n = n + MEM_WIDTH) begin: WORD
             wire [MEM_WIDTH-1:0] mem_din;
@@ -134,7 +139,7 @@ module {{ type }}
               if (n + i < DW) begin: ACTIVE
                 assign mem_din[i] = wr_din[n + i];
                 assign mem_wmask[i] = wr_wmask[n + i];
-                assign OUTPUTS[n + i].mem_outputs[a] = re_selected ? mem_dout[i] : 1'b0;
+                assign OUTPUTS[n + i].mem_outputs[a] = re_selected_reg ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE
                 assign mem_din[i] = 1'b0;
