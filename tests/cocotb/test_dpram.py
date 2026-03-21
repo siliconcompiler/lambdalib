@@ -18,6 +18,14 @@ if _has_cocotb:
     async def test_dpram_independent_clocks(dut):
         """Test DPRAM with different write and read clock frequencies"""
         
+        # Get the data width from the DUT signals
+        dw = len(dut.wr_din)
+        max_value = (1 << dw) - 1
+        
+        # Adapt test values to the actual data width
+        test_val1 = (0xABCDEF01 & max_value)
+        test_val2 = (0x12345678 & max_value)
+        
         # Setup independent clocks
         wr_clock = Clock(dut.wr_clk, 10, unit="ns")
         rd_clock = Clock(dut.rd_clk, 14, unit="ns")
@@ -39,8 +47,8 @@ if _has_cocotb:
         
         # Test 1: Write on write clock
         dut.wr_addr.value = 10
-        dut.wr_din.value = 0xABCDEF01
-        dut.wr_wmask.value = 0xFFFFFFFF
+        dut.wr_din.value = test_val1
+        dut.wr_wmask.value = max_value
         dut.wr_ce.value = 1
         dut.wr_we.value = 1
         
@@ -51,8 +59,8 @@ if _has_cocotb:
         
         # Write another value
         dut.wr_addr.value = 20
-        dut.wr_din.value = 0x12345678
-        dut.wr_wmask.value = 0xFFFFFFFF
+        dut.wr_din.value = test_val2
+        dut.wr_wmask.value = max_value
         dut.wr_ce.value = 1
         dut.wr_we.value = 1
         
@@ -68,7 +76,7 @@ if _has_cocotb:
         await ClockCycles(dut.rd_clk, 2)
         
         read_value = int(dut.rd_dout.value)
-        assert read_value == 0xABCDEF01, f"DPRAM read mismatch: got 0x{read_value:08X}"
+        assert read_value == test_val1, f"DPRAM read mismatch: got 0x{read_value:X}, expected 0x{test_val1:X}"
         
         dut.rd_ce.value = 0
         
@@ -81,15 +89,22 @@ if _has_cocotb:
         await ClockCycles(dut.rd_clk, 2)
         
         read_value = int(dut.rd_dout.value)
-        assert read_value == 0x12345678, f"DPRAM read mismatch: got 0x{read_value:08X}"
+        assert read_value == test_val2, f"DPRAM read mismatch: got 0x{read_value:X}, expected 0x{test_val2:X}"
 
     @cocotb.test()
     async def test_dpram_write_read_same_addr(dut):
         """Test DPRAM simultaneous write and read to different addresses"""
         
+        # Get the data width from the DUT signals
+        dw = len(dut.wr_din)
+        max_value = (1 << dw) - 1
+        
+        # Adapt test value to the actual data width
+        test_val = (0xDEADBEEF & max_value)
+        
         # Setup independent clocks
-        wr_clock = Clock(dut.wr_clk, 10, units="ns")
-        rd_clock = Clock(dut.rd_clk, 10, units="ns")
+        wr_clock = Clock(dut.wr_clk, 10, unit="ns")
+        rd_clock = Clock(dut.rd_clk, 10, unit="ns")
         cocotb.start_soon(wr_clock.start())
         cocotb.start_soon(rd_clock.start())
         
@@ -106,8 +121,8 @@ if _has_cocotb:
         
         # Simultaneous write on A, read from B
         dut.wr_addr.value = 7
-        dut.wr_din.value = 0xDEADBEEF
-        dut.wr_wmask.value = 0xFFFFFFFF
+        dut.wr_din.value = test_val
+        dut.wr_wmask.value = max_value
         dut.wr_ce.value = 1
         dut.wr_we.value = 1
         
