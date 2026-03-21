@@ -175,9 +175,9 @@ module {{ type }}
             assign we_in_B = we_b && selectedB;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
-  {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
-    .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
-  );
+              {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
+                .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
+              );
             end{% endfor %}
           end
         end
