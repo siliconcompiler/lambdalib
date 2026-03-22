@@ -59,6 +59,7 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
     address and data widths, verifying write/read operations and
     write masking.
     """
+    pytest.importorskip("cocotb")
 
     class SpramTbDesign(Design):
         """Testbench design for SPRAM cocotb functional tests"""
@@ -159,6 +160,7 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw):
     address and data widths, verifying write/read operations and
     write masking.
     """
+    pytest.importorskip("cocotb")
 
     class SpregfileTbDesign(Design):
         """Testbench design for SPREGFILE cocotb functional tests"""
@@ -259,6 +261,7 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw):
     address and data widths, verifying write/read operations and
     write masking with separate read and write clocks.
     """
+    pytest.importorskip("cocotb")
 
     class DpramTbDesign(Design):
         """Testbench design for DPRAM cocotb functional tests"""
@@ -368,6 +371,7 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw):
     address and data widths, verifying write/read operations and
     write masking with two independent ports.
     """
+    pytest.importorskip("cocotb")
 
     class TdpramTbDesign(Design):
         """Testbench design for TDPRAM cocotb functional tests"""
