@@ -95,15 +95,20 @@ if _has_cocotb:
             f"DPRAM read mismatch: got 0x{read_value:X}, expected 0x{test_val2:X}"
 
     @cocotb.test()
-    async def test_dpram_write_read_same_addr(dut):
-        """Test DPRAM simultaneous write and read to different addresses"""
+    async def test_dpram_concurrent_different_addr(dut):
+        """Test DPRAM concurrent read and write to different addresses.
+
+        Verifies that the independent read and write ports can operate
+        simultaneously on different addresses without interference.
+        """
 
         # Get the data width from the DUT signals
         dw = len(dut.wr_din)
         max_value = (1 << dw) - 1
 
-        # Adapt test value to the actual data width
-        test_val = (0xDEADBEEF & max_value)
+        # Adapt test values to the actual data width
+        wr_test_val = (0xDEADBEEF & max_value)
+        rd_test_val = (0xCAFEBABE & max_value)
 
         # Setup independent clocks
         wr_clock = Clock(dut.wr_clk, 10, unit="ns")
@@ -122,17 +127,44 @@ if _has_cocotb:
 
         await ClockCycles(dut.wr_clk, 2)
 
-        # Simultaneous write on A, read from B
-        dut.wr_addr.value = 7
-        dut.wr_din.value = test_val
+        # Pre-load address 3 with a known value
+        dut.wr_addr.value = 3
+        dut.wr_din.value = rd_test_val
         dut.wr_wmask.value = max_value
         dut.wr_ce.value = 1
         dut.wr_we.value = 1
 
+        await ClockCycles(dut.wr_clk, 1)
+
+        dut.wr_ce.value = 0
+        dut.wr_we.value = 0
+
+        await ClockCycles(dut.wr_clk, 1)
+
+        # Now perform concurrent read from address 3 and write to address 7
         dut.rd_addr.value = 3
         dut.rd_ce.value = 1
 
+        # Prime the read pipeline
+        await ClockCycles(dut.rd_clk, 2)
+
+        # Now write to a different address while reading
+        dut.wr_addr.value = 7
+        dut.wr_din.value = wr_test_val
+        dut.wr_wmask.value = max_value
+        dut.wr_ce.value = 1
+        dut.wr_we.value = 1
+
+        # Sample read output during concurrent write
         await ClockCycles(dut.wr_clk, 1)
+
+        read_value = int(dut.rd_dout.value)
+
+        # Verify read is from address 3 and not affected by write to address 7
+        assert read_value == rd_test_val, \
+            f"DPRAM concurrent access failed:\n" \
+            f"  Read from address 3: got 0x{read_value:X}, expected 0x{rd_test_val:X}\n" \
+            f"  (Should not be affected by concurrent write to address 7)"
 
         dut.wr_ce.value = 0
         dut.wr_we.value = 0
