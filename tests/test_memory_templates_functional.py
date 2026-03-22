@@ -74,7 +74,7 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_spram.py",
+                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_spram.py",
                                   filetype="python")
                     # Add generated wrapper and testbench
                     self.add_file(str(wrapper_file), filetype="verilog")
@@ -174,7 +174,7 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_spregfile.py",
+                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_spregfile.py",
                                   filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
@@ -274,7 +274,7 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_dpram.py",
+                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_dpram.py",
                                   filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
@@ -383,7 +383,7 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_tdpram.py",
+                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_tdpram.py",
                                   filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
