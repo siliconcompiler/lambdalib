@@ -456,9 +456,9 @@ def test_macro_selection_by_size(tmp_path):
     ]
 
     memories = [
-        create_mock_ram_class("spram_256x8", 8, 8, port_map),      # 2KB
-        create_mock_ram_class("spram_512x16", 16, 9, port_map),    # 8KB
-        create_mock_ram_class("spram_1024x32", 32, 10, port_map),  # 32KB
+        create_mock_ram_class("spram_256x8", 8, 8, port_map),      # 256B (0.25KB)
+        create_mock_ram_class("spram_512x16", 16, 9, port_map),    # 1KB
+        create_mock_ram_class("spram_1024x32", 32, 10, port_map),  # 4KB
     ]
 
     out = tmp_path / "la_spram_selection.v"
