@@ -13,7 +13,6 @@ if _has_cocotb:
     async def reset_dut(dut, active_level=False):
         """Perform an asynchronous reset on DUT"""
         dut.rst.value = active_level
-        await cocotb.triggers.Timer(1, unit="step")
-        dut.rst.value = not active_level
         await cocotb.triggers.Timer(100, "ns")
-        dut.rst.value = active_level if active_level else not active_level
+        dut.rst.value = not active_level
+        await cocotb.triggers.Timer(1, unit="step")
