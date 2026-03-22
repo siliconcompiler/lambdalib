@@ -228,32 +228,32 @@ if _has_cocotb:
 
         await ClockCycles(dut.clk_a, 2)
 
-        # Pre-write values via Port B to different addresses
+        # Pre-write values via Port A to different addresses
         test_val_addr0 = 0xAAAA & max_value
         test_addr0 = 0
         test_val_addr1 = 0x5555 & max_value
         test_addr1 = 2**(macroaw)
 
-        # Write to multiple addresses via Port B
+        # Write to multiple addresses via Port A
         for addr, val in [(test_addr0, test_val_addr0), (test_addr1, test_val_addr1)]:
-            dut.addr_b.value = addr
-            dut.din_b.value = val
-            dut.wmask_b.value = max_value
-            dut.ce_b.value = 1
-            dut.we_b.value = 1
-            await ClockCycles(dut.clk_b, 1)
+            dut.addr_a.value = addr
+            dut.din_a.value = val
+            dut.wmask_a.value = max_value
+            dut.ce_a.value = 1
+            dut.we_a.value = 1
+            await ClockCycles(dut.clk_a, 1)
 
-        dut.ce_b.value = 0
-        dut.we_b.value = 0
-        await ClockCycles(dut.clk_a, 1)
+        dut.we_a.value = 0
+        dut.ce_a.value = 0
+        await ClockCycles(dut.clk_a, 2)
 
         # CRITICAL TIMING TEST on Port A: Address changes mid-cycle
         dut.addr_a.value = test_addr0
         dut.ce_a.value = 1
         dut.we_a.value = 0
 
-        # Clock N: Setup address 0 read
-        await ClockCycles(dut.clk_a, 1)
+        # Clock N: Setup address 0 read - need 2 cycles for read latency
+        await ClockCycles(dut.clk_a, 2)
         await Timer(1, unit="ns")
         read_value0 = int(dut.dout_a.value)
 
@@ -264,10 +264,9 @@ if _has_cocotb:
         read_value0a = int(dut.dout_a.value)
 
         # Clock N+1: Let the change settle and next things latch
-        await ClockCycles(dut.clk_a, 1)
+        await ClockCycles(dut.clk_a, 2)
         await Timer(1, unit="ns")
         read_value1 = int(dut.dout_a.value)
-        await ClockCycles(dut.clk_a, 1)
 
         # ASSERTION MUST FAIL with the bug present
         assert read_value0 == test_val_addr0, \
@@ -284,3 +283,101 @@ if _has_cocotb:
             f"  Expected: 0x{test_val_addr1:X} (from address 1, which was latched)\n"
 
         dut.ce_a.value = 0
+
+    @cocotb.test()
+    async def test_tdpram_port_b_timing(dut):
+        """Test TDPRAM Port B timing - address must be stable during read pipeline.
+        
+        This test exposes timing bugs on Port B where address changes between
+        clock cycles affect the output selection. The address selection should be
+        LATCHED on the rising clock edge to maintain stable output.
+        
+        BUG CONDITION: If the template uses combinatorial 'selected' instead of 
+        'selected_reg', the output multiplexer will use the current address
+        combinatorially instead of the latched address.
+        """
+
+        # Setup clocks
+        clk_a = Clock(dut.clk_a, 10, unit="ns")
+        clk_b = Clock(dut.clk_b, 10, unit="ns")
+        cocotb.start_soon(clk_a.start())
+        cocotb.start_soon(clk_b.start())
+
+        # Get the data width from the DUT signals
+        dw = len(dut.din_a)
+        max_value = (1 << dw) - 1
+        addr_aw = len(dut.addr_a)
+        macroaw = int(os.getenv("COCOTB_MACROAW", "0"))
+
+        if macroaw >= addr_aw:
+            return # Skip test if macroaw is too large for the address width
+
+        # Initialize
+        dut.ce_a.value = 0
+        dut.we_a.value = 0
+        dut.wmask_a.value = 0
+        dut.addr_a.value = 0
+        dut.din_a.value = 0
+        dut.ce_b.value = 0
+        dut.we_b.value = 0
+        dut.wmask_b.value = 0
+        dut.addr_b.value = 0
+        dut.din_b.value = 0
+
+        await ClockCycles(dut.clk_a, 2)
+
+        # Pre-write values via Port A to different addresses
+        test_val_addr0 = 0xAAAA & max_value
+        test_addr0 = 0
+        test_val_addr1 = 0x5555 & max_value
+        test_addr1 = 2**(macroaw)
+
+        # Write to multiple addresses via Port B
+        for addr, val in [(test_addr0, test_val_addr0), (test_addr1, test_val_addr1)]:
+            dut.addr_b.value = addr
+            dut.din_b.value = val
+            dut.wmask_b.value = max_value
+            dut.ce_b.value = 1
+            dut.we_b.value = 1
+            await ClockCycles(dut.clk_b, 1)
+
+        dut.we_b.value = 0
+        dut.ce_b.value = 0
+        await ClockCycles(dut.clk_b, 2)
+
+        # CRITICAL TIMING TEST on Port B: Address changes mid-cycle
+        dut.addr_b.value = test_addr0
+        dut.ce_b.value = 1
+        dut.we_b.value = 0
+
+        # Clock N: Setup address 0 read - need 2 cycles for read latency
+        await ClockCycles(dut.clk_b, 2)
+        await Timer(1, unit="ns")
+        read_value0 = int(dut.dout_b.value)
+
+        # CRITICAL: Address changes AFTER rising edge but BEFORE next rising edge
+        await Timer(5, unit="ns")
+        dut.addr_b.value = test_addr1
+        await Timer(1, unit="ns")
+        read_value0a = int(dut.dout_b.value)
+
+        # Clock N+1: Let the change settle and next things latch
+        await ClockCycles(dut.clk_b, 2)
+        await Timer(1, unit="ns")
+        read_value1 = int(dut.dout_b.value)
+
+        # ASSERTION MUST FAIL with the bug present
+        assert read_value0 == test_val_addr0, \
+            f"TIMING BUG DETECTED in TDPRAM Port B template:\n" \
+            f"  Got: 0x{read_value0:X} (appears to be from address 1 or 2)\n" \
+            f"  Expected: 0x{test_val_addr0:X} (from address 0, which was latched)\n"
+        assert read_value0 == read_value0a, \
+            f"TIMING BUG DETECTED in TDPRAM Port B template:\n" \
+            f"  Got: 0x{read_value0:X} (appears to be from address 1 or 2)\n" \
+            f"  Expected: 0x{read_value0a:X} (from address 0, which was latched)\n"
+        assert read_value1 == test_val_addr1, \
+            f"TIMING BUG DETECTED in TDPRAM Port B template:\n" \
+            f"  Got: 0x{read_value1:X} (appears to be from address 1 or 2)\n" \
+            f"  Expected: 0x{test_val_addr1:X} (from address 1, which was latched)\n"
+
+        dut.ce_b.value = 0
