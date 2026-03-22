@@ -63,7 +63,7 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
     class SpramTbDesign(Design):
         """Testbench design for SPRAM cocotb functional tests"""
 
-        def __init__(self, simulator: str = "icarus", wrapper_file = None, macro_file = None):
+        def __init__(self, simulator: str = "icarus", wrapper_file=None, macro_file=None):
             super().__init__("testbench")
             self.set_dataroot("testdata", __file__)
 
@@ -74,7 +74,8 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_spram.py", filetype="python")
+                    self.add_file(Path(__file__).parent / "cocotb" / "test_spram.py",
+                                  filetype="python")
                     # Add generated wrapper and testbench
                     self.add_file(str(wrapper_file), filetype="verilog")
                     self.add_file(str(macro_file), filetype="verilog")
@@ -127,7 +128,9 @@ endmodule
     macro_file.write_text(macro_content)
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(SpramTbDesign("icarus", wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve()))
+    project = Sim(SpramTbDesign("icarus",
+                                wrapper_file=wrapper_file.resolve(),
+                                macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -171,7 +174,8 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_spregfile.py", filetype="python")
+                    self.add_file(Path(__file__).parent / "cocotb" / "test_spregfile.py",
+                                  filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
                     self.add_file(str(macro_file), filetype="verilog")
@@ -224,7 +228,9 @@ endmodule
     macro_file.write_text(macro_content)
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(SpregfileTbDesign("icarus", wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve()))
+    project = Sim(SpregfileTbDesign("icarus",
+                                    wrapper_file=wrapper_file.resolve(),
+                                    macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -268,7 +274,8 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_dpram.py", filetype="python")
+                    self.add_file(Path(__file__).parent / "cocotb" / "test_dpram.py",
+                                  filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
                     self.add_file(str(macro_file), filetype="verilog")
@@ -330,7 +337,9 @@ endmodule
 '''
     macro_file.write_text(macro_content)
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(DpramTbDesign("icarus", wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve()))
+    project = Sim(DpramTbDesign("icarus",
+                                wrapper_file=wrapper_file.resolve(),
+                                macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -374,7 +383,8 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw):
                     self.set_param("DW", str(dw))
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
                     # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb" / "test_tdpram.py", filetype="python")
+                    self.add_file(Path(__file__).parent / "cocotb" / "test_tdpram.py",
+                                  filetype="python")
                     # Add generated wrapper and macro
                     self.add_file(str(wrapper_file), filetype="verilog")
                     self.add_file(str(macro_file), filetype="verilog")
@@ -448,7 +458,9 @@ endmodule
 '''
     macro_file.write_text(macro_content)
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(TdpramTbDesign("icarus", wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve()))
+    project = Sim(TdpramTbDesign("icarus",
+                                 wrapper_file=wrapper_file.resolve(),
+                                 macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")

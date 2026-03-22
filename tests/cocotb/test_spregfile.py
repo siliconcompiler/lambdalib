@@ -76,7 +76,8 @@ if _has_cocotb:
 
         # Verify read data
         read_value = int(dut.dout.value)
-        assert read_value == test_val1, f"Read mismatch at addr 0: got 0x{read_value:X}, expected 0x{test_val1:X}"
+        assert read_value == test_val1, \
+            f"Read mismatch at addr 0: got 0x{read_value:X}, expected 0x{test_val1:X}"
 
         dut.ce.value = 0
 
@@ -90,7 +91,8 @@ if _has_cocotb:
         await ClockCycles(dut.clk, 2)
 
         read_value = int(dut.dout.value)
-        assert read_value == test_val2, f"Read mismatch at addr 1: got 0x{read_value:X}, expected 0x{test_val2:X}"
+        assert read_value == test_val2, \
+            f"Read mismatch at addr 1: got 0x{read_value:X}, expected 0x{test_val2:X}"
 
         dut.ce.value = 0
 
@@ -155,21 +157,22 @@ if _has_cocotb:
 
         read_value = int(dut.dout.value)
         expected = (0x1234 & upper_mask) | (max_value & ~upper_mask)
-        assert read_value == expected, f"Partial write mask failed: got 0x{read_value:X}, expected 0x{expected:X}"
+        assert read_value == expected, \
+            f"Partial write mask failed: got 0x{read_value:X}, expected 0x{expected:X}"
 
         dut.ce.value = 0
 
     @cocotb.test()
     async def test_spregfile_address_timing(dut):
         """Test SPREGFILE timing - address must be stable during read pipeline.
-        
+
         This test exposes timing bugs where address changes between clock cycles
         during a read operation. The address selection should be LATCHED on the rising
         clock edge (using selected_reg) to maintain stable output. Changing the address
         mid-cycle should not affect the data currently in the pipeline.
-        
-        BUG CONDITION: If the template uses combinatorial 'selected' instead of 
-        'selected_reg' in the address decoder, the output multiplexer will use 
+
+        BUG CONDITION: If the template uses combinatorial 'selected' instead of
+        'selected_reg' in the address decoder, the output multiplexer will use
         the current address combinatorially instead of the latched address.
         """
 
@@ -184,7 +187,7 @@ if _has_cocotb:
         macroaw = int(os.getenv("COCOTB_MACROAW", "0"))
 
         if macroaw >= aw:
-            return # Skip test if macroaw is too large for the address width
+            return  # Skip test if macroaw is too large for the address width
 
         # Initialize
         dut.ce.value = 0
