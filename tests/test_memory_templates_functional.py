@@ -228,6 +228,7 @@ endmodule
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
+    project.option.set_env("COCOTB_MACROAW", str(macroaw))
     assert project.run()
 
 
@@ -333,6 +334,7 @@ endmodule
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
+    project.option.set_env("COCOTB_MACROAW", str(macroaw))
     assert project.run()
 
 
@@ -450,4 +452,5 @@ endmodule
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
+    project.option.set_env("COCOTB_MACROAW", str(macroaw))
     assert project.run()
