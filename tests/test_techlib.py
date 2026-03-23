@@ -1,6 +1,6 @@
 """Comprehensive tests for lambdalib.LambalibTechLibrary module."""
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from lambdalib import LambalibTechLibrary
 from siliconcompiler import ASIC
 from siliconcompiler.library import LibrarySchema
@@ -75,7 +75,7 @@ def test_init_accepts_non_string_lambdalib():
     class IntLib(LambalibTechLibrary):
         def __init__(self):
             super().__init__(123, [MockTechLib])
-    
+
     lib = IntLib()
     assert lib.cell == 123
 
@@ -141,14 +141,15 @@ def test_techlibs_property_mutation_does_not_affect_internal():
     """Test that mutating returned techlibs doesn't affect internal list."""
     lib = ValidConcreteLib()
     original_length = len(lib.techlibs)
-    
+
     # Get techlibs and try to mutate it
     techlibs = lib.techlibs
     techlibs.append(AnotherMockTechLib)
-    
+
     # Original should be unchanged
     assert len(lib.techlibs) == original_length
-    assert AnotherMockTechLib not in lib.techlibs or len(lib.techlibs[lib.techlibs.index(AnotherMockTechLib):]) == 1
+    assert AnotherMockTechLib not in lib.techlibs or \
+        len(lib.techlibs[lib.techlibs.index(AnotherMockTechLib):]) == 1
 
 
 def test_techlibs_empty_list_returns_copy():
@@ -184,9 +185,9 @@ def test_alias_with_asic_no_library():
     """Test alias() when library doesn't exist in project."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = False
-    
+
     ValidConcreteLib.alias(project)
-    
+
     project._has_library.assert_called_once_with("valid_lib")
     project.add_alias.assert_not_called()
     project.add_asiclib.assert_not_called()
@@ -196,9 +197,9 @@ def test_alias_with_asic_library_exists_no_techlibs():
     """Test alias() success with no technology libraries."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = True
-    
+
     ValidConcreteLosLib.alias(project)
-    
+
     project._has_library.assert_called_once_with("empty_lib")
     project.add_alias.assert_called_once()
     project.add_asiclib.assert_not_called()
@@ -208,9 +209,9 @@ def test_alias_calls_add_alias_with_correct_params():
     """Test that alias() calls add_alias with correct parameters."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = True
-    
+
     ValidConcreteLib.alias(project)
-    
+
     # Check add_alias call
     assert project.add_alias.call_count == 1
     call_args = project.add_alias.call_args[0]
@@ -224,13 +225,13 @@ def test_alias_with_single_techlib():
     """Test alias() adds single technology library."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = True
-    
+
     class SingleTechLib(LambalibTechLibrary):
         def __init__(self):
             super().__init__("single", [MockTechLib])
-    
+
     SingleTechLib.alias(project)
-    
+
     assert project.add_asiclib.call_count == 1
     added_lib = project.add_asiclib.call_args[0][0]
     assert isinstance(added_lib, MockTechLib)
@@ -240,9 +241,9 @@ def test_alias_with_multiple_techlibs():
     """Test alias() adds multiple technology libraries."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = True
-    
+
     ValidConcreteLib.alias(project)
-    
+
     assert project.add_asiclib.call_count == 2
     calls = project.add_asiclib.call_args_list
     added_instances = [call[0][0] for call in calls]
@@ -257,10 +258,10 @@ def test_alias_with_multiple_techlibs():
 def test_alias_raises_valueerror_on_missing_zero_arg_constructor():
     """Test that alias() raises ValueError with clear message when zero-arg constructor missing."""
     project = MagicMock(spec=ASIC)
-    
+
     with pytest.raises(ValueError) as exc_info:
         InvalidConcreteLib.alias(project)
-    
+
     error_msg = str(exc_info.value)
     assert "InvalidConcreteLib" in error_msg
     assert "LambalibTechLibrary" in error_msg
@@ -270,20 +271,20 @@ def test_alias_raises_valueerror_on_missing_zero_arg_constructor():
 def test_alias_valueerror_includes_class_name():
     """Test that ValueError includes the actual subclass name."""
     project = MagicMock(spec=ASIC)
-    
+
     with pytest.raises(ValueError) as exc_info:
         InvalidConcreteLib.alias(project)
-    
+
     assert "InvalidConcreteLib" in str(exc_info.value)
 
 
 def test_alias_valueerror_exception_chaining():
     """Test that ValueError is properly chained from TypeError."""
     project = MagicMock(spec=ASIC)
-    
+
     with pytest.raises(ValueError) as exc_info:
         InvalidConcreteLib.alias(project)
-    
+
     # Check that the original TypeError is preserved
     assert exc_info.value.__cause__ is not None
     assert isinstance(exc_info.value.__cause__, TypeError)
@@ -297,9 +298,9 @@ def test_alias_not_called_before_library_check():
     """Test that _has_library is checked before trying to call alias."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = False
-    
+
     ValidConcreteLib.alias(project)
-    
+
     # Should check library existence on first call
     assert project._has_library.call_count == 1
 
@@ -309,7 +310,7 @@ def test_cell_with_special_characters():
     class LibWithSpecialName(LambalibTechLibrary):
         def __init__(self):
             super().__init__("lib_with-special.chars_123", [])
-    
+
     lib = LibWithSpecialName()
     assert lib.cell == "lib_with-special.chars_123"
 
@@ -319,9 +320,10 @@ def test_large_techlib_list():
     class LargeLibList(LambalibTechLibrary):
         def __init__(self):
             # Create 50 unique mock classes
-            libs = [type(f'MockLib{i}', (LibrarySchema,), {'__init__': lambda self: None}) for i in range(50)]
+            libs = [type(f'MockLib{i}', (LibrarySchema,),
+                         {'__init__': lambda self: None}) for i in range(50)]
             super().__init__("large", libs)
-    
+
     lib = LargeLibList()
     assert len(lib.techlibs) == 50
 
@@ -336,9 +338,9 @@ def test_alias_with_project_that_has_library():
     """Test complete alias() flow with mocked ASIC project."""
     project = MagicMock(spec=ASIC)
     project._has_library.return_value = True
-    
+
     ValidConcreteLib.alias(project)
-    
+
     # Verify both add_alias and add_asiclib were called
     assert project.add_alias.called
     assert project.add_asiclib.called
