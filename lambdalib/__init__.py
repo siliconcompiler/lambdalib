@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 
 from siliconcompiler import Design, ASIC
 from siliconcompiler.library import LibrarySchema
@@ -13,7 +13,7 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.11.1"
+__version__ = "0.11.2"
 
 
 class LambalibTechLibrary(Design):
@@ -22,7 +22,7 @@ class LambalibTechLibrary(Design):
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.
     """
-    def __init__(self, lambdalib: str, techlibs: List[LibrarySchema]):
+    def __init__(self, lambdalib: str, techlibs: List[Type[LibrarySchema]]):
         """Initializes the LambalibTechLibrary instance.
 
         Args:
@@ -32,11 +32,11 @@ class LambalibTechLibrary(Design):
         """
         super().__init__()
 
-        self.__cell = lambdalib
+        self.__cell: str = lambdalib
 
         if not techlibs:
             techlibs = []
-        self.__techlibs = techlibs.copy()
+        self.__techlibs: List[Type[LibrarySchema]] = techlibs.copy()
 
     @property
     def cell(self) -> str:
@@ -44,13 +44,16 @@ class LambalibTechLibrary(Design):
         return self.__cell
 
     @property
-    def techlibs(self) -> List[LibrarySchema]:
+    def techlibs(self) -> List[Type[LibrarySchema]]:
         """Returns a copy of the list of associated technology libraries."""
         return self.__techlibs.copy()
 
     @classmethod
     def alias(cls, project: ASIC) -> None:
         """Creates and registers aliases for the library and its techlibs in a project.
+
+        Requires that subclasses of LambalibTechLibrary provide a zero-argument
+        constructor for use by this classmethod.
 
         This method checks if the provided project is an ASIC and if the
         lambda library cell exists within the project's libraries. If both
@@ -60,11 +63,21 @@ class LambalibTechLibrary(Design):
         Args:
             project (ASIC): The ASIC project instance to which the aliases
                                    and libraries will be added.
+
+        Raises:
+            ValueError: If the subclass does not provide a zero-argument constructor.
         """
         if not isinstance(project, ASIC):
             return
 
-        tech = cls()
+        try:
+            tech = cls()
+        except TypeError as e:
+            raise ValueError(
+                f"Subclass '{cls.__name__}' of LambalibTechLibrary must provide a "
+                f"zero-argument constructor for use in alias(). {str(e)}"
+            ) from e
+
         if not project._has_library(tech.__cell):
             return
 
