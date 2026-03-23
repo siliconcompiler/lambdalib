@@ -9,6 +9,7 @@ try:
 except ModuleNotFoundError:
     _has_cocotb = False
 
+from typing import List
 from siliconcompiler import Design, Sim
 from lambdalib.ramlib import Tdpram
 
@@ -359,7 +360,8 @@ class TbDesign(Design):
         aw: int,
         simulator: str = "icarus",
         ctrl: int = 0,
-        name: str = None
+        name: str = None,
+        other_tests: List[Design] = None
     ):
         super().__init__()
 
@@ -374,14 +376,19 @@ class TbDesign(Design):
 
         with self.active_dataroot(name):
             with self.active_fileset("testbench.cocotb"):
-                self.set_topmodule("la_tdpram_impl")
+                self.set_topmodule("la_tdpram")
                 self.add_depfileset(Tdpram(), "rtl")
                 self.set_param("DW", str(dw))
                 self.set_param("AW", str(aw))
 
-                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+                if simulator in ["icarus", "verilator"]:
+                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
 
                 self.add_file("la_tdpram_test.py", filetype="python")
+
+                if other_tests is not None:
+                    for test in other_tests:
+                        self.add_depfileset(test, "testbench.cocotb")
 
 
 def run_test(
