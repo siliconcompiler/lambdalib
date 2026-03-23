@@ -13,6 +13,7 @@ def test_la_rsync(
     simulator: str,
     output_wave: bool,
 ):
+    pytest.importorskip("cocotb")
     from lambdalib.reusable_tests.auxlib.la_rsync.la_rsync_test import run_test
     run_test(
         stages=stages,

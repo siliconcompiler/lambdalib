@@ -114,6 +114,8 @@ module {{ type }}
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin : ADDR
           wire selectedA;
           wire selectedB;
+          reg selectedA_reg;
+          reg selectedB_reg;
           wire [MEM_DEPTH-1:0] mem_addrA;
           wire [MEM_DEPTH-1:0] mem_addrB;
 
@@ -127,6 +129,14 @@ module {{ type }}
             assign selectedB = addr_b[AW-1:MEM_DEPTH] == a;
             assign mem_addrA = addr_a[MEM_DEPTH-1:0];
             assign mem_addrB = addr_b[MEM_DEPTH-1:0];
+          end
+
+          always @(posedge clk_a) begin
+            selectedA_reg <= selectedA;
+          end
+
+          always @(posedge clk_b) begin
+            selectedB_reg <= selectedB;
           end
 
           genvar n;
@@ -143,10 +153,10 @@ module {{ type }}
               if (n + i < DW) begin : ACTIVE
                 assign mem_dinA[i] = din_a[n+i];
                 assign mem_wmaskA[i] = wmask_a[n+i];
-                assign OUTPUTS[n+i].mem_outputsA[a] = selectedA ? mem_doutA[i] : 1'b0;
+                assign OUTPUTS[n+i].mem_outputsA[a] = selectedA_reg ? mem_doutA[i] : 1'b0;
                 assign mem_dinB[i] = din_b[n+i];
                 assign mem_wmaskB[i] = wmask_b[n+i];
-                assign OUTPUTS[n+i].mem_outputsB[a] = selectedB ? mem_doutB[i] : 1'b0;
+                assign OUTPUTS[n+i].mem_outputsB[a] = selectedB_reg ? mem_doutB[i] : 1'b0;
               end else begin : INACTIVE
                 assign mem_dinA[i]   = 1'b0;
                 assign mem_wmaskA[i] = 1'b0;
@@ -165,9 +175,9 @@ module {{ type }}
             assign we_in_B = we_b && selectedB;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
-  {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
-    .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
-  );
+              {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
+                .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
+              );
             end{% endfor %}
           end
         end

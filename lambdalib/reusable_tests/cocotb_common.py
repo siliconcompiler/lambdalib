@@ -3,8 +3,8 @@ import random
 import string
 from decimal import Decimal
 
-from cocotb.triggers import Timer
-from cocotb.handle import SimHandleBase
+# Note: cocotb imports are deferred to where they're actually used
+# (inside cocotb simulation, not in normal Python environment)
 
 from siliconcompiler import Design, Sim
 from siliconcompiler.flows.dvflow import DVFlow
@@ -17,10 +17,12 @@ from siliconcompiler.tools.verilator.cocotb_exec import CocotbExecTask as Verila
 
 
 async def do_reset(
-        reset: SimHandleBase,
+        reset,
         time_ns: int,
         active_level: bool = False):
     """Perform a async reset"""
+    from cocotb.triggers import Timer
+
     reset.value = not active_level
     await Timer(1, unit="step")
     reset.value = active_level

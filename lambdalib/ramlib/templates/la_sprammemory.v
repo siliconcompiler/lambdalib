@@ -96,6 +96,7 @@ module {{ type }}
         genvar a;
         for (a = 0; a < MEM_ADDRS; a = a + 1) begin: ADDR
           wire selected;
+          reg selected_reg;
           wire [MEM_DEPTH-1:0] mem_addr;
 
           if (MEM_ADDRS == 1) begin: FITS
@@ -104,6 +105,10 @@ module {{ type }}
           end else begin: NOFITS
             assign selected = addr[AW-1:MEM_DEPTH] == a;
             assign mem_addr = addr[MEM_DEPTH-1:0];
+          end
+
+          always @(posedge clk) begin
+            selected_reg <= selected;
           end
 
           genvar n;
@@ -117,7 +122,7 @@ module {{ type }}
               if (n + i < DW) begin: ACTIVE
                 assign mem_din[i] = din[n + i];
                 assign mem_wmask[i] = wmask[n + i];
-                assign OUTPUTS[n + i].mem_outputs[a] = selected ? mem_dout[i] : 1'b0;
+                assign OUTPUTS[n + i].mem_outputs[a] = selected_reg ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE
                 assign mem_din[i] = 1'b0;
