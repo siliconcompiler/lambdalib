@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 
 from siliconcompiler import Design, ASIC
 from siliconcompiler.library import LibrarySchema
@@ -22,7 +22,7 @@ class LambalibTechLibrary(Design):
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.
     """
-    def __init__(self, lambdalib: str, techlibs: List[LibrarySchema]):
+    def __init__(self, lambdalib: str, techlibs: List[Type[LibrarySchema]]):
         """Initializes the LambalibTechLibrary instance.
 
         Args:
@@ -32,11 +32,11 @@ class LambalibTechLibrary(Design):
         """
         super().__init__()
 
-        self.__cell = lambdalib
+        self.__cell: str = lambdalib
 
         if not techlibs:
             techlibs = []
-        self.__techlibs = techlibs.copy()
+        self.__techlibs: List[Type[LibrarySchema]] = techlibs.copy()
 
     @property
     def cell(self) -> str:
@@ -44,7 +44,7 @@ class LambalibTechLibrary(Design):
         return self.__cell
 
     @property
-    def techlibs(self) -> List[LibrarySchema]:
+    def techlibs(self) -> List[Type[LibrarySchema]]:
         """Returns a copy of the list of associated technology libraries."""
         return self.__techlibs.copy()
 
