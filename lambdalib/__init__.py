@@ -52,6 +52,9 @@ class LambalibTechLibrary(Design):
     def alias(cls, project: ASIC) -> None:
         """Creates and registers aliases for the library and its techlibs in a project.
 
+        Requires that subclasses of LambalibTechLibrary provide a zero-argument
+        constructor for use by this classmethod.
+
         This method checks if the provided project is an ASIC and if the
         lambda library cell exists within the project's libraries. If both
         conditions are met, it adds an alias for the main library and adds
@@ -60,11 +63,21 @@ class LambalibTechLibrary(Design):
         Args:
             project (ASIC): The ASIC project instance to which the aliases
                                    and libraries will be added.
+
+        Raises:
+            ValueError: If the subclass does not provide a zero-argument constructor.
         """
         if not isinstance(project, ASIC):
             return
 
-        tech = cls()
+        try:
+            tech = cls()
+        except TypeError as e:
+            raise ValueError(
+                f"Subclass '{cls.__name__}' of LambalibTechLibrary must provide a "
+                f"zero-argument constructor for use in alias(). {str(e)}"
+            ) from e
+
         if not project._has_library(tech.__cell):
             return
 
