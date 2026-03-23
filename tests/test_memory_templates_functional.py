@@ -115,7 +115,10 @@ module spram(
     input [{macrodw-1}:0] mem_wmask,
     output [{macrodw-1}:0] mem_dout
 );
-    la_spram_impl memory (
+    la_spram_impl #(
+        .AW({macroaw}),
+        .DW({macrodw})
+    ) memory (
         .clk(clk),
         .ce(ce_in),
         .we(we_in),
@@ -216,7 +219,10 @@ module spregfile(
     input [{macrodw-1}:0] mem_wmask,
     output [{macrodw-1}:0] mem_dout
 );
-    la_spregfile_impl memory (
+    la_spregfile_impl #(
+        .AW({macroaw}),
+        .DW({macrodw})
+    ) memory (
         .clk(clk),
         .ce(ce_in),
         .we(we_in),
@@ -324,7 +330,10 @@ module dpram(
     input rd_ce,
     output [{macrodw-1}:0] rd_dout
 );
-    la_dpram_impl memory (
+    la_dpram_impl  #(
+        .AW({macroaw}),
+        .DW({macrodw})
+    ) memory (
         .wr_clk(wr_clk),
         .wr_ce(wr_ce),
         .wr_we(wr_we),
@@ -442,7 +451,10 @@ module tdpram(
     input [{macrodw-1}:0] din_b,
     output [{macrodw-1}:0] dout_b
 );
-    la_tdpram_impl memory (
+    la_tdpram_impl #(
+        .AW({macroaw}),
+        .DW({macrodw})
+    ) memory (
         .clk_a(clk_a),
         .ce_a(ce_a),
         .we_a(we_a),
