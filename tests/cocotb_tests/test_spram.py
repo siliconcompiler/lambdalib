@@ -23,7 +23,7 @@ if _has_cocotb:
 
         # Setup clock
         clock = Clock(dut.clk, 10, unit="ns")
-        cocotb.start_soon(clock.start())
+        clock.start()
 
         # Get the data width from the DUT parameter
         dw = len(dut.din)
@@ -106,7 +106,7 @@ if _has_cocotb:
 
         # Setup clock
         clock = Clock(dut.clk, 10, unit="ns")
-        cocotb.start_soon(clock.start())
+        clock.start()
 
         # Get the data width from the DUT parameter
         dw = len(dut.din)
@@ -180,7 +180,7 @@ if _has_cocotb:
 
         # Setup clock (10ns period = 5ns half-cycle)
         clock = Clock(dut.clk, 10, unit="ns")
-        cocotb.start_soon(clock.start())
+        clock.start()
 
         # Get the data width from the DUT parameter
         dw = len(dut.din)

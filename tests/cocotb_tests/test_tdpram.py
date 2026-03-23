@@ -37,8 +37,8 @@ if _has_cocotb:
         # Setup clocks for both ports
         clk_a = Clock(dut.clk_a, 10, unit="ns")
         clk_b = Clock(dut.clk_b, 10, unit="ns")
-        cocotb.start_soon(clk_a.start())
-        cocotb.start_soon(clk_b.start())
+        clk_a.start()
+        clk_b.start()
 
         # Initialize port A
         dut.ce_a.value = 0
@@ -134,8 +134,8 @@ if _has_cocotb:
         # Setup clocks
         clk_a = Clock(dut.clk_a, 10, unit="ns")
         clk_b = Clock(dut.clk_b, 10, unit="ns")
-        cocotb.start_soon(clk_a.start())
-        cocotb.start_soon(clk_b.start())
+        clk_a.start()
+        clk_b.start()
 
         # Initialize
         dut.ce_a.value = 0
@@ -206,8 +206,8 @@ if _has_cocotb:
         # Setup clocks
         clk_a = Clock(dut.clk_a, 10, unit="ns")
         clk_b = Clock(dut.clk_b, 10, unit="ns")
-        cocotb.start_soon(clk_a.start())
-        cocotb.start_soon(clk_b.start())
+        clk_a.start()
+        clk_b.start()
 
         # Get the data width from the DUT signals
         dw = len(dut.din_a)
@@ -304,8 +304,8 @@ if _has_cocotb:
         # Setup clocks
         clk_a = Clock(dut.clk_a, 10, unit="ns")
         clk_b = Clock(dut.clk_b, 10, unit="ns")
-        cocotb.start_soon(clk_a.start())
-        cocotb.start_soon(clk_b.start())
+        clk_a.start()
+        clk_b.start()
 
         # Get the data width from the DUT signals
         dw = len(dut.din_a)

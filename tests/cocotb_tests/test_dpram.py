@@ -30,8 +30,8 @@ if _has_cocotb:
         # Setup independent clocks
         wr_clock = Clock(dut.wr_clk, 10, unit="ns")
         rd_clock = Clock(dut.rd_clk, 14, unit="ns")
-        cocotb.start_soon(wr_clock.start())
-        cocotb.start_soon(rd_clock.start())
+        wr_clock.start()
+        rd_clock.start()
 
         # Initialize write side
         dut.wr_ce.value = 0
@@ -113,8 +113,8 @@ if _has_cocotb:
         # Setup independent clocks
         wr_clock = Clock(dut.wr_clk, 10, unit="ns")
         rd_clock = Clock(dut.rd_clk, 10, unit="ns")
-        cocotb.start_soon(wr_clock.start())
-        cocotb.start_soon(rd_clock.start())
+        wr_clock.start()
+        rd_clock.start()
 
         # Initialize
         dut.wr_ce.value = 0
@@ -188,8 +188,8 @@ if _has_cocotb:
         # Setup clocks
         wr_clock = Clock(dut.wr_clk, 10, unit="ns")
         rd_clock = Clock(dut.rd_clk, 10, unit="ns")
-        cocotb.start_soon(wr_clock.start())
-        cocotb.start_soon(rd_clock.start())
+        wr_clock.start()
+        rd_clock.start()
 
         # Get the data width from the DUT signals
         dw = len(dut.wr_din)
