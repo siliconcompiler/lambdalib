@@ -15,15 +15,16 @@ except ModuleNotFoundError:
 from typing import List
 from pathlib import Path
 import random
+
 from siliconcompiler import Design, Sim
-from lambdalib.ramlib import Spram
+from lambdalib.ramlib import Spregfile
 
 
 if _has_cocotb:
 
     @cocotb.test()
-    async def test_la_spram_fuzz(dut):
-        """Test basic read/write operations of single-port RAM"""
+    async def test_la_spregfile_fuzz(dut):
+        """FUZZ inputs to spregfile. Attach monitor to track expected state of DUT"""
         DW = int(dut.DW.value)
         AW = int(dut.AW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
@@ -70,8 +71,8 @@ if _has_cocotb:
             assert actual == expected
 
     @cocotb.test()
-    async def test_la_spram_basic(dut):
-        """Test basic read/write operations of single-port RAM"""
+    async def test_la_spregfile_basic(dut):
+        """Test basic read/write operations of spregfile"""
         DW = int(dut.DW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
@@ -127,11 +128,11 @@ if _has_cocotb:
             assert (actual & wmask) == (expected & wmask)
 
 else:
-    def test_la_spram_fuzz():
+    def test_la_spregfile_fuzz():
         """Placeholder test when cocotb is not installed."""
         pass
 
-    def test_la_spram_basic(dut):
+    def test_la_spregfile_basic(dut):
         """Placeholder test when cocotb is not installed."""
         pass
 
@@ -160,8 +161,8 @@ class TbDesign(Design):
 
         with self.active_dataroot(name):
             with self.active_fileset("testbench.cocotb"):
-                self.set_topmodule("la_spram")
-                self.add_depfileset(Spram(), "rtl")
+                self.set_topmodule("la_spregfile")
+                self.add_depfileset(Spregfile(), "rtl")
                 self.set_param("DW", str(dw))
                 self.set_param("AW", str(aw))
 

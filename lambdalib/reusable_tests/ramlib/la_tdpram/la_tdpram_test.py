@@ -2,348 +2,111 @@ try:
     import cocotb
     import os
 
-    from cocotb.triggers import Timer
+    from cocotb.triggers import Timer, FallingEdge
     from cocotb.clock import Clock
     from lambdalib.reusable_tests.cocotb_common import SimCmdFiles, use_cocotb
+    from lambdalib.reusable_tests.ramlib.common.spram_driver import RamDriver
     _has_cocotb = True
 except ModuleNotFoundError:
     _has_cocotb = False
 
+import random
 from typing import List
+from pathlib import Path
 from siliconcompiler import Design, Sim
 from lambdalib.ramlib import Tdpram
 
 
 if _has_cocotb:
 
-    async def wait_cycles(clk, n):
-        """Wait for n clock cycles by monitoring clock edges"""
-        for _ in range(n):
-            await cocotb.triggers.RisingEdge(clk)
-
-    async def port_a_write(dut, DW):
-        """Port A write operations"""
-        clk_a = dut.clk_a
-        ce_a = dut.ce_a
-        we_a = dut.we_a
-        wmask_a = dut.wmask_a
-        addr_a = dut.addr_a
-        din_a = dut.din_a
-
-        # Setup Port A for writing
-        ce_a.value = 1
-        wmask_a.value = (1 << DW) - 1
-        we_a.value = 1
-
-        # Write 0xAAAA to address 0 on port A
-        addr_a.value = 0
-        din_a.value = 0xAAAA & ((1 << DW) - 1)
-        await wait_cycles(clk_a, 1)
-
-        # Write 0x5555 to address 1 on port A
-        addr_a.value = 1
-        din_a.value = 0x5555 & ((1 << DW) - 1)
-        await wait_cycles(clk_a, 1)
-
-        # Disable writes before returning
-        we_a.value = 0
-
-    async def port_b_write(dut, DW):
-        """Port B write operations"""
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        wmask_b = dut.wmask_b
-        addr_b = dut.addr_b
-        din_b = dut.din_b
-
-        # Setup Port B for writing
-        ce_b.value = 1
-        wmask_b.value = (1 << DW) - 1
-        we_b.value = 1
-
-        # Write 0x3333 to address 2 on port B
-        addr_b.value = 2
-        din_b.value = 0x3333 & ((1 << DW) - 1)
-        await wait_cycles(clk_b, 1)
-
-        # Write 0x7777 to address 3 on port B
-        addr_b.value = 3
-        din_b.value = 0x7777 & ((1 << DW) - 1)
-        await wait_cycles(clk_b, 1)
-
-        # Disable writes before returning
-        we_b.value = 0
-
-    async def port_a_read(dut, DW):
-        """Port A read operations"""
-        clk_a = dut.clk_a
-        ce_a = dut.ce_a
-        we_a = dut.we_a
-        addr_a = dut.addr_a
-        dout_a = dut.dout_a
-
-        # Set up read mode for Port A
-        we_a.value = 0
-        ce_a.value = 1
-        addr_a.value = 0
-        await wait_cycles(clk_a, 2)  # Wait for read setup
-
-        # Read from address 0 on port A
-        await wait_cycles(clk_a, 2)
-        assert dout_a.value == (0xAAAA & ((1 << DW) - 1)), \
-            f"Port A read addr 0 failed: {hex(dout_a.value)}"
-
-        # Read from address 1 on port A
-        addr_a.value = 1
-        await wait_cycles(clk_a, 2)
-        assert dout_a.value == (0x5555 & ((1 << DW) - 1)), \
-            f"Port A read addr 1 failed: {hex(dout_a.value)}"
-
-    async def port_b_read(dut, DW):
-        """Port B read operations"""
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        addr_b = dut.addr_b
-        dout_b = dut.dout_b
-
-        # Set up read mode for Port B
-        we_b.value = 0
-        ce_b.value = 1
-        addr_b.value = 2
-        await wait_cycles(clk_b, 2)  # Wait for read setup
-
-        # Read from address 2 on port B
-        await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0x3333 & ((1 << DW) - 1)), \
-            f"Port B read addr 2 failed: {hex(dout_b.value)}"
-
-        # Read from address 3 on port B
-        addr_b.value = 3
-        await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0x7777 & ((1 << DW) - 1)), \
-            f"Port B read addr 3 failed: {hex(dout_b.value)}"
-
-    async def port_b_write_and_read(dut, DW):
-        """Port B write-and-read sequence within Port B clock domain"""
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        wmask_b = dut.wmask_b
-        addr_b = dut.addr_b
-        din_b = dut.din_b
-        dout_b = dut.dout_b
-        data_mask = (1 << DW) - 1
-
-        # Initialize - clear addresses 4 and 5 first
-        ce_b.value = 1
-        wmask_b.value = data_mask
-        we_b.value = 1
-
-        # Clear address 4
-        addr_b.value = 4
-        din_b.value = 0
-        await wait_cycles(clk_b, 1)
-
-        # Clear address 5
-        addr_b.value = 5
-        din_b.value = 0
-        await wait_cycles(clk_b, 1)
-
-        # Write test data to address 4
-        addr_b.value = 4
-        din_b.value = 0xBEEF & data_mask
-        await wait_cycles(clk_b, 1)
-
-        # Write test data to address 5
-        addr_b.value = 5
-        din_b.value = 0xDEAD & data_mask
-        await wait_cycles(clk_b, 1)
-
-        # Switch to read mode
-        we_b.value = 0
-        await wait_cycles(clk_b, 1)
-
-        # Read back from address 4 and verify
-        addr_b.value = 4
-        await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0xBEEF & data_mask), \
-            f"Port B write-read addr 4 failed: {hex(dout_b.value)}"
-
-        # Read back from address 5 and verify
-        addr_b.value = 5
-        await wait_cycles(clk_b, 2)
-        assert dout_b.value == (0xDEAD & data_mask), \
-            f"Port B write-read addr 5 failed: {hex(dout_b.value)}"
-
-    async def all_addresses(dut, DW, AW):
-        """Write and read from all addresses on both ports"""
-        clk_a = dut.clk_a
-        ce_a = dut.ce_a
-        we_a = dut.we_a
-        wmask_a = dut.wmask_a
-        addr_a = dut.addr_a
-        din_a = dut.din_a
-        dout_a = dut.dout_a
-
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        wmask_b = dut.wmask_b
-        addr_b = dut.addr_b
-        dout_b = dut.dout_b
-
-        depth = 2 ** AW
-        data_mask = (1 << DW) - 1
-
-        # Setup: Disable all operations initially
-        we_a.value = 0
-        we_b.value = 0
-        ce_a.value = 1
-        ce_b.value = 1
-        wmask_a.value = data_mask
-        wmask_b.value = data_mask
-
-        # Clear entire memory from Port A only (simplifies data handling)
-        we_a.value = 1
-        for clear_addr in range(depth):
-            addr_a.value = clear_addr
-            din_a.value = 0
-            await wait_cycles(clk_a, 1)
-
-        # Disable Port A writes and wait
-        we_a.value = 0
-        await wait_cycles(clk_a, 2)
-
-        # Write all addresses from Port A with test pattern
-        we_a.value = 1
-        for test_addr in range(depth):
-            addr_a.value = test_addr
-            test_pattern = (test_addr * 0x1111) & data_mask
-            din_a.value = test_pattern
-            await wait_cycles(clk_a, 1)
-
-        # Disable Port A writes and wait
-        we_a.value = 0
-        await wait_cycles(clk_a, 3)
-
-        # Read back from Port A and verify all addresses
-        addr_a.value = 0
-        await wait_cycles(clk_a, 3)  # Prime first read
-        for test_addr in range(depth):
-            addr_a.value = test_addr
-            await wait_cycles(clk_a, 2)
-            expected_pattern = (test_addr * 0x1111) & data_mask
-            assert dout_a.value == expected_pattern, \
-                f"Port A address {test_addr} mismatch: got {hex(dout_a.value)}, " \
-                f"expected {hex(expected_pattern)}"
-
-        # Also verify all addresses can be read from Port B
-        addr_b.value = 0
-        await wait_cycles(clk_b, 3)  # Prime first read
-        for test_addr in range(depth):
-            addr_b.value = test_addr
-            await wait_cycles(clk_b, 2)
-            expected_pattern = (test_addr * 0x1111) & data_mask
-            assert dout_b.value == expected_pattern, \
-                f"Port B address {test_addr} mismatch: got {hex(dout_b.value)}, " \
-                f"expected {hex(expected_pattern)}"
-
     @cocotb.test()
     async def test_la_tdpram_basic(dut):
         """Test basic read/write operations of true dual-port RAM"""
-        DW = int(dut.DW.value)
-        CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
-        clk_period_ns = 10
-
-        # Port A
-        clk_a = dut.clk_a
-        ce_a = dut.ce_a
-        we_a = dut.we_a
-        wmask_a = dut.wmask_a
-        addr_a = dut.addr_a
-        din_a = dut.din_a
-
-        # Port B
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        wmask_b = dut.wmask_b
-        addr_b = dut.addr_b
-        din_b = dut.din_b
-        ctrl = dut.ctrl
-
-        # Initialize
-        ce_a.value = 0
-        we_a.value = 0
-        wmask_a.value = 0
-        addr_a.value = 0
-        din_a.value = 0
-        ce_b.value = 0
-        we_b.value = 0
-        wmask_b.value = 0
-        addr_b.value = 0
-        din_b.value = 0
-        ctrl.value = CTRL_VALUE
-
-        # Start clocks using cocotb Clock
-        cocotb.start_soon(Clock(clk_a, clk_period_ns, unit="ns").start())
-        cocotb.start_soon(Clock(clk_b, clk_period_ns, unit="ns").start())
-        await Timer(clk_period_ns, unit="ns")
-
-        # Test basic Port A write operation
-        await port_a_write(dut, DW)
-
-        # Test Port B write and read-back within Port B's clock domain
-        # This exercises we_b, din_b, data_out_b and verifies data integrity
-        await port_b_write_and_read(dut, DW)
-
-    @cocotb.test()
-    async def test_la_tdpram_all_addresses(dut):
-        """Test all address coverage for true dual-port RAM"""
         DW = int(dut.DW.value)
         AW = int(dut.AW.value)
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
 
-        # Port A
-        clk_a = dut.clk_a
-        ce_a = dut.ce_a
-        we_a = dut.we_a
-        wmask_a = dut.wmask_a
-        addr_a = dut.addr_a
-        din_a = dut.din_a
+        port_a = RamDriver(
+            clk=dut.clk_a,
+            ce=dut.ce_a,
+            we=dut.we_a,
+            wmask=dut.wmask_a,
+            addr=dut.addr_a,
+            din=dut.din_a,
+            dout=dut.dout_a,
+            ctrl=dut.ctrl
+        )
 
-        # Port B
-        clk_b = dut.clk_b
-        ce_b = dut.ce_b
-        we_b = dut.we_b
-        wmask_b = dut.wmask_b
-        addr_b = dut.addr_b
-        din_b = dut.din_b
-        ctrl = dut.ctrl
+        port_b = RamDriver(
+            clk=dut.clk_b,
+            ce=dut.ce_b,
+            we=dut.we_b,
+            wmask=dut.wmask_b,
+            addr=dut.addr_b,
+            din=dut.din_b,
+            dout=dut.dout_b,
+            ctrl=dut.ctrl
+        )
 
-        # Initialize
-        ce_a.value = 0
-        we_a.value = 0
-        wmask_a.value = 0
-        addr_a.value = 0
-        din_a.value = 0
-        ce_b.value = 0
-        we_b.value = 0
-        wmask_b.value = 0
-        addr_b.value = 0
-        din_b.value = 0
-        ctrl.value = CTRL_VALUE
+        port_a.init(CTRL_VALUE)
+        port_b.init(CTRL_VALUE)
 
         # Start clocks using cocotb Clock
-        cocotb.start_soon(Clock(clk_a, clk_period_ns, unit="ns").start())
-        cocotb.start_soon(Clock(clk_b, clk_period_ns, unit="ns").start())
-        await Timer(clk_period_ns, unit="ns")
+        cocotb.start_soon(Clock(dut.clk_a, clk_period_ns, unit="ns").start())
+        cocotb.start_soon(Clock(dut.clk_b, clk_period_ns, unit="ns").start())
 
-        # Run comprehensive test
-        await all_addresses(dut, DW, AW)
+        def rand_address(min_addr: int, max_addr: int):
+            rand_addresses = [
+                min_addr,
+                max_addr,
+                random.randint(min_addr + 1, max_addr - 1)
+            ]
+            # Use weighted random selection to increase likelihood of hitting edge cases
+            address_weights = [0.10, 0.10, 0.80]
+            return random.choices(rand_addresses, weights=address_weights)[0]
+
+        async def rw_test(ram_driver: RamDriver, n_cycles: int, addresses: List[int]):
+            await FallingEdge(ram_driver.clk)
+            mem = {}
+            for _ in range(n_cycles):
+                wr = random.choice([True, False]) if mem else True
+                if wr:
+                    address = random.choice(addresses)
+                    data = random.randint(0, (1 << DW) - 1)
+                    wmask = random.randint(0, (1 << DW) - 1)
+                    await ram_driver.write(address, data, wmask, True)
+                    mem[address] = (wmask, data)
+                else:
+                    address, (wmask, expected) = random.choice(list(mem.items()))
+                    actual = await ram_driver.read(address, True)
+                    assert (actual & wmask) == (expected & wmask)
+            return mem
+
+        # Generate a set of unique random addresses to test
+        n_possible_addresses = min((1 << AW) - 1, 1000)
+        addresses = random.sample(range(0, 1 << AW), n_possible_addresses)
+
+        # Create two seperate unique lists of addresses
+        addr_space_0 = addresses[:len(addresses) // 2]
+        addr_space_1 = addresses[len(addresses) // 2:]
+
+        for as0, as1 in [(addr_space_0, addr_space_1), (addr_space_1, addr_space_0)]:
+            port_a_rw_test_task = cocotb.start_soon(
+                rw_test(port_a, 100, as0)
+            )
+
+            port_b_rw_test_task = cocotb.start_soon(
+                rw_test(port_b, 100, as1)
+            )
+
+            for driver, task in [(port_a, port_a_rw_test_task), (port_b, port_b_rw_test_task)]:
+                mem = await task
+
+                # Verify all written addresses can be read back correctly
+                for address, (wmask, expected) in mem.items():
+                    actual = await driver.read(address, True)
+                    assert (actual & wmask) == (expected & wmask)
 
 
 else:
@@ -366,7 +129,7 @@ class TbDesign(Design):
         super().__init__()
 
         if name is None:
-            name = f"cocotb_test_la_tdpram_dw{dw}_aw{aw}_ctrl{ctrl}_sim_{simulator}"
+            name = f"cocotb_{Path(__file__).stem}_dw{dw}_aw{aw}_ctrl{ctrl}_sim_{simulator}"
 
         # Set the design's name
         self.set_name(name)
@@ -384,7 +147,7 @@ class TbDesign(Design):
                 if simulator in ["icarus", "verilator"]:
                     self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
 
-                self.add_file("la_tdpram_test.py", filetype="python")
+                self.add_file(Path(__file__).name, filetype="python")
 
                 if other_tests is not None:
                     for test in other_tests:
