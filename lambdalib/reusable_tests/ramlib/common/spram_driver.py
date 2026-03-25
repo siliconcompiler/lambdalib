@@ -1,3 +1,10 @@
+"""Cocotb driver for single-port RAM-like interfaces.
+
+Provides async write/read methods that drive ce, we, wmask, addr, din signals
+and sample dout, with optional post-access signal randomization to stress
+hold-time and bus-contention behavior.
+"""
+
 import random
 from cocotb.triggers import RisingEdge, FallingEdge
 
@@ -14,6 +21,18 @@ class RamDriver:
         dout,
         ctrl
     ):
+        """Initialize driver with DUT signal handles.
+
+        Args:
+            clk: Clock signal.
+            ce: Chip enable.
+            we: Write enable.
+            wmask: Bit-level write mask (1 = write, 0 = preserve).
+            addr: Address bus.
+            din: Data input bus.
+            dout: Data output bus.
+            ctrl: Control/configuration signal.
+        """
         self.clk = clk
         self.ce = ce
         self.we = we
@@ -27,6 +46,7 @@ class RamDriver:
         self.data_width = len(din)
 
     def init(self, ctrl_value=0):
+        """Drive all signals to idle state."""
         self.ce.value = 0
         self.we.value = 0
         self.wmask.value = 0
@@ -41,6 +61,13 @@ class RamDriver:
         wmask=None,
         randomize_after_write=False
     ):
+        """Perform a single write transaction.
+
+        Asserts ce and we, drives addr/din/wmask on the current cycle,
+        then de-asserts on the next falling edge. When *randomize_after_write*
+        is True, random values are driven after the rising edge to stress
+        hold-time behavior.
+        """
         if wmask is None:
             wmask = (1 << self.data_width) - 1
 
@@ -67,7 +94,12 @@ class RamDriver:
         randomize_after_read=False,
         resolve="random"
     ):
+        """Perform a single read transaction and return the unsigned result.
 
+        Asserts ce (with we=0), drives addr, waits one cycle, then returns
+        dout resolved to an unsigned integer. The *resolve* parameter controls
+        how X/Z bits are resolved (e.g. "random", "zeros").
+        """
         self.addr.value = addr
         self.we.value = 0
         self.ce.value = 1

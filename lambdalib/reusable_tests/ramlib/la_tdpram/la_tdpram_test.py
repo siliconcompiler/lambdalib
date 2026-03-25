@@ -1,8 +1,18 @@
+"""Cocotb tests for the la_tdpram (true dual-port RAM) module.
+
+Tests concurrent access from two independent ports (A and B), each with its
+own clock, using disjoint address spaces to avoid write conflicts. Both ports
+are exercised with randomized read/write sequences and full readback
+verification.
+
+Also provides TbDesign and run_test() for SiliconCompiler-based simulation flow.
+"""
+
 try:
     import cocotb
     import os
 
-    from cocotb.triggers import Timer, FallingEdge
+    from cocotb.triggers import FallingEdge
     from cocotb.clock import Clock
     from lambdalib.reusable_tests.cocotb_common import SimCmdFiles, use_cocotb
     from lambdalib.reusable_tests.ramlib.common.spram_driver import RamDriver
@@ -56,16 +66,6 @@ if _has_cocotb:
         cocotb.start_soon(Clock(dut.clk_a, clk_period_ns, unit="ns").start())
         cocotb.start_soon(Clock(dut.clk_b, clk_period_ns, unit="ns").start())
 
-        def rand_address(min_addr: int, max_addr: int):
-            rand_addresses = [
-                min_addr,
-                max_addr,
-                random.randint(min_addr + 1, max_addr - 1)
-            ]
-            # Use weighted random selection to increase likelihood of hitting edge cases
-            address_weights = [0.10, 0.10, 0.80]
-            return random.choices(rand_addresses, weights=address_weights)[0]
-
         async def rw_test(ram_driver: RamDriver, n_cycles: int, addresses: List[int]):
             await FallingEdge(ram_driver.clk)
             mem = {}
@@ -76,18 +76,19 @@ if _has_cocotb:
                     data = random.randint(0, (1 << DW) - 1)
                     wmask = random.randint(0, (1 << DW) - 1)
                     await ram_driver.write(address, data, wmask, True)
-                    mem[address] = (wmask, data)
+                    old_data, old_mask = mem.get(address, (0, 0))
+                    mem[address] = ((old_data & ~wmask) | (data & wmask), old_mask | wmask)
                 else:
-                    address, (wmask, expected) = random.choice(list(mem.items()))
+                    address, (expected, mask) = random.choice(list(mem.items()))
                     actual = await ram_driver.read(address, True)
-                    assert (actual & wmask) == (expected & wmask)
+                    assert (actual & mask) == (expected & mask)
             return mem
 
         # Generate a set of unique random addresses to test
-        n_possible_addresses = min((1 << AW) - 1, 1000)
+        n_possible_addresses = min(1 << AW, 1000)
         addresses = random.sample(range(0, 1 << AW), n_possible_addresses)
 
-        # Create two seperate unique lists of addresses
+        # Create two separate unique lists of addresses
         addr_space_0 = addresses[:len(addresses) // 2]
         addr_space_1 = addresses[len(addresses) // 2:]
 
@@ -104,9 +105,9 @@ if _has_cocotb:
                 mem = await task
 
                 # Verify all written addresses can be read back correctly
-                for address, (wmask, expected) in mem.items():
+                for address, (expected, mask) in mem.items():
                     actual = await driver.read(address, True)
-                    assert (actual & wmask) == (expected & wmask)
+                    assert (actual & mask) == (expected & mask)
 
 
 else:
@@ -116,6 +117,7 @@ else:
 
 
 class TbDesign(Design):
+    """SiliconCompiler Design wrapper for la_tdpram cocotb testbench."""
 
     def __init__(
         self,

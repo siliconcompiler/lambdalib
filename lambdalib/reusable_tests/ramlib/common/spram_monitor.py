@@ -1,9 +1,17 @@
+"""Cocotb monitor for single-port RAM interfaces.
+
+Passively observes write transactions (ce & we asserted on rising clock edge)
+and maintains a shadow memory with bit-level write-mask accumulation, suitable
+for scoreboard-style verification.
+"""
+
 import cocotb
 from cocotb.triggers import RisingEdge
 
 
 class RamMonitor:
     def __init__(self, dut):
+        """Initialize monitor from DUT handle. Call start() to begin capture."""
         self.clk = dut.clk
         self.ce = dut.ce
         self.we = dut.we
@@ -21,6 +29,7 @@ class RamMonitor:
         self.log = dut._log
 
     def start(self):
+        """Launch the background monitor coroutine"""
         if self.monitor_task is None:
             self.monitor_task = cocotb.start_soon(self._monitor())
 
@@ -38,6 +47,6 @@ class RamMonitor:
                     self.mem[addr] = 0
                 self.mem[addr] = (self.mem[addr] & ~wmask) | (data & wmask)
                 self.log.debug(
-                    f"Monitor captured write: addr={hex(addr)}, ",
+                    f"Monitor captured write: addr={hex(addr)}, "
                     f"data={hex(data)}, wmask={hex(wmask)}, mem[{hex(addr)}]={hex(self.mem[addr])}"
                 )

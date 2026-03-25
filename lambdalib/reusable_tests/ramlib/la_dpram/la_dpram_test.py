@@ -1,3 +1,14 @@
+"""Cocotb tests for the la_dpram (dual-port RAM) module.
+
+Contains two test strategies:
+- **test_la_dpram_basic**: Writes known patterns via the write port, then reads
+  and verifies them via the read port.
+- **test_la_dpram_all_addresses**: Exhaustive write-then-read of every address
+  in the memory using a deterministic address-derived pattern.
+
+Also provides TbDesign and run_test() for SiliconCompiler-based simulation flow.
+"""
+
 try:
     import cocotb
     import os
@@ -209,8 +220,13 @@ else:
         """Placeholder test when cocotb is not installed."""
         pass
 
+    def test_la_dpram_all_addresses():
+        """Placeholder test when cocotb is not installed."""
+        pass
+
 
 class TbDesign(Design):
+    """SiliconCompiler Design wrapper for la_dpram cocotb testbench."""
 
     def __init__(
         self,
@@ -238,7 +254,8 @@ class TbDesign(Design):
                 self.set_param("DW", str(dw))
                 self.set_param("AW", str(aw))
 
-                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+                if simulator in ["icarus", "verilator"]:
+                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
 
                 self.add_file("la_dpram_test.py", filetype="python")
 

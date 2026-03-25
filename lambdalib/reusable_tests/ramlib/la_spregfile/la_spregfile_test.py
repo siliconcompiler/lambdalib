@@ -1,3 +1,14 @@
+"""Cocotb tests for the la_spregfile (single-port register file) module.
+
+Contains two test strategies:
+- **test_la_spregfile_fuzz**: Randomized input fuzzing with a passive RamMonitor
+  that accumulates expected state, followed by readback verification.
+- **test_la_spregfile_basic**: Directed random read/write sequences with an
+  active RamDriver and software shadow memory for per-address verification.
+
+Also provides TbDesign and run_test() for SiliconCompiler-based simulation flow.
+"""
+
 try:
     import cocotb
     import os
@@ -30,7 +41,10 @@ if _has_cocotb:
         CTRL_VALUE = int(os.environ.get('CTRL_VALUE', 0))
         clk_period_ns = 10
         n_trials = 10000
-        time_per_trial = 3
+        # Use a timer period so that, starting from the falling edge
+        # fuzz events never coincide with rising edges.
+        # avoiding delta-cycle races with the monitor.
+        time_per_trial = clk_period_ns // 5
         time_unit_per_trial = "ns"
 
         dut.ctrl.value = CTRL_VALUE
@@ -106,7 +120,8 @@ if _has_cocotb:
             address_weights = [0.10, 0.10, 0.80]
             return random.choices(rand_addresses, weights=address_weights)[0]
 
-        # Dictionary to keep track of expected memory contents
+        # Dictionary to keep track of expected memory contents (accumulated)
+        # Each entry is (accumulated_data, accumulated_wmask)
         mem = {}
 
         for _ in range(n_trials):
@@ -116,28 +131,30 @@ if _has_cocotb:
                 data = random.randint(0, (1 << DW) - 1)
                 wmask = random.randint(0, (1 << DW) - 1)
                 await ram.write(address, data, wmask, True)
-                mem[address] = (wmask, data)
+                old_data, old_mask = mem.get(address, (0, 0))
+                mem[address] = ((old_data & ~wmask) | (data & wmask), old_mask | wmask)
             else:
-                address, (wmask, expected) = random.choice(list(mem.items()))
+                address, (expected, mask) = random.choice(list(mem.items()))
                 actual = await ram.read(address, True)
-                assert (actual & wmask) == (expected & wmask)
+                assert (actual & mask) == (expected & mask)
 
         # Verify all written addresses can be read back correctly
-        for address, (wmask, expected) in mem.items():
+        for address, (expected, mask) in mem.items():
             actual = await ram.read(address, True)
-            assert (actual & wmask) == (expected & wmask)
+            assert (actual & mask) == (expected & mask)
 
 else:
     def test_la_spregfile_fuzz():
         """Placeholder test when cocotb is not installed."""
         pass
 
-    def test_la_spregfile_basic(dut):
+    def test_la_spregfile_basic():
         """Placeholder test when cocotb is not installed."""
         pass
 
 
 class TbDesign(Design):
+    """SiliconCompiler Design wrapper for la_spregfile cocotb testbench."""
 
     def __init__(
         self,
