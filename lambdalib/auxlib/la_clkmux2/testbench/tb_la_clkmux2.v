@@ -23,7 +23,7 @@ module tb_la_clkmux2();
    always @(posedge out) out_edges <= out_edges + 1;
 
    // Helper task: check output is toggling
-   task check_toggling;
+   task automatic check_toggling;
       input [80*8-1:0] label;
       begin
          out_edges = 0;
