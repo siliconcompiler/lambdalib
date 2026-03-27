@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module tb_la_clkmux2();
    reg clk0, clk1, sel, nreset;
    reg clk1_en;
@@ -6,7 +7,11 @@ module tb_la_clkmux2();
    // Clock definitions
    initial clk0 = 0; always #20 clk0 = ~clk0; // 25MHz
    initial begin clk1 = 0; clk1_en = 0; end
-   always #2 if (clk1_en) clk1 = ~clk1;
+   initial begin
+    #1.9;
+    forever #2 if (clk1_en) clk1 = ~clk1;
+   end
+   // always #2 if (clk1_en) clk1 = ~clk1;
 
    la_clkmux2 dut (.clk0(clk0), .clk1(clk1), .nreset(nreset), .sel(sel), .out(out));
 
@@ -110,6 +115,11 @@ module tb_la_clkmux2();
       #100;
       clk1_en = 1;
       check_toggling("sel=1, clk1 stopped then restarted");
+
+      #139;
+      nreset = 0;
+      #100;
+      nreset = 1;
 
       // ----------------------------------------------------------
       // Final: back to clk0

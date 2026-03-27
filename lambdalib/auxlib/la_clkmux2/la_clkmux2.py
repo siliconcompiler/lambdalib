@@ -3,8 +3,9 @@ from siliconcompiler import Design
 from lambdalib.stdlib import Inv
 from lambdalib.stdlib import And2
 from lambdalib.stdlib import Clkor2
-from lambdalib.auxlib import Drsync
-from lambdalib.auxlib import Clkicgand
+from lambdalib.auxlib.la_drsync.la_drsync import Drsync
+from lambdalib.auxlib.la_clkicgand.la_clkicgand import Clkicgand
+from lambdalib.auxlib.la_rsync.la_rsync import Rsync
 
 
 class Clkmux2(Lambda):
@@ -13,7 +14,7 @@ class Clkmux2(Lambda):
         super().__init__(name, __file__)
 
         # dependencies
-        deps = [Inv(), And2(), Clkor2(), Drsync(), Clkicgand()]
+        deps = [Inv(), And2(), Clkor2(), Drsync(), Clkicgand(), Rsync()]
         with self.active_fileset('rtl'):
             for item in deps:
                 self.add_depfileset(item)

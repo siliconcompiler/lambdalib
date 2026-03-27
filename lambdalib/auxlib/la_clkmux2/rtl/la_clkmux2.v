@@ -47,30 +47,69 @@ module la_clkmux2 #(parameter PROP = "DEFAULT" // cell property
        out_reg <= sel ? clk1 : clk0;
    assign out = out_reg;
 `else
+
+   reg isel;
+
    // local wires
+   wire       clk0_nreset_sync;
+   wire       sel_sample;
+   wire       fb_1_sync;
    wire       selb;
    wire [1:0] en;
    wire [1:0] ensync;
+   wire [1:0] ensync_fb;
    wire [1:0] maskb;
    wire [1:0] clkg;
    wire       en0b;
    wire       ensync0b;
 
-   // Handshake logic: each path is enabled only after the other is gated off
-   la_inv isel (.a(sel),
-                .z(selb));
+   la_rsync u_clk0rstsync(
+    .clk(clk0),
+    .nrst_in(nreset),
+    .nrst_out(clk0_nreset_sync)
+   );
 
-   la_inv inv0 (.a(ensync[0]),
+   // Only allow internal sel signal to change state once clk mux has settled
+   assign sel_sample = isel ? fb_1_sync & ~ensync_fb[0] : ~fb_1_sync & ensync_fb[0];
+   always @(posedge clk0 or negedge clk0_nreset_sync)
+      if (~clk0_nreset_sync)
+        isel <= 1'b0;
+      else if (sel_sample)
+        isel <= sel;
+
+   la_drsync ensync_fb1 (.clk    (clk0),
+                           .nreset (nreset),
+                           .in     (ensync_fb[1]),
+                           .out    (fb_1_sync));
+
+   // Handshake logic: each path is enabled only after the other is gated off
+   la_inv isel_inv (.a(isel),
+                    .z(selb));
+
+  
+   la_drsync idelay_mask0 (.clk    (clk0),
+                           .nreset (nreset),
+                           .in     (ensync[0]),
+                           .out    (ensync_fb[0]));
+
+
+   la_drsync idelay_mask1 (.clk    (clk1),
+                           .nreset (nreset),
+                           .in     (ensync[1]),
+                           .out    (ensync_fb[1]));
+
+
+   la_inv inv0 (.a(ensync_fb[0]),
                 .z(maskb[0]));
 
-   la_inv inv1 (.a(ensync[1]),
+   la_inv inv1 (.a(ensync_fb[1]),
                 .z(maskb[1]));
 
    la_and2 ien0 (.a(selb),
                  .b(maskb[1]), // enable once clk1 path is gated off
                  .z(en[0]));
 
-   la_and2 ien1 (.a(sel),
+   la_and2 ien1 (.a(isel),
                  .b(maskb[0]), // enable once clk0 path is gated off
                  .z(en[1]));
 
