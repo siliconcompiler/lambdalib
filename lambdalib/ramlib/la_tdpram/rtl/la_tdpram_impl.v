@@ -20,36 +20,33 @@
  *
  ****************************************************************************/
 
-module la_tdpram_impl #(
-    parameter DW    = 32,         // Memory width
-    parameter AW    = 10,         // address width (derived)
-    parameter PROP  = "DEFAULT",  // pass through variable for hard macro
-    parameter CTRLW = 128,        // width of asic ctrl interface
-    parameter TESTW = 128         // width of asic test interface
-) (  // Write port
-    input               clk_a,    // write clock
-    input               ce_a,     // write chip-enable
-    input               we_a,     // write enable
-    input [DW-1:0]      wmask_a,  // write mask
-    input [AW-1:0]      addr_a,   // write address
-    input [DW-1:0]      din_a,    // write data in
-    output reg [DW-1:0] dout_a,   // read data out
+module la_tdpram_impl #(parameter DW = 32,          // Memory width
+                        parameter AW = 10,          // Address width (derived)
+                        parameter PROP = "DEFAULT", // variable for hard macro
+                        parameter CTRLW = 32,       // width of ctrl interface
+                        parameter STATUSW = 32      // width of status interface
+                        )
+   (// A port
+    input               clk_a,   // write clock
+    input               ce_a,    // write chip-enable
+    input               we_a,    // write enable
+    input [DW-1:0]      wmask_a, // write mask
+    input [AW-1:0]      addr_a,  // write address
+    input [DW-1:0]      din_a,   // write data in
+    output reg [DW-1:0] dout_a,  // read data out
     // B port
-    input               clk_b,    // write clock
-    input               ce_b,     // write chip-enable
-    input               we_b,     // write enable
-    input [DW-1:0]      wmask_b,  // write mask
-    input [AW-1:0]      addr_b,   // write address
-    input [DW-1:0]      din_b,    // write data in
-    output reg [DW-1:0] dout_b,   // read data out
-    // Power signal
-    input               vss,      // ground signal
-    input               vdd,      // memory core array power
-    input               vddio,    // periphery/io power
-    // Generic interfaces
-    input [CTRLW-1:0]   ctrl,     // pass through ASIC control interface
-    input [TESTW-1:0]   test      // pass through ASIC test interface
-);
+    input               clk_b,   // write clock
+    input               ce_b,    // write chip-enable
+    input               we_b,    // write enable
+    input [DW-1:0]      wmask_b, // write mask
+    input [AW-1:0]      addr_b,  // write address
+    input [DW-1:0]      din_b,   // write data in
+    output reg [DW-1:0] dout_b,  // read data out
+    // Technology interfaces
+    input               selctrl, // selects control interface
+    input [CTRLW-1:0]   ctrl,    // pass through control interface
+    input [STATUSW-1:0] status   // pass through status interface
+    );
 
     // Generic RTL RAM
    /* verilator lint_off MULTIDRIVEN */
