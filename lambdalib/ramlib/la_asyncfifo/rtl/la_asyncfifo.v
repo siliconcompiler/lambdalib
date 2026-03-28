@@ -182,4 +182,7 @@ module la_asyncfifo #(parameter DW = 32,         // Memory width
    // Read port (FIFO output)
    assign rd_dout[DW-1:0] = ram[rd_binptr_mem[AW-1:0]];
 
+   // Status (active in hard macro, tied off in soft model)
+   assign status = {STATUSW{1'b0}};
+
 endmodule

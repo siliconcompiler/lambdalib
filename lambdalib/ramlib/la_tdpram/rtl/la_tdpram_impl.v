@@ -87,4 +87,7 @@ module la_tdpram_impl #(parameter DW = 32,          // Memory width
       end
    end
 
+   // Status (active in hard macro, tied off in soft model)
+   assign status = {STATUSW{1'b0}};
+
 endmodule

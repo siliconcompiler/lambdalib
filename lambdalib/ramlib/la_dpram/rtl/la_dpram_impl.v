@@ -57,4 +57,7 @@ module la_dpram_impl #(
    // Read Port
    always @(posedge rd_clk) if (rd_ce) rd_dout[DW-1:0] <= ram[rd_addr[AW-1:0]];
 
+   // Status (active in hard macro, tied off in soft model)
+   assign status = {STATUSW{1'b0}};
+
 endmodule
