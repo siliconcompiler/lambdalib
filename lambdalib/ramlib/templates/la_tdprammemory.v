@@ -170,6 +170,8 @@ module {{ type }}
             assign we_in_B = we_b && selectedB;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
+              wire [{{ default_ctrl_width[memory] - 1 }}:0] mem_ctrl;
+              assign mem_ctrl = selctrl ? ctrl[{{ default_ctrl_width[memory] - 1 }}:0] : {{ default_ctrl[memory] }};
               {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
                 .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
               );

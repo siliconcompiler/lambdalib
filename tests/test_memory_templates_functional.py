@@ -35,6 +35,37 @@ def create_mock_ram_class(name, width, depth, ports):
         def get_ram_ports(self):
             return self.ports
 
+        def get_ram_defaultctrl(self) -> str:
+            """Returns the default control signal value for the RAM cell."""
+            # Detect if dual-port or single-port by checking port names
+            port_names = [port for port, _ in ports]
+            is_dual_port = any('wr_' in p or 'rd_' in p for p in port_names)
+            is_true_dual_port = any('_a' in p or '_b' in p for p in port_names)
+
+            if is_true_dual_port:
+                # True dual port with independently accessed ports
+                return "16'b1_1_0_10_101_1_0_10_100"
+            elif is_dual_port:
+                # Dual port with separate read/write clocks
+                return "14'b1_1_0_10_100_1_10_100"
+            else:
+                # Single port
+                return "8'b1_0_1_10_101"
+
+        def get_ram_defaultctrl_width(self) -> int:
+            """Returns the width of the default control signal for the RAM cell."""
+            # Detect if dual-port or single-port by checking port names
+            port_names = [port for port, _ in ports]
+            is_dual_port = any('wr_' in p or 'rd_' in p for p in port_names)
+            is_true_dual_port = any('_a' in p or '_b' in p for p in port_names)
+
+            if is_true_dual_port:
+                return 16
+            elif is_dual_port:
+                return 14
+            else:
+                return 8
+
     return _MockRAM
 
 
