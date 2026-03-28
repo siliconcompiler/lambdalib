@@ -45,7 +45,7 @@ module la_dpram #(parameter DW = 32,          // Memory width
     // Generic interfaces
     input               selctrl,  // selects control interface
     input [CTRLW-1:0]   ctrl,     // pass through control interface
-    input [STATUSW-1:0] status    // pass through status interface
+    output [STATUSW-1:0] status    // pass through status interface
     );
 
    la_dpram_impl #(.DW      (DW),

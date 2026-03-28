@@ -42,7 +42,7 @@ module la_dpram_impl #(
     // Technology interfaces
     input               selctrl,  // selects control interface
     input [CTRLW-1:0]   ctrl,     // pass through control interface
-    input [STATUSW-1:0] status    // pass through status interface
+    output [STATUSW-1:0] status    // pass through status interface
     );
 
    // Generic RTL RAM
