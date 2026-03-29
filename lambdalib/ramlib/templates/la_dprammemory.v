@@ -93,7 +93,8 @@ module {{ type }}
       end
       if (MEM_PROP != "SOFT") begin: itech
         // Create memories
-        localparam MEM_ADDRS = 2**(AW - MEM_DEPTH) < 1 ? 1 : 2**(AW - MEM_DEPTH);
+        // When AW < MEM_DEPTH, force single-macro case (MEM_ADDRS = 1)
+        localparam MEM_ADDRS = (AW >= MEM_DEPTH) ? 2**(AW - MEM_DEPTH) : 1;
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
@@ -120,6 +121,7 @@ module {{ type }}
               assign wr_mem_addr = wr_addr;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_WR
+              // Single-macro forced case: zero-extend address to macro width
               assign wr_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, wr_addr{{ '}' }};
             end
             // Handle address width mismatch for read
@@ -130,6 +132,7 @@ module {{ type }}
               assign rd_mem_addr = rd_addr;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_RD
+              // Single-macro forced case: zero-extend address to macro width
               assign rd_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, rd_addr{{ '}' }};
             end
           end else begin: NOFITS
