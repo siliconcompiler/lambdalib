@@ -21,42 +21,43 @@
  ****************************************************************************/
 
 module la_dpram_impl #(
-    parameter DW    = 32,         // Memory width
-    parameter AW    = 10,         // address width (derived)
-    parameter PROP  = "DEFAULT",  // pass through variable for hard macro
-    parameter CTRLW = 128,        // width of asic ctrl interface
-    parameter TESTW = 128         // width of asic test interface
-) (  // Write port
-    input wr_clk,  // write clock
-    input wr_ce,  // write chip-enable
-    input wr_we,  // write enable
-    input [DW-1:0] wr_wmask,  // write mask
-    input [AW-1:0] wr_addr,  // write address
-    input [DW-1:0] wr_din,  //write data in
+                       parameter DW = 32,          // memory width
+                       parameter AW = 10,          // address width (derived)
+                       parameter PROP = "DEFAULT", // variable for hard macro
+                       parameter CTRLW = 32,       // width of ctrl interface
+                       parameter STATUSW = 32      // width of status interface
+                       )
+   (// Write port
+    input               wr_clk,   // write clock
+    input               wr_ce,    // write chip-enable
+    input               wr_we,    // write enable
+    input [DW-1:0]      wr_wmask, // write mask
+    input [AW-1:0]      wr_addr,  // write address
+    input [DW-1:0]      wr_din,   //write data in
     // Read port
-    input rd_clk,  // read clock
-    input rd_ce,  // read chip-enable
-    input [AW-1:0] rd_addr,  // read address
+    input               rd_clk,   // read clock
+    input               rd_ce,    // read chip-enable
+    input [AW-1:0]      rd_addr,  // read address
     output reg [DW-1:0] rd_dout,  //read data out
-    // Power signal
-    input vss,  // ground signal
-    input vdd,  // memory core array power
-    input vddio,  // periphery/io power
-    // Generic interfaces
-    input [CTRLW-1:0] ctrl,  // pass through ASIC control interface
-    input [TESTW-1:0] test  // pass through ASIC test interface
-);
+    // Technology interfaces
+    input               selctrl,  // selects control interface
+    input [CTRLW-1:0]   ctrl,     // pass through control interface
+    output [STATUSW-1:0] status    // pass through status interface
+    );
 
-    // Generic RTL RAM
-    reg     [DW-1:0] ram[(2**AW)-1:0];
-    integer          i;
+   // Generic RTL RAM
+   reg     [DW-1:0] ram[(2**AW)-1:0];
+   integer          i;
 
-    // Write port
-    always @(posedge wr_clk)
-        for (i = 0; i < DW; i = i + 1)
-            if (wr_ce & wr_we & wr_wmask[i]) ram[wr_addr[AW-1:0]][i] <= wr_din[i];
+   // Write port
+   always @(posedge wr_clk)
+     for (i = 0; i < DW; i = i + 1)
+       if (wr_ce & wr_we & wr_wmask[i]) ram[wr_addr[AW-1:0]][i] <= wr_din[i];
 
-    // Read Port
-    always @(posedge rd_clk) if (rd_ce) rd_dout[DW-1:0] <= ram[rd_addr[AW-1:0]];
+   // Read Port
+   always @(posedge rd_clk) if (rd_ce) rd_dout[DW-1:0] <= ram[rd_addr[AW-1:0]];
+
+   // Status (active in hard macro, tied off in soft model)
+   assign status = {STATUSW{1'b0}};
 
 endmodule

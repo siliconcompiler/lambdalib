@@ -9,34 +9,29 @@
  *
  ****************************************************************************/
 
-module la_syncfifo
-  #(
-    parameter DW    = 32,        // Memory width
-    parameter DEPTH = 4,         // FIFO depth
-    parameter NS    = 1,         // Number of power supplies
-    parameter CHAOS = 1,         // generates random full logic when set
-    parameter CTRLW = 1,         // width of asic ctrl interface
-    parameter TESTW = 1,         // width of asic test interface
-    parameter PROP  = "DEFAULT"  // Pass through variable for hard macro
-    )
+module la_syncfifo #(parameter DW = 32,         // Memory width
+                     parameter DEPTH = 4,       // FIFO depth
+                     parameter CTRLW = 32,      // width of ctrl interface
+                     parameter STATUSW = 32,    // width of status interface
+                     parameter PROP = "DEFAULT" // variable for hard macro
+                     )
    (// basic interface
-    input             clk,
-    input             nreset,//async reset
-    input             clear, //clear fifo statemachine (sync)
-    input             vss, // ground signal
-    input [NS-1:0]    vdd, // supplies
-    input             chaosmode, // randomly assert fifo full when set
-    input [CTRLW-1:0] ctrl, // pass through ASIC control interface
-    input [TESTW-1:0] test, // pass through ASIC test interface
+    input               clk,
+    input               nreset,   //async reset
+    input               clear,    //clear fifo statemachine (sync)
     // write port
-    input             wr_en, // write fifo
-    input [DW-1:0]    wr_din, // data to write
-    output            wr_full, // fifo full
+    input               wr_en,    // write fifo
+    input [DW-1:0]      wr_din,   // data to write
+    output              wr_full,  // fifo full
     // read port
-    input             rd_en, // read fifo
-    output [DW-1:0]   rd_dout, // output data
-    output            rd_empty    // fifo is empty
-);
+    input               rd_en,    // read fifo
+    output [DW-1:0]     rd_dout,  // output data
+    output              rd_empty, // fifo is empty
+    // Technology interfaces
+    input               selctrl,  // selects control interface
+    input [CTRLW-1:0]   ctrl,     // pass through control interface
+    output [STATUSW-1:0] status    // pass through status interface
+    );
 
     // local params
     parameter AW = $clog2(DEPTH);
@@ -48,7 +43,6 @@ module la_syncfifo
     wire [AW:0] rd_addr_nxt;
     wire        fifo_read;
     wire        fifo_write;
-    wire        chaosfull;
     wire        rd_wrap_around;
     wire        wr_wrap_around;
 
@@ -57,10 +51,7 @@ module la_syncfifo
     //############################
 
     // support any fifo depth
-    assign wr_full = (chaosfull & chaosmode) |
-                     {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
-
-
+    assign wr_full = {~wr_addr[AW], wr_addr[AW-1:0]} == rd_addr[AW:0];
 
     assign rd_empty = wr_addr[AW:0] == rd_addr[AW:0];
 
@@ -110,22 +101,7 @@ module la_syncfifo
     // Read port (FIFO output)
     assign rd_dout[DW-1:0] = ram[rd_addr[AW-1:0]];
 
-
-    //############################
-    // Randomly Asserts FIFO full
-    //############################
-
-    generate
-        if (CHAOS) begin
-            // TODO: implement LFSR
-            reg chaosreg;
-            always @(posedge clk or negedge nreset)
-                if (~nreset) chaosreg <= 1'b0;
-                else chaosreg <= ~chaosreg;
-            assign chaosfull = chaosreg;
-        end else begin
-            assign chaosfull = 1'b0;
-        end
-    endgenerate
+    // Status (active in hard macro, tied off in soft model)
+    assign status = {STATUSW{1'b0}};
 
 endmodule

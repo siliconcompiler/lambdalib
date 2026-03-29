@@ -20,36 +20,31 @@
  *
  ****************************************************************************/
 
-module la_asyncfifo #(
-    parameter DW                = 32,       // Memory width
-    parameter DEPTH             = 4,        // FIFO depth
-    parameter ALMOSTFULL        = 0,        // FIFO depth
-    parameter NS                = 1,        // Number of power supplies
-    parameter CTRLW             = 1,        // width of asic ctrl interface
-    parameter TESTW             = 1,        // width of asic teset interface
-    parameter CHAOS             = 0,        // generates random full logic when set
-    parameter PROP              = "DEFAULT" // Pass through variable for hard macro
-) (  // write port
-    input                  wr_clk,
-    input                  wr_nreset,
-    input      [   DW-1:0] wr_din,         // data to write
-    input                  wr_en,          // write fifo
-    input                  wr_chaosmode,   // randomly assert fifo full when set
-    output reg             wr_full,        // fifo full
-    output reg             wr_almost_full, // fifo almost full
+module la_asyncfifo #(parameter DW = 32,         // Memory width
+                      parameter DEPTH = 4,       // FIFO depth
+                      parameter ALMOSTFULL = 0,  // FIFO depth
+                      parameter CTRLW = 32,      // width of ctrl interface
+                      parameter STATUSW = 32,    // width of status interface
+                      parameter PROP = "DEFAULT" // variable for hard macro
+                      )
+   (// write port
+    input               wr_clk,
+    input               wr_nreset,
+    input [ DW-1:0]     wr_din,         // data to write
+    input               wr_en,          // write fifo
+    output reg          wr_full,        // fifo full
+    output reg          wr_almost_full, // fifo almost full
     // read port
-    input                  rd_clk,
-    input                  rd_nreset,
-    output     [   DW-1:0] rd_dout,        // output data (next cycle)
-    input                  rd_en,          // read fifo
-    output reg             rd_empty,       // fifo is empty
-    // Power signals
-    input                  vss,            // ground signal
-    input      [   NS-1:0] vdd,            // supplies
-    // Generic interfaces
-    input      [CTRLW-1:0] ctrl,           // pass through ASIC control interface
-    input      [TESTW-1:0] test            // pass through ASIC test interface
-);
+    input               rd_clk,
+    input               rd_nreset,
+    output [ DW-1:0]    rd_dout,        // output data (next cycle)
+    input               rd_en,          // read fifo
+    output reg          rd_empty,       // fifo is empty
+    // Technology interfaces
+    input               selctrl,        // selects control interface
+    input [CTRLW-1:0]   ctrl,           // pass through control interface
+    output [STATUSW-1:0] status          // pass through status interface
+    );
 
     // local params
     localparam AW = (DEPTH == 1) ? 1 : $clog2(DEPTH);
@@ -63,7 +58,6 @@ module la_asyncfifo #(
     wire [AW:0] wr_binptr_nxt;
     wire [AW:0] wr_binptr_mem_nxt;
     wire [AW:0] wr_grayptr_sync;
-    wire        wr_chaosfull;
     wire        wr_almost_full_next;
 
     reg  [AW:0] rd_grayptr;
@@ -117,8 +111,7 @@ module la_asyncfifo #(
     always @(posedge wr_clk or negedge wr_nreset)
         if (~wr_nreset) wr_full <= 1'b0;
         else
-            wr_full <= (wr_chaosfull & wr_chaosmode) |
-                  (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH[AW:0];
+            wr_full <= (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH[AW:0];
 
     generate
       if (DEPTH == 1)
@@ -179,31 +172,17 @@ module la_asyncfifo #(
     //# Dual Port Memory
     //###########################
 
-    reg [DW-1:0] ram[DEPTH-1:0];
+   reg [DW-1:0] ram[DEPTH-1:0];
 
-    // Write port (FIFO input)
-    always @(posedge wr_clk) if (wr_en & ~wr_full) ram[wr_binptr_mem[AW-1:0]] <= wr_din[DW-1:0];
+   // Write port (FIFO input)
+   always @(posedge wr_clk)
+     if (wr_en & ~wr_full)
+       ram[wr_binptr_mem[AW-1:0]] <= wr_din[DW-1:0];
 
-    // Read port (FIFO output)
-    assign rd_dout[DW-1:0] = ram[rd_binptr_mem[AW-1:0]];
+   // Read port (FIFO output)
+   assign rd_dout[DW-1:0] = ram[rd_binptr_mem[AW-1:0]];
 
-    //############################
-    // Randomly Asserts FIFO full
-    //############################
-
-    generate
-        if (CHAOS) begin
-            // TODO: implement LFSR
-            reg chaosreg;
-            always @(posedge wr_clk or negedge wr_nreset)
-                if (~wr_nreset) chaosreg <= 1'b0;
-                else chaosreg <= ~chaosreg;
-            assign wr_chaosfull = chaosreg;
-        end else begin
-            assign wr_chaosfull = 1'b0;
-        end
-
-    endgenerate
-
+   // Status (active in hard macro, tied off in soft model)
+   assign status = {STATUSW{1'b0}};
 
 endmodule

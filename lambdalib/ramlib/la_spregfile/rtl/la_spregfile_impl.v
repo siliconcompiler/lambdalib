@@ -20,29 +20,24 @@
  *
  ****************************************************************************/
 
-module la_spregfile_impl
-  #(
-    parameter DW = 32,          // Memory width
-    parameter AW = 10,          // Address width (derived)
-    parameter PROP = "DEFAULT", // Pass through variable for hard macro
-    parameter CTRLW = 1,        // Width of asic ctrl interface
-    parameter TESTW = 1         // Width of asic test interface
-    )
+module la_spregfile_impl #(parameter DW = 32,          // Memory width
+                           parameter AW = 10,          // Address width (derived)
+                           parameter PROP = "DEFAULT", // variable for hard macro
+                           parameter CTRLW = 32,       // width of ctrl interface
+                           parameter STATUSW = 32      // width of status interface
+                           )
    (// Memory interface
-    input               clk,   // write clock
-    input               ce,    // chip enable
-    input               we,    // write enable
-    input [DW-1:0]      wmask, //per bit write mask
-    input [AW-1:0]      addr,  //write address
-    input [DW-1:0]      din,   //write data
-    output reg [DW-1:0] dout,  //read output data
-    // Power signals
-    input               vss,   // ground signal
-    input               vdd,   // memory core array power
-    input               vddio, // periphery/io power
-    // Generic interfaces
-    input [CTRLW-1:0]   ctrl,  // pass through ASIC control interface
-    input [TESTW-1:0]   test   // pass through ASIC test interface
+    input               clk,     // write clock
+    input               ce,      // chip enable
+    input               we,      // write enable
+    input [DW-1:0]      wmask,   // per bit write mask
+    input [AW-1:0]      addr,    // write address
+    input [DW-1:0]      din,     // write data
+    output reg [DW-1:0] dout,    // read output data
+    // Technology interfaces
+    input               selctrl, // selects control interface
+    input [CTRLW-1:0]   ctrl,    // pass through control interface
+    output [STATUSW-1:0] status   // pass through status interface
     );
 
     // Generic RTL RAM
@@ -64,5 +59,8 @@ module la_spregfile_impl
     always @(posedge clk)
       if (ce)
         dout[DW-1:0] <= ram[addr[AW-1:0]];
+
+    // Status (active in hard macro, tied off in soft model)
+    assign status = {STATUSW{1'b0}};
 
 endmodule

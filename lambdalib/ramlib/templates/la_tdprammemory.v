@@ -8,7 +8,7 @@
  * This is a wrapper for selecting from a set of hardened memory macros.
  *
  * A synthesizable reference model is used when the PROP is DEFAULT. The
- * synthesizable model does not implement the cfg and test interface and should
+ * synthesizable model does not implement the ctrl interface and should
  * only be used for basic testing and for synthesizing for FPGA devices.
  * Advanced ASIC development should rely on complete functional models
  * supplied on a per macro basis.
@@ -23,11 +23,11 @@
 (* keep_hierarchy *)
 module {{ type }}
   #(
-    parameter DW    = 32,         // Memory width
-    parameter AW    = 10,         // Address width (derived)
-    parameter PROP  = "DEFAULT",  // Pass through variable for hard macro
-    parameter CTRLW = 128,        // Width of asic ctrl interface
-    parameter TESTW = 128         // Width of asic test interface
+    parameter DW      = 32,         // Memory width
+    parameter AW      = 10,         // Address width (derived)
+    parameter PROP    = "DEFAULT",  // Pass through variable for hard macro
+    parameter CTRLW   = 32,         // Width of ctrl interface
+    parameter STATUSW = 32          // Width of status interface
   ) (  // Memory interface
       input               clk_a,    // write clock
       input               ce_a,     // write chip-enable
@@ -44,13 +44,10 @@ module {{ type }}
       input [AW-1:0]      addr_b,   // write address
       input [DW-1:0]      din_b,    // write data in
       output [DW-1:0]     dout_b,   // read data out
-      // Power signals
-      input vss,  // ground signal
-      input vdd,  // memory core array power
-      input vddio,  // periphery/io power
-      // Generic interfaces
-      input [CTRLW-1:0] ctrl,  // pass through ASIC control interface
-      input [TESTW-1:0] test  // pass through ASIC test interface
+      // Technology interfaces
+      input selctrl,  // selects control interface
+      input [CTRLW-1:0] ctrl,  // pass through control interface
+      output [STATUSW-1:0] status  // pass through status interface
   );
 
     // Total number of bits
@@ -63,7 +60,7 @@ module {{ type }}
     localparam MEM_WIDTH = {% for memory, width in width_table %}
       (MEM_PROP == "{{ memory }}") ? {{ width }} :{% endfor %}
       0;
- 
+
     localparam MEM_DEPTH = {% for memory, depth in depth_table %}
       (MEM_PROP == "{{ memory }}") ? {{ depth }} :{% endfor %}
       0;
@@ -75,7 +72,7 @@ module {{ type }}
             .AW(AW),
             .PROP(PROP),
             .CTRLW(CTRLW),
-            .TESTW(TESTW)
+            .STATUSW(STATUSW)
         ) memory (
             .clk_a(clk_a),
             .ce_a(ce_a),
@@ -91,11 +88,9 @@ module {{ type }}
             .addr_b(addr_b),
             .din_b(din_b),
             .dout_b(dout_b),
-            .vss(vss),
-            .vdd(vdd),
-            .vddio(vddio),
+            .selctrl(selctrl),
             .ctrl(ctrl),
-            .test(test)
+            .status(status)
         );
       end
       if (MEM_PROP != "SOFT") begin : itech
