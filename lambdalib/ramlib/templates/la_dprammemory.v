@@ -120,7 +120,7 @@ module {{ type }}
               assign wr_mem_addr = wr_addr;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_WR
-              assign wr_mem_addr = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, wr_addr{{ '}' }};
+              assign wr_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, wr_addr{{ '}' }};
             end
             // Handle address width mismatch for read
             if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_RD
@@ -130,7 +130,7 @@ module {{ type }}
               assign rd_mem_addr = rd_addr;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_RD
-              assign rd_mem_addr = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, rd_addr{{ '}' }};
+              assign rd_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, rd_addr{{ '}' }};
             end
           end else begin: NOFITS
             assign we_selected = wr_addr[AW-1:MEM_DEPTH] == a;

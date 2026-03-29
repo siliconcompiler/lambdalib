@@ -46,8 +46,10 @@ module {{ type }}
     localparam TOTAL_BITS = (2 ** AW) * DW;
 
     // Determine which memory to select
+    //verilator lint_off WIDTHEXPAND
     localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% if minsize > 0 %} ({{ minsize }} >= TOTAL_BITS) ? "SOFT" :{% endif %}{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW >= {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
+    //verilator lint_on WIDTHEXPAND
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
       (MEM_PROP == "{{ memory }}") ? {{ width }} :{% endfor %}
@@ -96,19 +98,22 @@ module {{ type }}
 
           if (MEM_ADDRS == 1) begin: FITS
             assign selected = 1'b1;
-            // Handle address width mismatch
-            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE
-              assign mem_addr = addr[MEM_DEPTH-1:0];
-            end
-            if (AW == MEM_DEPTH) begin: ADDR_MATCH
-              assign mem_addr = addr;
-            end
-            if (AW < MEM_DEPTH) begin: ADDR_EXTEND
-              assign mem_addr = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, addr{{ '}' }};
-            end
           end else begin: NOFITS
             assign selected = addr[AW-1:MEM_DEPTH] == a;
+          end
+
+          // Handle address width mismatch between wrapper and macro
+          if (AW > MEM_DEPTH) begin: ADDR_ADAPT
+            // Truncate address to macro width
             assign mem_addr = addr[MEM_DEPTH-1:0];
+          end
+          if (AW == MEM_DEPTH) begin: ADDR_MATCH
+            // Address width matches
+            assign mem_addr = addr;
+          end
+          if (AW < MEM_DEPTH) begin: ADDR_EXTEND
+            // Zero-extend address to macro width
+            assign mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, addr{{ '}' }};
           end
 
           always @(posedge clk) begin
@@ -148,6 +153,8 @@ module {{ type }}
             end{% endfor %}
           end
         end
+        // Drive status to zero by default for tech-specific memories
+        assign status = {STATUSW{1'b0}};
       end
     endgenerate
 endmodule
