@@ -70,6 +70,7 @@ if _has_cocotb:
         )
 
         Clock(dut.wr_clk, wr_clk_period_ns, unit="ns").start()
+        dut.selctrl.value = 0
 
         # Randomize phase shift between clocks
         await Timer(wr_clk_period_ns * Decimal(random.random()), "ns", round_mode="round")
@@ -181,6 +182,7 @@ if _has_cocotb:
         )
 
         Clock(dut.wr_clk, wr_clk_period_ns, unit="ns").start()
+        dut.selctrl.value = 0
 
         # Randomize phase shift between clocks
         await Timer(wr_clk_period_ns * Decimal(random.random()), "ns", round_mode="round")

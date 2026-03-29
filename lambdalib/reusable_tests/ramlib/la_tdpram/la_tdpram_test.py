@@ -61,6 +61,7 @@ if _has_cocotb:
 
         port_a.init(CTRL_VALUE)
         port_b.init(CTRL_VALUE)
+        dut.selctrl.value = 0
 
         # Start clocks using cocotb Clock
         cocotb.start_soon(Clock(dut.clk_a, clk_period_ns, unit="ns").start())

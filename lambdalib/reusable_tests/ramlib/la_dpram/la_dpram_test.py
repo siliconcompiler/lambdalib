@@ -167,6 +167,7 @@ if _has_cocotb:
         rd_ce.value = 0
         rd_addr.value = 0
         ctrl.value = CTRL_VALUE
+        dut.selctrl.value = 0
 
         # Start clocks using cocotb Clock
         cocotb.start_soon(Clock(wr_clk, clk_period_ns, unit="ns").start())
@@ -205,6 +206,7 @@ if _has_cocotb:
         rd_ce.value = 0
         rd_addr.value = 0
         ctrl.value = CTRL_VALUE
+        dut.selctrl.value = 0
 
         # Start clocks using cocotb Clock
         cocotb.start_soon(Clock(wr_clk, clk_period_ns, unit="ns").start())
