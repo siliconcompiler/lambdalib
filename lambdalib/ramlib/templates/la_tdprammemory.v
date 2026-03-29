@@ -127,7 +127,7 @@ module {{ type }}
               assign mem_addrA = addr_a;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_A
-              {% raw %}assign mem_addrA = {{(MEM_DEPTH-AW){1'b0}}, addr_a};{% endraw %}
+              assign mem_addrA = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, addr_a{{ '}' }};
             end
             // Handle address width mismatch for port B
             if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_B
@@ -137,7 +137,7 @@ module {{ type }}
               assign mem_addrB = addr_b;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND_B
-              {% raw %}assign mem_addrB = {{(MEM_DEPTH-AW){1'b0}}, addr_b};{% endraw %}
+              assign mem_addrB = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, addr_b{{ '}' }};
             end
           end else begin : NOFITS
             assign selectedA = addr_a[AW-1:MEM_DEPTH] == a;

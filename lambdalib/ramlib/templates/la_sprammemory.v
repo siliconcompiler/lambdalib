@@ -113,7 +113,7 @@ module {{ type }}
           end
           if (AW < MEM_DEPTH) begin: ADDR_EXTEND
             // Zero-extend address to macro width
-            {% raw %}assign mem_addr = {{(MEM_DEPTH-AW){1'b0}}, addr};{% endraw %}
+            assign mem_addr = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, addr{{ '}' }};
           end
 
           always @(posedge clk) begin

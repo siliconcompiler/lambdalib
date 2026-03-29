@@ -104,7 +104,7 @@ module {{ type }}
               assign mem_addr = addr;
             end
             if (AW < MEM_DEPTH) begin: ADDR_EXTEND
-              {% raw %}assign mem_addr = {{(MEM_DEPTH-AW){1'b0}}, addr};{% endraw %}
+              assign mem_addr = {{ '{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}' }}{{ '}' }}, addr{{ '}' }};
             end
           end else begin: NOFITS
             assign selected = addr[AW-1:MEM_DEPTH] == a;
