@@ -15,7 +15,7 @@ def test_la_asyncfifo(
     output_wave: bool,
 ):
     pytest.importorskip("cocotb")
-    from lambdalib.reusable_tests.ramlib.la_asyncfifo.test_la_asyncfifo import run_test
+    from lambdalib.reusable_tests.ramlib.la_asyncfifo.la_asyncfifo_test import run_test
     run_test(
         depth=depth,
         simulator=simulator,

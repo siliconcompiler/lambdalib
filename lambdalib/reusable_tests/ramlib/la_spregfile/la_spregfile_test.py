@@ -48,6 +48,7 @@ if _has_cocotb:
         time_unit_per_trial = "ns"
 
         dut.ctrl.value = CTRL_VALUE
+        dut.selctrl.value = 0
 
         ram_mon = RamMonitor(dut)
 
@@ -105,6 +106,7 @@ if _has_cocotb:
 
         # Initialize
         ram.init(ctrl_value=CTRL_VALUE)
+        dut.selctrl.value = 0
 
         # Start clock using cocotb Clock
         cocotb.start_soon(Clock(ram.clk, clk_period_ns, unit="ns").start())

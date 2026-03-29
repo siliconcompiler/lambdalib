@@ -46,12 +46,16 @@ class RAMLib(Lambda):
             memdata[memobj.get_ram_libcell()] = {
                 "DW": memobj.get_ram_width(),
                 "AW": memobj.get_ram_depth(),
+                "default_ctrl": memobj.get_ram_defaultctrl(),
+                "default_ctrl_width": memobj.get_ram_defaultctrl_width(),
                 "port_map": [(port, wire) for port, wire in memobj.get_ram_ports().items()]
             }
 
         widths_table = []
         depths_table = []
         memory_port_map = {}
+        default_ctrl_map = {}
+        default_ctrl_width_map = {}
         selection_table = {}
         memory_inst_map = {}
 
@@ -67,6 +71,8 @@ class RAMLib(Lambda):
             )
 
             memory_port_map[memory] = sorted(info["port_map"])
+            default_ctrl_map[memory] = info["default_ctrl"]
+            default_ctrl_width_map[memory] = info["default_ctrl_width"]
             memory_inst_map[memory] = memory
 
             selection_table.setdefault(info['AW'], {})[int(info['DW'])] = memory
@@ -89,4 +95,6 @@ class RAMLib(Lambda):
                 selection_table=selection_table,
                 inst_map=memory_inst_map,
                 port_mapping=memory_port_map,
+                default_ctrl=default_ctrl_map,
+                default_ctrl_width=default_ctrl_width_map,
                 minsize=min_size))

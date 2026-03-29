@@ -35,6 +35,37 @@ def create_mock_ram_class(name, width, depth, ports):
         def get_ram_ports(self):
             return self.ports
 
+        def get_ram_defaultctrl(self) -> str:
+            """Returns the default control signal value for the RAM cell."""
+            # Detect if dual-port or single-port by checking port names
+            port_names = [port for port, _ in ports]
+            is_dual_port = any('wr_' in p or 'rd_' in p for p in port_names)
+            is_true_dual_port = any('_a' in p or '_b' in p for p in port_names)
+
+            if is_true_dual_port:
+                # True dual port with independently accessed ports
+                return "16'b1_1_0_10_101_1_0_10_100"
+            elif is_dual_port:
+                # Dual port with separate read/write clocks
+                return "14'b1_1_0_10_100_1_10_100"
+            else:
+                # Single port
+                return "8'b1_0_1_10_101"
+
+        def get_ram_defaultctrl_width(self) -> int:
+            """Returns the width of the default control signal for the RAM cell."""
+            # Detect if dual-port or single-port by checking port names
+            port_names = [port for port, _ in ports]
+            is_dual_port = any('wr_' in p or 'rd_' in p for p in port_names)
+            is_true_dual_port = any('_a' in p or '_b' in p for p in port_names)
+
+            if is_true_dual_port:
+                return 16
+            elif is_dual_port:
+                return 14
+            else:
+                return 8
+
     return _MockRAM
 
 
@@ -51,7 +82,7 @@ def create_mock_ram_class(name, width, depth, ports):
     (9, 16),    # 512 x 16
     (10, 64),   # 1024 x 64
 ])
-def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
+def test_spram_cocotb_functional(macroaw, macrodw, aw, dw, spram_macro):
     """
     Run SPRAM cocotb functional tests with generated template.
 
@@ -103,33 +134,9 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw):
     wrapper_file = Path("la_spram.v")
     spram_lib.write_lambdalib(wrapper_file, memories)
 
-    # Generate testbench that instantiates the wrapper
+    # Generate macro file using fixture
     macro_file = Path("spram_macro.v")
-    macro_content = f'''
-module spram(
-    input clk,
-    input [{macroaw-1}:0] mem_addr,
-    input [{macrodw-1}:0] mem_din,
-    input ce_in,
-    input we_in,
-    input [{macrodw-1}:0] mem_wmask,
-    output [{macrodw-1}:0] mem_dout
-);
-    la_spram_impl #(
-        .AW({macroaw}),
-        .DW({macrodw})
-    ) memory (
-        .clk(clk),
-        .ce(ce_in),
-        .we(we_in),
-        .wmask(mem_wmask),
-        .addr(mem_addr),
-        .din(mem_din),
-        .dout(mem_dout)
-    );
-endmodule
-'''
-    macro_file.write_text(macro_content)
+    macro_file.write_text(spram_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
     project = Sim(SpramTbDesign("icarus",
@@ -155,7 +162,7 @@ endmodule
     (9, 16),    # 512 x 16
     (10, 64),   # 1024 x 64
 ])
-def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw):
+def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw, spregfile_macro):
     """
     Run SPREGFILE cocotb functional tests with generated template.
 
@@ -207,33 +214,9 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw):
     wrapper_file = Path("la_spregfile.v")
     spregfile_lib.write_lambdalib(wrapper_file, memories)
 
-    # Generate macro file that instantiates the wrapper
+    # Generate macro file using fixture
     macro_file = Path("spregfile_macro.v")
-    macro_content = f'''
-module spregfile(
-    input clk,
-    input [{macroaw-1}:0] mem_addr,
-    input [{macrodw-1}:0] mem_din,
-    input ce_in,
-    input we_in,
-    input [{macrodw-1}:0] mem_wmask,
-    output [{macrodw-1}:0] mem_dout
-);
-    la_spregfile_impl #(
-        .AW({macroaw}),
-        .DW({macrodw})
-    ) memory (
-        .clk(clk),
-        .ce(ce_in),
-        .we(we_in),
-        .wmask(mem_wmask),
-        .addr(mem_addr),
-        .din(mem_din),
-        .dout(mem_dout)
-    );
-endmodule
-'''
-    macro_file.write_text(macro_content)
+    macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
     project = Sim(SpregfileTbDesign("icarus",
@@ -259,7 +242,7 @@ endmodule
     (9, 16),    # 512 x 16
     (10, 64),   # 1024 x 64
 ])
-def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw):
+def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw, dpram_macro):
     """
     Run DPRAM cocotb functional tests with generated template.
 
@@ -315,39 +298,10 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw):
     wrapper_file = Path("la_dpram.v")
     dpram_lib.write_lambdalib(wrapper_file, memories)
 
-    # Generate macro file that instantiates the wrapper
+    # Generate macro file using fixture
     macro_file = Path("dpram_macro.v")
-    macro_content = f'''
-module dpram(
-    input wr_clk,
-    input [{macroaw-1}:0] wr_addr,
-    input [{macrodw-1}:0] wr_din,
-    input wr_ce,
-    input wr_we,
-    input [{macrodw-1}:0] wr_wmask,
-    input rd_clk,
-    input [{macroaw-1}:0] rd_addr,
-    input rd_ce,
-    output [{macrodw-1}:0] rd_dout
-);
-    la_dpram_impl  #(
-        .AW({macroaw}),
-        .DW({macrodw})
-    ) memory (
-        .wr_clk(wr_clk),
-        .wr_ce(wr_ce),
-        .wr_we(wr_we),
-        .wr_wmask(wr_wmask),
-        .wr_addr(wr_addr),
-        .wr_din(wr_din),
-        .rd_clk(rd_clk),
-        .rd_ce(rd_ce),
-        .rd_addr(rd_addr),
-        .rd_dout(rd_dout)
-    );
-endmodule
-'''
-    macro_file.write_text(macro_content)
+    macro_file.write_text(dpram_macro(macroaw, macrodw))
+
     # Run cocotb simulation via SiliconCompiler
     project = Sim(DpramTbDesign("icarus",
                                 wrapper_file=wrapper_file.resolve(),
@@ -372,7 +326,7 @@ endmodule
     (9, 16),    # 512 x 16
     (10, 64),   # 1024 x 64
 ])
-def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw):
+def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw, tdpram_macro):
     """
     Run TDPRAM cocotb functional tests with generated template.
 
@@ -432,47 +386,10 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw):
     wrapper_file = Path("la_tdpram.v")
     tdpram_lib.write_lambdalib(wrapper_file, memories)
 
-    # Generate macro file that instantiates the wrapper
+    # Generate macro file using fixture
     macro_file = Path("tdpram_macro.v")
-    macro_content = f'''
-module tdpram(
-    input clk_a,
-    input ce_a,
-    input we_a,
-    input [{macrodw-1}:0] wmask_a,
-    input [{macroaw-1}:0] addr_a,
-    input [{macrodw-1}:0] din_a,
-    output [{macrodw-1}:0] dout_a,
-    input clk_b,
-    input ce_b,
-    input we_b,
-    input [{macrodw-1}:0] wmask_b,
-    input [{macroaw-1}:0] addr_b,
-    input [{macrodw-1}:0] din_b,
-    output [{macrodw-1}:0] dout_b
-);
-    la_tdpram_impl #(
-        .AW({macroaw}),
-        .DW({macrodw})
-    ) memory (
-        .clk_a(clk_a),
-        .ce_a(ce_a),
-        .we_a(we_a),
-        .wmask_a(wmask_a),
-        .addr_a(addr_a),
-        .din_a(din_a),
-        .dout_a(dout_a),
-        .clk_b(clk_b),
-        .ce_b(ce_b),
-        .we_b(we_b),
-        .wmask_b(wmask_b),
-        .addr_b(addr_b),
-        .din_b(din_b),
-        .dout_b(dout_b)
-    );
-endmodule
-'''
-    macro_file.write_text(macro_content)
+    macro_file.write_text(tdpram_macro(macroaw, macrodw))
+
     # Run cocotb simulation via SiliconCompiler
     project = Sim(TdpramTbDesign("icarus",
                                  wrapper_file=wrapper_file.resolve(),

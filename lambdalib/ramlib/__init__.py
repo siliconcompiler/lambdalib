@@ -64,3 +64,19 @@ class RAMTechLib:
             str: The name of the RAM library cell.
         """
         raise NotImplementedError("Subclasses must implement get_ram_libcell method")
+
+    def get_ram_defaultctrl(self) -> str:
+        """Returns the default control signal value for the RAM cell.
+
+        Returns:
+            str: The default control signal value for the RAM cell.
+        """
+        raise NotImplementedError("Subclasses must implement get_ram_defaultctrl method")
+
+    def get_ram_defaultctrl_width(self) -> int:
+        """Returns the width of the default control signal for the RAM cell.
+
+        Returns:
+            int: The width of the default control signal for the RAM cell.
+        """
+        raise NotImplementedError("Subclasses must implement get_ram_defaultctrl_width method")

@@ -51,8 +51,10 @@ module {{ type }}
     localparam TOTAL_BITS = (2 ** AW) * DW;
 
     // Determine which memory to select
+    //verilator lint_off WIDTHEXPAND
     localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% if minsize > 0 %} ({{ minsize }} >= TOTAL_BITS) ? "SOFT" :{% endif %}{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW >= {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
+    //verilator lint_on WIDTHEXPAND
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
       (MEM_PROP == "{{ memory }}") ? {{ width }} :{% endfor %}
@@ -91,7 +93,8 @@ module {{ type }}
       end
       if (MEM_PROP != "SOFT") begin: itech
         // Create memories
-        localparam MEM_ADDRS = 2**(AW - MEM_DEPTH) < 1 ? 1 : 2**(AW - MEM_DEPTH);
+        // When AW < MEM_DEPTH, force single-macro case (MEM_ADDRS = 1)
+        localparam MEM_ADDRS = (AW >= MEM_DEPTH) ? 2**(AW - MEM_DEPTH) : 1;
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
@@ -110,8 +113,28 @@ module {{ type }}
           if (MEM_ADDRS == 1) begin: FITS
             assign we_selected = 1'b1;
             assign re_selected = 1'b1;
-            assign wr_mem_addr = wr_addr;
-            assign rd_mem_addr = rd_addr;
+            // Handle address width mismatch for write
+            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_WR
+              assign wr_mem_addr = wr_addr[MEM_DEPTH-1:0];
+            end
+            if (AW == MEM_DEPTH) begin: ADDR_MATCH_WR
+              assign wr_mem_addr = wr_addr;
+            end
+            if (AW < MEM_DEPTH) begin: ADDR_EXTEND_WR
+              // Single-macro forced case: zero-extend address to macro width
+              assign wr_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, wr_addr{{ '}' }};
+            end
+            // Handle address width mismatch for read
+            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_RD
+              assign rd_mem_addr = rd_addr[MEM_DEPTH-1:0];
+            end
+            if (AW == MEM_DEPTH) begin: ADDR_MATCH_RD
+              assign rd_mem_addr = rd_addr;
+            end
+            if (AW < MEM_DEPTH) begin: ADDR_EXTEND_RD
+              // Single-macro forced case: zero-extend address to macro width
+              assign rd_mem_addr = {{ '{{' }}(MEM_DEPTH-AW){{ '{' }}1'b0{{ '}}' }}, rd_addr{{ '}' }};
+            end
           end else begin: NOFITS
             assign we_selected = wr_addr[AW-1:MEM_DEPTH] == a;
             assign re_selected = rd_addr[AW-1:MEM_DEPTH] == a;
@@ -150,12 +173,17 @@ module {{ type }}
             assign we_in = wr_we && we_selected;
             {% for memory, inst_name in inst_map.items() %}
             if (MEM_PROP == "{{ memory }}") begin: i{{ memory }}
+              wire [{{ default_ctrl_width[memory] - 1 }}:0] mem_ctrl;
+              assign mem_ctrl = selctrl ? ctrl[{{ default_ctrl_width[memory] - 1 }}:0] : {{ default_ctrl[memory] }};
               {{ inst_name }} memory ({% for port, net in port_mapping[memory] %}
                 .{{ port }}({{ net }}){% if loop.nextitem is defined %},{% endif %}{% endfor %}
               );
             end{% endfor %}
           end
         end
+        // Drive status to zero by default for tech-specific memories
+        assign status = {STATUSW{1'b0}};
       end
     endgenerate
+
 endmodule
