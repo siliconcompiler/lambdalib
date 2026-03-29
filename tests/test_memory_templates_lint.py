@@ -67,16 +67,16 @@ def create_mock_ram_class(name, width, depth, ports):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_spram_lint_slang(macroaw, macrodw, aw, dw, spram_macro):
     """Test SPRAM template linting with slang linter."""
@@ -118,16 +118,16 @@ def test_spram_lint_slang(macroaw, macrodw, aw, dw, spram_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_dpram_lint_slang(macroaw, macrodw, aw, dw, dpram_macro):
     """Test DPRAM template linting with slang linter."""
@@ -172,16 +172,16 @@ def test_dpram_lint_slang(macroaw, macrodw, aw, dw, dpram_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
     """Test SPREGFILE template linting with slang linter."""
@@ -213,7 +213,8 @@ def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
     macro_file = Path("spregfile_macro.v")
     macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
-    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(),
+                                 macro_file=macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="slang"))
@@ -223,16 +224,16 @@ def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_tdpram_lint_slang(macroaw, macrodw, aw, dw, tdpram_macro):
     """Test TDPRAM template linting with slang linter."""
@@ -282,16 +283,16 @@ def test_tdpram_lint_slang(macroaw, macrodw, aw, dw, tdpram_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_spram_lint_verilator(macroaw, macrodw, aw, dw, spram_macro):
     """Test SPRAM template linting with verilator."""
@@ -334,16 +335,16 @@ def test_spram_lint_verilator(macroaw, macrodw, aw, dw, spram_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_dpram_lint_verilator(macroaw, macrodw, aw, dw, dpram_macro):
     """Test DPRAM template linting with verilator."""
@@ -389,16 +390,16 @@ def test_dpram_lint_verilator(macroaw, macrodw, aw, dw, dpram_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
     """Test SPREGFILE template linting with verilator."""
@@ -430,7 +431,8 @@ def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
     macro_file = Path("spregfile_macro.v")
     macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
-    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(),
+                                 macro_file=macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="verilator"))
@@ -441,16 +443,16 @@ def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
-    (7, 8, 7, 8),       # 128x8 macro with 128x8 wrapper
-    (8, 32, 8, 32),     # 256x32 macro with 256x32 wrapper
-    (9, 64, 9, 64),     # 512x64 macro with 512x64 wrapper
-    (10, 128, 10, 128), # 1024x128 macro with 1024x128 wrapper
+    (7, 8, 7, 8),        # 128x8 macro with 128x8 wrapper
+    (8, 32, 8, 32),      # 256x32 macro with 256x32 wrapper
+    (9, 64, 9, 64),      # 512x64 macro with 512x64 wrapper
+    (10, 128, 10, 128),  # 1024x128 macro with 1024x128 wrapper
     # Larger macro tests (macro >= wrapper)
-    (9, 64, 7, 8),      # 512x64 macro with 128x8 wrapper
-    (10, 32, 8, 32),    # 1024x32 macro with 256x32 wrapper
-    (9, 64, 8, 32),     # 512x64 macro with 256x32 wrapper
-    (11, 128, 8, 32),   # 2048x128 macro with 256x32 wrapper
-    (10, 128, 7, 16),   # 1024x128 macro with 128x16 wrapper
+    (9, 64, 7, 8),       # 512x64 macro with 128x8 wrapper
+    (10, 32, 8, 32),     # 1024x32 macro with 256x32 wrapper
+    (9, 64, 8, 32),      # 512x64 macro with 256x32 wrapper
+    (11, 128, 8, 32),    # 2048x128 macro with 256x32 wrapper
+    (10, 128, 7, 16),    # 1024x128 macro with 128x16 wrapper
 ])
 def test_tdpram_lint_verilator(macroaw, macrodw, aw, dw, tdpram_macro):
     """Test TDPRAM template linting with verilator."""

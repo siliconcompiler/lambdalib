@@ -245,7 +245,7 @@ class TbDesign(Design):
 
                 self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
 
-                self.add_file("test_la_asyncfifo.py", filetype="python")
+                self.add_file("la_asyncfifo_test.py", filetype="python")
                 self.add_file("la_asyncfifo_wr_driver.py", filetype="python")
                 self.add_file("la_asyncfifo_rd_monitor.py", filetype="python")
 
