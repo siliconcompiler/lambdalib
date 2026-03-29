@@ -37,7 +37,7 @@ module spram(
         .din(mem_din),
         .dout(mem_dout),
         .selctrl(1'b0),
-        .ctrl(14'h0),
+        .ctrl(32'h0),
         .status()
     );
 endmodule
@@ -77,7 +77,7 @@ module dpram(
         .rd_addr(rd_addr),
         .rd_dout(rd_dout),
         .selctrl(1'b0),
-        .ctrl(14'h0),
+        .ctrl(32'h0),
         .status()
     );
 endmodule
@@ -111,7 +111,7 @@ module spregfile(
         .din(mem_din),
         .dout(mem_dout),
         .selctrl(1'b0),
-        .ctrl(14'h0),
+        .ctrl(32'h0),
         .status()
     );
 endmodule
@@ -159,7 +159,7 @@ module tdpram(
         .din_b(din_b),
         .dout_b(dout_b),
         .selctrl(1'b0),
-        .ctrl(16'h0),
+        .ctrl(32'h0),
         .status()
     );
 endmodule

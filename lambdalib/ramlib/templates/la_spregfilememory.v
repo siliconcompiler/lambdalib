@@ -96,7 +96,16 @@ module {{ type }}
 
           if (MEM_ADDRS == 1) begin: FITS
             assign selected = 1'b1;
-            assign mem_addr = addr;
+            // Handle address width mismatch
+            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE
+              assign mem_addr = addr[MEM_DEPTH-1:0];
+            end
+            if (AW == MEM_DEPTH) begin: ADDR_MATCH
+              assign mem_addr = addr;
+            end
+            if (AW < MEM_DEPTH) begin: ADDR_EXTEND
+              {% raw %}assign mem_addr = {{(MEM_DEPTH-AW){1'b0}}, addr};{% endraw %}
+            end
           end else begin: NOFITS
             assign selected = addr[AW-1:MEM_DEPTH] == a;
             assign mem_addr = addr[MEM_DEPTH-1:0];

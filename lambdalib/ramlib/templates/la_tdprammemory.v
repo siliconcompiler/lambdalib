@@ -54,8 +54,10 @@ module {{ type }}
     localparam TOTAL_BITS = (2 ** AW) * DW;
 
     // Determine which memory to select
+    //verilator lint_off WIDTHEXPAND
     localparam MEM_PROP = (PROP != "DEFAULT") ? PROP :{% if minsize > 0 %} ({{ minsize }} >= TOTAL_BITS) ? "SOFT" :{% endif %}{% for aw, dw_select in selection_table.items() %}
       {% if loop.nextitem is defined %}(AW >= {{ aw }}) ? {% endif %}{% for dw, memory in dw_select.items() %}{% if loop.nextitem is defined %}(DW >= {{dw}}) ? {% endif %}"{{ memory}}"{% if loop.nextitem is defined %} : {% endif%}{% endfor %}{% if loop.nextitem is defined %} :{% else %};{% endif %}{% endfor %}
+    //verilator lint_on WIDTHEXPAND
 
     localparam MEM_WIDTH = {% for memory, width in width_table %}
       (MEM_PROP == "{{ memory }}") ? {{ width }} :{% endfor %}
@@ -117,8 +119,26 @@ module {{ type }}
           if (MEM_ADDRS == 1) begin : FITS
             assign selectedA = 1'b1;
             assign selectedB = 1'b1;
-            assign mem_addrA = addr_a;
-            assign mem_addrB = addr_b;
+            // Handle address width mismatch for port A
+            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_A
+              assign mem_addrA = addr_a[MEM_DEPTH-1:0];
+            end
+            if (AW == MEM_DEPTH) begin: ADDR_MATCH_A
+              assign mem_addrA = addr_a;
+            end
+            if (AW < MEM_DEPTH) begin: ADDR_EXTEND_A
+              {% raw %}assign mem_addrA = {{(MEM_DEPTH-AW){1'b0}}, addr_a};{% endraw %}
+            end
+            // Handle address width mismatch for port B
+            if (AW > MEM_DEPTH) begin: ADDR_TRUNCATE_B
+              assign mem_addrB = addr_b[MEM_DEPTH-1:0];
+            end
+            if (AW == MEM_DEPTH) begin: ADDR_MATCH_B
+              assign mem_addrB = addr_b;
+            end
+            if (AW < MEM_DEPTH) begin: ADDR_EXTEND_B
+              {% raw %}assign mem_addrB = {{(MEM_DEPTH-AW){1'b0}}, addr_b};{% endraw %}
+            end
           end else begin : NOFITS
             assign selectedA = addr_a[AW-1:MEM_DEPTH] == a;
             assign selectedB = addr_b[AW-1:MEM_DEPTH] == a;
@@ -178,6 +198,9 @@ module {{ type }}
             end{% endfor %}
           end
         end
+        // Drive status to zero by default for tech-specific memories
+        assign status = {STATUSW{1'b0}};
       end
     endgenerate
+
 endmodule
