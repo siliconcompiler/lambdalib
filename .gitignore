@@ -20,3 +20,4 @@ __pycache__/
 lambdalib.egg-info/
 build/
 dist/
+lambdalib/_version.py
