@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.eda
 @pytest.mark.timeout(240)
 @pytest.mark.parametrize("depth, simulator, output_wave", list(itertools.product(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [2, 4, 8, 16],
     ["icarus", "verilator"],
     [False]
 )))

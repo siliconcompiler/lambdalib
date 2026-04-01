@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 module la_asyncfifo #(parameter DW = 32,         // Memory width
-                      parameter DEPTH = 4,       // FIFO depth
+                      parameter DEPTH = 4,       // FIFO depth (must be power of 2 and greater than 1)
                       parameter ALMOSTFULL = 0,  // FIFO depth
                       parameter CTRLW = 32,      // width of ctrl interface
                       parameter STATUSW = 32,    // width of status interface
@@ -47,7 +47,7 @@ module la_asyncfifo #(parameter DW = 32,         // Memory width
     );
 
     // local params
-    localparam AW = (DEPTH == 1) ? 1 : $clog2(DEPTH);
+    localparam AW = $clog2(DEPTH);
     localparam AFULLFINAL = (ALMOSTFULL != 0) ? ALMOSTFULL : DEPTH - 1;
 
     // local wires
@@ -113,12 +113,7 @@ module la_asyncfifo #(parameter DW = 32,         // Memory width
         else
             wr_full <= (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) == DEPTH[AW:0];
 
-    generate
-      if (DEPTH == 1)
-        assign wr_almost_full_next = 1'b1;
-      else
-        assign wr_almost_full_next = (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) >= AFULLFINAL[AW:0];
-    endgenerate
+    assign wr_almost_full_next = (fifo_used + {{AW{1'b0}}, (wr_en && ~wr_full)}) >= AFULLFINAL[AW:0];
 
     always @(posedge wr_clk or negedge wr_nreset)
         if (~wr_nreset) wr_almost_full <= 1'b0;
@@ -184,5 +179,13 @@ module la_asyncfifo #(parameter DW = 32,         // Memory width
 
    // Status (active in hard macro, tied off in soft model)
    assign status = {STATUSW{1'b0}};
+
+   // ERROR CHECKING
+   initial begin
+    if ((DEPTH < 2) || ((DEPTH & (DEPTH - 1)) != 0)) begin
+      $error("Invalid FIFO depth: %0d. Depth must be a power of 2 and greater than 1.", DEPTH);
+      $finish;
+    end
+   end
 
 endmodule
