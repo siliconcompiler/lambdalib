@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Lint with Flake8
         run: |
           python3 -m venv .venv
@@ -36,6 +39,9 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Check spelling with codespell
         run: |
           python3 -m venv .venv
@@ -51,6 +57,9 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Run tests
         run: |
           python3 -m venv .venv
@@ -71,12 +80,16 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Check out siliconcompiler Git repository
         uses: actions/checkout@v6
         with:
           repository: siliconcompiler/siliconcompiler
           path: siliconcompiler
+          fetch-depth: 0
+
 
       - name: Set up Verible
         run: |
@@ -102,8 +115,13 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Run tests
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
           python3 -m venv .venv
           . .venv/bin/activate
 

@@ -13,7 +13,11 @@ from lambdalib import stdlib
 from lambdalib import ramlib
 from lambdalib import veclib
 
-__version__ = "0.12.0"
+try:
+    from lambdalib._version import __version__ as __version__
+except ImportError:
+    # This only exists in installations
+    __version__ = None
 
 
 class LambalibTechLibrary(Design):
