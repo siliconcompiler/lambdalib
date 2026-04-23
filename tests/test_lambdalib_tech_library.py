@@ -268,8 +268,9 @@ def test_fileset_with_check_filesets_enabled_not_in_filesets():
 
 
 def test_fileset_property_not_exposed():
-    """Test that fileset is properly stored internally."""
+    """Test that fileset is properly stored internally as a private attribute."""
     lib = ConcreteLibCustomFileset()
     assert lib.cell == "mylib_custom"
-    # Fileset should not be exposed as a public property
-    assert not hasattr(lib, 'fileset') or lib.fileset is None
+    # Verify fileset is stored as a private name-mangled attribute
+    assert hasattr(lib, '_LambalibTechLibrary__fileset')
+    assert getattr(lib, '_LambalibTechLibrary__fileset') == "behavioral"
