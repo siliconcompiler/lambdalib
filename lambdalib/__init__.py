@@ -22,17 +22,21 @@ class LambalibTechLibrary(Design):
     This class encapsulates a main lambda library cell and a list of technology
     libraries, providing a mechanism to alias them within an ASIC project.
     """
-    def __init__(self, lambdalib: str, techlibs: List[Type[LibrarySchema]]):
+    def __init__(self, lambdalib: str,
+                 techlibs: List[Type[LibrarySchema]],
+                 fileset: str = "rtl") -> None:
         """Initializes the LambalibTechLibrary instance.
 
         Args:
             lambdalib: The main lambda library cell.
             techlibs (list): A list of technology library classes to be associated
                              with the main lambda library.
+            fileset: The fileset to use for the alias. Default is "rtl".
         """
         super().__init__()
 
         self.__cell: str = lambdalib
+        self.__fileset: str = fileset
 
         if not techlibs:
             techlibs = []
@@ -49,7 +53,7 @@ class LambalibTechLibrary(Design):
         return self.__techlibs.copy()
 
     @classmethod
-    def alias(cls, project: ASIC) -> None:
+    def alias(cls, project: ASIC, check_filesets: bool = False) -> None:
         """Creates and registers aliases for the library and its techlibs in a project.
 
         Requires that subclasses of LambalibTechLibrary provide a zero-argument
@@ -62,7 +66,15 @@ class LambalibTechLibrary(Design):
 
         Args:
             project (ASIC): The ASIC project instance to which the aliases
-                                   and libraries will be added.
+                and libraries will be added.
+            check_filesets (bool): If True, checks for the use of the filesets
+                in the project before adding the alias. This can help avoid adding
+                aliases for libraries that are not actually being used in the
+                project, potentially improving performance and reducing clutter
+                in the project's library management. Default is False.
+
+        Returns:
+            None
 
         Raises:
             ValueError: If the subclass does not provide a zero-argument constructor.
@@ -81,7 +93,11 @@ class LambalibTechLibrary(Design):
         if not project._has_library(tech.__cell):
             return
 
-        project.add_alias(tech.__cell, "rtl", tech, "rtl")
+        if check_filesets and not any([
+                tech.__cell == lib.name for lib, _ in project.get_filesets()]):
+            return
+
+        project.add_alias(tech.__cell, "rtl", tech, tech.__fileset)
 
         for lib in tech.__techlibs:
             project.add_asiclib(lib())
