@@ -53,6 +53,9 @@ module la_ring
            // enable gate
            la_nand2 #(.PROP(PROP)) i0 (.a(stage[STAGES-1]), .b(en),
                                        .z(stage[i]));
+         else if (GATE == INV)
+           la_inv #(.PROP(PROP)) i0 (.a(stage[i-1]),
+                                      .z(stage[i]));
          else if (GATE == NAND2)
            la_nand2 #(.PROP(PROP)) i0 (.a(stage[i-1]), .b(stage[i-1]),
                                        .z(stage[i]));
@@ -75,10 +78,6 @@ module la_ring
            la_nor4 #(.PROP(PROP)) i0 (.a(stage[i-1]), .b(stage[i-1]),
                                       .c(stage[i-1]), .d(stage[i-1]),
                                       .z(stage[i]));
-         else begin
-            la_inv #(.PROP(PROP)) i0 (.a(stage[i-1]),
-                                      .z(stage[i]));
-         end
       end
    endgenerate
 
