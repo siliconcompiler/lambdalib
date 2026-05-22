@@ -29,23 +29,24 @@ module tb_la_vclkmux();
     );
 
     // --- Glitch Detection Logic ---
-    // Monitors the time between transitions on clkout
+    // Monitors the time between transitions on clkout. Any pulse
+    // narrower than the fastest input clock half-period (while nreset
+    // is released) is treated as a glitch.
     realtime last_edge_time;
     realtime pulse_width;
-    reg glitch_detected;
+    reg      glitch_detected;
 
     initial begin
         glitch_detected = 0;
-        last_edge_time = 0;
+        last_edge_time  = 0;
     end
 
     always @(clkout) begin
         if (last_edge_time > 0) begin
             pulse_width = $realtime - last_edge_time;
-            // Define glitch: any pulse < 1ns (shorter than our fastest half-period)
-            // unless we are in the middle of a reset transition.
             if (pulse_width < 0.5 && nreset) begin
-                $display("ERROR: Glitch detected at %t | Width: %0.3f ns", $realtime, pulse_width);
+                $display("ERROR: Glitch detected at %t | Width: %0.3f ns",
+                         $realtime, pulse_width);
                 glitch_detected = 1;
             end
         end
@@ -53,39 +54,49 @@ module tb_la_vclkmux();
     end
 
     // --- Stimulus ---
+    // Exercises the documented usage contract: power-on nreset, then
+    // switch clocks by pulsing sel==0 between one-hot selections.
     initial begin
         // Setup VCD dumping
         $dumpfile("waveform.vcd");
         $dumpvars(0, tb_la_vclkmux);
 
-        // Initialize
-        nreset = 0;      // Start in reset (Quiet)
-        sel    = 4'b0001; // Select Clock 0
-
+        // Power-on initialization: assert nreset to bring up the
+        // per-domain synchronizers, then release it.
+        nreset = 0;
+        sel    = 4'b0000;
         #50;
-
-        // Sequence 1: Enable Clock 0
-        $display("Switching to Clock 0...");
         nreset = 1;
-        #200;
+        #100;  // allow rsync+drsync to come out of reset in every domain
 
-        // Sequence 2: Switch to Clock 2 (Much Slower)
-        $display("Switching to Clock 2 (Quiet Path)...");
-        nreset = 0;       // 1. Assert nreset
-        #33.3;            // Wait some "random" time
-        sel = 4'b0100;    // 2. Change Selection
-        #50.7;            // Wait some "random" time
-        nreset = 1;       // 3. Release nreset
+        // Sequence 1: Select Clock 0 via the contract.
+        $display("Switching to Clock 0 (sel==0 -> 0001)...");
+        sel = 4'b0001;
+        #300;
+
+        // Sequence 2: Switch to Clock 2 (slowest) via a sel==0 pulse.
+        // The zero pulse must be long enough for the deselected
+        // channel's enable to fall through its drsync (>= STAGES cycles
+        // of its clkin) before the new channel is selected.
+        $display("Switching to Clock 2 (0001 -> 0000 -> 0100)...");
+        sel = 4'b0000;
+        #200;            // ample for 41.6 MHz domain (~24 ns period)
+        sel = 4'b0100;
         #400;
 
-        // Sequence 3: Switch to Clock 3 (Fastest) while clocks are running
-        $display("Switching to Clock 3...");
-        nreset = 0;
-        #15;
-        sel = 4'b1000;
-        #15;
-        nreset = 1;
+        // Sequence 3: Switch to Clock 3 (fastest) via a sel==0 pulse.
+        $display("Switching to Clock 3 (0100 -> 0000 -> 1000)...");
+        sel = 4'b0000;
         #200;
+        sel = 4'b1000;
+        #300;
+
+        // Sequence 4: Switch to Clock 1 via a sel==0 pulse.
+        $display("Switching to Clock 1 (1000 -> 0000 -> 0010)...");
+        sel = 4'b0000;
+        #200;
+        sel = 4'b0010;
+        #300;
 
         // Final Check
         if (glitch_detected)
