@@ -145,7 +145,9 @@ module tb_la_vclkmux();
                     if (hi_err < 0) hi_err = -hi_err;
                     if (lo_err < 0) lo_err = -lo_err;
                     if ((hi_err > TOL_NS) || (lo_err > TOL_NS)) begin
-                        $display("ERROR: Pulse-width mismatch at %t | sel=%b clkout hi=%0.3f lo=%0.3f vs clkin[%0d] hi=%0.3f lo=%0.3f (ns)",
+                        $display({"ERROR: Pulse-width mismatch at %t | sel=%b ",
+                                  "clkout hi=%0.3f lo=%0.3f vs ",
+                                  "clkin[%0d] hi=%0.3f lo=%0.3f (ns)"},
                                  $realtime, sel,
                                  clkout_high_w, clkout_low_w,
                                  k, clkin_high_w[k], clkin_low_w[k]);
