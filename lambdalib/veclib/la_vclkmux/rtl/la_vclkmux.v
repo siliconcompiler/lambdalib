@@ -5,16 +5,14 @@
  * ****************************************************************************
  *
  * This a vectorized N input clock mux that allows for safe glitch-less
- * selection of an arbitrary number of input clocks using asynchronous
- * inputs 'nreset' and 'sel'. The circuit is safe as long as the following
- * sequence is followed:
+ * selection of an arbitrary number of input clocks. The circuit is
+ * guaranteed glitch free given the following usage constraints:
  *
- * 1. Assert async reset (nreset==0), usually by setting a bit in a register
- * (ie CLKEN=0).
+ * 1. Sel signals are one hot.
  *
- * 2. Change the async 'sel' value, usually by changing a register like 'CLKSEL'.
- *
- * 3. Deassert async reset (nreset==1) to reneable clkout.
+ * 2. Two sel bits cannot be changed simultaneously, there must be a
+ *    a puse with sel==0 between the dessertion of one clock select bit
+ *    and the assertion of another clock select bit.
  *
  *******************************************************************************/
 
@@ -32,19 +30,26 @@ module la_vclkmux
 
    wire [N-1:0] clken;
    wire [N-1:0] gatedclk;
+   wire [N-1:0] nreset_sync;
 
    genvar i;
 
    for (i = 0; i < N; i = i + 1) begin : imux
 
-      // 1. Asynchronous Reset, Synchronous Release if reset
-      // 2. Non-glitching guaranteed via nreset sequence
+      // Syncrhonize reset to each clock individually.
+      la_rsync #(.STAGES(STAGES),
+                 .PROP(PROP))
+      irsync (.clk(clkin[i]),
+              .nrst_in(nreset),
+              .nrst_out(nreset_sync[i]));
+
+      // Synchronize select to each clock individually
       la_drsync #(.STAGES(STAGES),
                   .PROP(PROP))
-      isync (.clk(clkin[i]),
-             .nreset(nreset),
-             .in(sel[i]),
-             .out(clken[i]));
+      idsync (.clk(clkin[i]),
+              .nreset(nreset_sync[i]),
+              .in(sel[i]),
+              .out(clken[i]));
 
       // Gate each clock separately
       la_clkicgand #(.PROP(PROP))
