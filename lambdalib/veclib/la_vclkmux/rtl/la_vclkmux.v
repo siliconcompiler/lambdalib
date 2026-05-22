@@ -6,12 +6,16 @@
  *
  * This a vectorized N input clock mux that allows for safe glitch-less
  * selection of an arbitrary number of input clocks. The circuit is
- * guaranteed glitch free given the following usage constraints:
+ * glitch-free under the following usage constraints:
  *
- * 1. Sel signals are one hot.
+ * 1. nreset must be asserted at least once at power-on to initialize
+ *    the per-domain synchronizers. Driving nreset==0 at any time also
+ *    asynchronously forces clkout to 0.
  *
- * 2. Two sel bits cannot be changed simultaneously, there must be a
- *    a puse with sel==0 between the dessertion of one clock select bit
+ * 2. Sel signals are one hot.
+ *
+ * 3. Two sel bits cannot be changed simultaneously, there must be a
+ *    pulse with sel==0 between the deassertion of one clock select bit
  *    and the assertion of another clock select bit.
  *
  *******************************************************************************/
@@ -36,7 +40,7 @@ module la_vclkmux
 
    for (i = 0; i < N; i = i + 1) begin : imux
 
-      // Syncrhonize reset to each clock individually.
+      // Synchronize reset to each clock individually.
       la_rsync #(.STAGES(STAGES),
                  .PROP(PROP))
       irsync (.clk(clkin[i]),
