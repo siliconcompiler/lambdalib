@@ -1,6 +1,6 @@
 from lambdalib.lambdalib import Lambda
 from lambdalib.auxlib import Clkicgand
-from lambdalib.auxlib import Drsync
+from lambdalib.auxlib import Drsync, Rsync
 
 
 class Vclkmux(Lambda):
@@ -9,7 +9,7 @@ class Vclkmux(Lambda):
         super().__init__(name, __file__)
 
         # dependencies
-        deps = [Drsync(), Clkicgand()]
+        deps = [Drsync(), Rsync(), Clkicgand()]
         with self.active_fileset('rtl'):
             for item in deps:
                 self.add_depfileset(item)
