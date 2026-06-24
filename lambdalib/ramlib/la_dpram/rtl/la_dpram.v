@@ -26,6 +26,7 @@
 
 module la_dpram #(parameter DW = 32,          // Memory width
                   parameter AW = 10,          // address width (derived)
+                  parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask(def)
                   parameter PROP = "DEFAULT", // hard macro property
                   parameter CTRLW = 32,       // width of ctrl interface
                   parameter STATUSW = 32      // width of status interface
@@ -48,8 +49,26 @@ module la_dpram #(parameter DW = 32,          // Memory width
     output [STATUSW-1:0] status    // pass through status interface
     );
 
+   // In byte mode replicate byte-aligned mask bit wr_wmask[i*8] across its
+   // 8-bit lane so the lane is byte-uniform. This keeps the synthesis byte
+   // for-loop and the verilator mux consistent, and gives any hard macro a
+   // clean byte mask. Bit mode passes the per-bit mask through.
+   wire [DW-1:0] wr_wmask_int;
+   genvar gi;
+   generate
+      if (BYTEMODE) begin : g_bytemask
+         for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
+            assign wr_wmask_int[gi*8+:8] = {8{wr_wmask[gi*8]}};
+         end
+      end
+      else begin : g_passthru
+         assign wr_wmask_int = wr_wmask;
+      end
+   endgenerate
+
    la_dpram_impl #(.DW      (DW),
                    .AW      (AW),
+                   .BYTEMODE(BYTEMODE),
                    .PROP    (PROP),
                    .CTRLW   (CTRLW),
                    .STATUSW (STATUSW)
@@ -58,7 +77,7 @@ module la_dpram #(parameter DW = 32,          // Memory width
            .wr_clk     (wr_clk),
            .wr_ce      (wr_ce),
            .wr_we      (wr_we),
-           .wr_wmask   (wr_wmask),
+           .wr_wmask   (wr_wmask_int),
            .wr_addr    (wr_addr),
            .wr_din     (wr_din),
            // read port
@@ -70,6 +89,5 @@ module la_dpram #(parameter DW = 32,          // Memory width
            .selctrl    (selctrl),
            .ctrl       (ctrl),
            .status     (status));
-
 
 endmodule
