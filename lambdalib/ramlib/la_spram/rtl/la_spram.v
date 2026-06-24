@@ -52,12 +52,14 @@ module la_spram #(parameter DW = 32,          // Memory width
    wire [DW-1:0] wmask_int;
    genvar gi;
    generate
-      if (BYTEMODE)
-        for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
-           assign wmask_int[gi*8+:8] = {8{wmask[gi*8]}};
-        end
-      else
-        assign wmask_int = wmask;
+      if (BYTEMODE) begin : g_bytemask
+         for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
+            assign wmask_int[gi*8+:8] = {8{wmask[gi*8]}};
+         end
+      end
+      else begin : g_passthru
+         assign wmask_int = wmask;
+      end
    endgenerate
 
    la_spram_impl #(.DW      (DW),
