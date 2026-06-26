@@ -22,6 +22,7 @@
 
 module la_tdpram_impl #(parameter DW = 32,          // Memory width
                         parameter AW = 10,          // Address width (derived)
+                        parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask
                         parameter PROP = "DEFAULT", // variable for hard macro
                         parameter CTRLW = 32,       // width of ctrl interface
                         parameter STATUSW = 32      // width of status interface
@@ -53,25 +54,60 @@ module la_tdpram_impl #(parameter DW = 32,          // Memory width
    reg [DW-1:0]       ram[(2**AW)-1:0];
    /* verilator lint_on MULTIDRIVEN */
 
-   integer            i;
+`ifdef VERILATOR
+   // Fast equivalent ram write model (for ultra wide RAMs)
+   always @(posedge clk_a)
+     if (ce_a & we_a)
+       ram[addr_a] <= (din_a & wmask_a) | (ram[addr_a] & ~wmask_a);
+   always @(posedge clk_b)
+     if (ce_b & we_b)
+       ram[addr_b] <= (din_b & wmask_b) | (ram[addr_b] & ~wmask_b);
+`else
+   // FPGA synthesis friendly RAM pattern. BYTEMODE selects the write
+   // granularity: per-bit (hard macro / per-bit BRAM such as ice40) or per
+   // 8-bit lane (byte-wide BRAM). In byte mode the masks are byte-uniform (the
+   // la_tdpram wrapper replicates wmask_x[i*8]) and DW must be a multiple of 8.
 
    // Port A write
-   always @(posedge clk_a) begin
-      for (i = 0; i < DW; i = i + 1) begin
-         if (ce_a && we_a && wmask_a[i]) begin
-            ram[addr_a][i] <= din_a[i];
-         end
+   generate
+      if (BYTEMODE) begin : g_bytemask_a
+         integer i;
+         always @(posedge clk_a)
+           if (ce_a & we_a)
+             for (i = 0; i < DW/8; i = i + 1)
+               if (wmask_a[i*8])
+                 ram[addr_a][i*8+:8] <= din_a[i*8+:8];
       end
-   end
+      else begin : g_bitmask_a
+         integer i;
+         always @(posedge clk_a)
+           if (ce_a & we_a)
+             for (i = 0; i < DW; i = i + 1)
+               if (wmask_a[i])
+                 ram[addr_a][i] <= din_a[i];
+      end
+   endgenerate
 
    // Port B write
-   always @(posedge clk_b) begin
-      for (i = 0; i < DW; i = i + 1) begin
-         if (ce_b && we_b && wmask_b[i]) begin
-            ram[addr_b][i] <= din_b[i];
-         end
+   generate
+      if (BYTEMODE) begin : g_bytemask_b
+         integer i;
+         always @(posedge clk_b)
+           if (ce_b & we_b)
+             for (i = 0; i < DW/8; i = i + 1)
+               if (wmask_b[i*8])
+                 ram[addr_b][i*8+:8] <= din_b[i*8+:8];
       end
-   end
+      else begin : g_bitmask_b
+         integer i;
+         always @(posedge clk_b)
+           if (ce_b & we_b)
+             for (i = 0; i < DW; i = i + 1)
+               if (wmask_b[i])
+                 ram[addr_b][i] <= din_b[i];
+      end
+   endgenerate
+`endif
 
    // Port A read
    always @(posedge clk_a) begin

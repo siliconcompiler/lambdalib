@@ -22,6 +22,7 @@
 
 module la_tdpram #(parameter DW = 32,          // Memory width
                    parameter AW = 10,          // Address width (derived)
+                   parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask(def)
                    parameter PROP = "DEFAULT", // variable for hard macro
                    parameter CTRLW = 32,       // width of ctrl interface
                    parameter STATUSW = 32      // width of status interface
@@ -48,8 +49,29 @@ module la_tdpram #(parameter DW = 32,          // Memory width
     output [STATUSW-1:0] status   // pass through status interface
     );
 
+   // In byte mode replicate each byte-aligned mask bit (wmask_x[i*8]) across
+   // its 8-bit lane so the lane is byte-uniform. This keeps the synthesis byte
+   // for-loop and the verilator mux consistent, and gives any hard macro a
+   // clean byte mask. Bit mode passes the per-bit masks through.
+   wire [DW-1:0] wmask_a_int;
+   wire [DW-1:0] wmask_b_int;
+   genvar gi;
+   generate
+      if (BYTEMODE) begin : g_bytemask
+         for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
+            assign wmask_a_int[gi*8+:8] = {8{wmask_a[gi*8]}};
+            assign wmask_b_int[gi*8+:8] = {8{wmask_b[gi*8]}};
+         end
+      end
+      else begin : g_passthru
+         assign wmask_a_int = wmask_a;
+         assign wmask_b_int = wmask_b;
+      end
+   endgenerate
+
    la_tdpram_impl #(.DW      (DW),
                     .AW      (AW),
+                    .BYTEMODE(BYTEMODE),
                     .PROP    (PROP),
                     .CTRLW   (CTRLW),
                     .STATUSW (STATUSW))
@@ -57,7 +79,7 @@ module la_tdpram #(parameter DW = 32,          // Memory width
            .clk_a      (clk_a),
            .ce_a       (ce_a),
            .we_a       (we_a),
-           .wmask_a    (wmask_a),
+           .wmask_a    (wmask_a_int),
            .addr_a     (addr_a),
            .din_a      (din_a),
            .dout_a     (dout_a),
@@ -65,7 +87,7 @@ module la_tdpram #(parameter DW = 32,          // Memory width
            .clk_b      (clk_b),
            .ce_b       (ce_b),
            .we_b       (we_b),
-           .wmask_b    (wmask_b),
+           .wmask_b    (wmask_b_int),
            .addr_b     (addr_b),
            .din_b      (din_b),
            .dout_b     (dout_b),
