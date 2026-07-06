@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Function:
+ * Function: True Dual Port RAM (Two write + read ports)
  * Copyright: Lambda Project Authors. All rights Reserved.
  * License:  MIT (see LICENSE file in Lambda repository)
  *
@@ -15,83 +15,67 @@
  *
  * Technology specific implementations of "la_tdpram" would generally include
  * one or more hardcoded instantiations of RAM modules with a generate
- * statement relying on the "PROP" to select between the list of modules
- * at build time.
+ * statement relying on the "PROP", AW, and DW to select between the list of
+ * modules at build time.
+ *
+ * The 'selctrl' signal tells the implementation to select the ctrl interface
+ * if set to one, otherwise hard coded tech specific parameters inside the
+ * lambdalib implementations are used to control the RAM.
  *
  ****************************************************************************/
 
-module la_tdpram #(parameter DW = 32,          // Memory width
-                   parameter AW = 10,          // Address width (derived)
-                   parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask(def)
+module la_tdpram #(parameter DW = 32,          // memory width
+                   parameter AW = 10,          // address width
+                   parameter BYTEMASK = 0,     // 1=byte mask, 0=bit mask
                    parameter PROP = "DEFAULT", // variable for hard macro
                    parameter CTRLW = 32,       // width of ctrl interface
                    parameter STATUSW = 32      // width of status interface
                    )
    (// A port
-    input               clk_a,   // write clock
-    input               ce_a,    // write chip-enable
-    input               we_a,    // write enable
-    input [DW-1:0]      wmask_a, // write mask
-    input [AW-1:0]      addr_a,  // write address
-    input [DW-1:0]      din_a,   // write data in
-    output [DW-1:0]     dout_a,  // read data out
+    input                          clk_a,   // write clock
+    input                          ce_a,    // write chip-enable
+    input                          we_a,    // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0] wmask_a, // bit or byte write mask
+    input [AW-1:0]                 addr_a,  // write address
+    input [DW-1:0]                 din_a,   // write data in
+    output [DW-1:0]                dout_a,  // read data out
     // B port
-    input               clk_b,   // write clock
-    input               ce_b,    // write chip-enable
-    input               we_b,    // write enable
-    input [DW-1:0]      wmask_b, // write mask
-    input [AW-1:0]      addr_b,  // write address
-    input [DW-1:0]      din_b,   // write data in
-    output [DW-1:0]     dout_b,  // read data out
+    input                          clk_b,   // write clock
+    input                          ce_b,    // write chip-enable
+    input                          we_b,    // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0] wmask_b, // bit or byte write mask
+    input [AW-1:0]                 addr_b,  // write address
+    input [DW-1:0]                 din_b,   // write data in
+    output [DW-1:0]                dout_b,  // read data out
     // Technology interfaces
-    input               selctrl, // selects control interface
-    input [CTRLW-1:0]   ctrl,    // pass through control interface
-    output [STATUSW-1:0] status   // pass through status interface
+    input                          selctrl, // selects control interface
+    input [CTRLW-1:0]              ctrl,    // control interface
+    output [STATUSW-1:0]           status   // status interface
     );
-
-   // In byte mode replicate each byte-aligned mask bit (wmask_x[i*8]) across
-   // its 8-bit lane so the lane is byte-uniform. This keeps the synthesis byte
-   // for-loop and the verilator mux consistent, and gives any hard macro a
-   // clean byte mask. Bit mode passes the per-bit masks through.
-   wire [DW-1:0] wmask_a_int;
-   wire [DW-1:0] wmask_b_int;
-   genvar gi;
-   generate
-      if (BYTEMODE) begin : g_bytemask
-         for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
-            assign wmask_a_int[gi*8+:8] = {8{wmask_a[gi*8]}};
-            assign wmask_b_int[gi*8+:8] = {8{wmask_b[gi*8]}};
-         end
-      end
-      else begin : g_passthru
-         assign wmask_a_int = wmask_a;
-         assign wmask_b_int = wmask_b;
-      end
-   endgenerate
 
    la_tdpram_impl #(.DW      (DW),
                     .AW      (AW),
-                    .BYTEMODE(BYTEMODE),
+                    .BYTEMASK(BYTEMASK),
                     .PROP    (PROP),
                     .CTRLW   (CTRLW),
                     .STATUSW (STATUSW))
-   memory (// a port
+   memory (// A port
            .clk_a      (clk_a),
            .ce_a       (ce_a),
            .we_a       (we_a),
-           .wmask_a    (wmask_a_int),
+           .wmask_a    (wmask_a),
            .addr_a     (addr_a),
            .din_a      (din_a),
            .dout_a     (dout_a),
-           // b port
+           // B port
            .clk_b      (clk_b),
            .ce_b       (ce_b),
            .we_b       (we_b),
-           .wmask_b    (wmask_b_int),
+           .wmask_b    (wmask_b),
            .addr_b     (addr_b),
            .din_b      (din_b),
            .dout_b     (dout_b),
-            // macro interface
+            // Macro interface
            .selctrl    (selctrl),
            .ctrl       (ctrl),
            .status     (status));
