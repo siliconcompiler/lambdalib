@@ -9,15 +9,15 @@ This module parses both with `slang <https://sv-lang.com>`_ (via the ``pyslang``
 binding), elaborates them, and diffs the resulting ports and parameters.
 
 Usage from a downstream (e.g. PDK) test suite -- ``lambdalib`` ships this module
-as a ``pytest11`` plugin, so the ``assert_techlib_interface`` fixture is available
+as a ``pytest11`` plugin, so the ``assert_lambdalib_techlib_interface`` fixture is available
 automatically once lambdalib is installed (no conftest changes needed)::
 
     import pytest
     from my_pdk import MyRamLambdalib
 
     @pytest.mark.parametrize("techlib", [MyRamLambdalib])
-    def test_interface(techlib, assert_techlib_interface):
-        assert_techlib_interface(techlib)
+    def test_interface(techlib, assert_lambdalib_techlib_interface):
+        assert_lambdalib_techlib_interface(techlib)
 
 Or call :func:`check_techlib` directly and inspect the returned list of mismatch
 messages.
@@ -25,6 +25,8 @@ messages.
 ``pyslang`` is an optional dependency imported lazily, so importing this module
 never fails.  Install it with ``pip install lambdalib[slang]``.
 """
+
+import functools
 
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -62,12 +64,14 @@ class Interface:
 # Resolving a lambda cell name -> its reference lambdalib Design
 # ---------------------------------------------------------------------------
 
+@functools.lru_cache(maxsize=None)
 def find_lambda_design(cell: str):
     """Return the reference lambdalib ``Design`` whose top module is ``cell``.
 
     Discovers the sub-libraries dynamically from ``lambdalib.__all__`` (rather
     than a hardcoded list) and matches each exported cell on its design name.
-    Returns ``None`` if no cell matches.
+    Returns ``None`` if no cell matches.  Results are cached per cell name so
+    repeated lookups don't rebuild every exported design.
     """
     for libname in getattr(ll, "__all__", []):
         module = getattr(ll, libname, None)
@@ -77,8 +81,9 @@ def find_lambda_design(cell: str):
                 continue
             try:
                 design = cls()
-            except Exception:
-                # Not a zero-arg cell class (e.g. a helper); skip it.
+            except TypeError:
+                # Constructor needs arguments -- not a zero-arg cell class
+                # (e.g. a helper).  Real constructor bugs are left to surface.
                 continue
             if getattr(design, "name", None) == cell:
                 return design
@@ -104,10 +109,7 @@ def verilog_files(design, fileset: Optional[str] = None) -> List[str]:
 
     files: List[str] = []
     for fs in filesets:
-        try:
-            if not design.has_fileset(fs):
-                continue
-        except Exception:
+        if not design.has_fileset(fs):
             continue
         for f in design.get_file(fileset=fs):
             if str(f).lower().endswith(_VERILOG_EXTS) and str(f) not in files:
@@ -250,6 +252,21 @@ def compare_cell_to_files(cell: str, impl_files: List[str],
                               check_param_defaults=check_param_defaults)
 
 
+def _as_techlib_instance(techlib):
+    """Validate and normalize ``techlib`` to a ``LambalibTechLibrary`` instance.
+
+    A class is instantiated via its zero-argument constructor.  Raises
+    ``AssertionError`` if it is not a ``LambalibTechLibrary``.
+    """
+    if isinstance(techlib, type):
+        assert issubclass(techlib, ll.LambalibTechLibrary), (
+            f"{techlib.__name__} is not a LambalibTechLibrary")
+        return techlib()
+    assert isinstance(techlib, ll.LambalibTechLibrary), (
+        f"{type(techlib).__name__} is not a LambalibTechLibrary")
+    return techlib
+
+
 def check_techlib(techlib, fileset: str = "rtl",
                   check_param_defaults: bool = True) -> List[str]:
     """Compare a ``LambalibTechLibrary``'s cell wrapper against its lambda cell.
@@ -272,24 +289,10 @@ def check_techlib(techlib, fileset: str = "rtl",
         AssertionError: if ``techlib`` is not a ``LambalibTechLibrary``.
         LookupError: if the reference lambdalib cell cannot be found.
     """
-    if isinstance(techlib, type):
-        assert issubclass(techlib, ll.LambalibTechLibrary), (
-            f"{techlib.__name__} is not a LambalibTechLibrary")
-        techlib = techlib()
-    else:
-        assert isinstance(techlib, ll.LambalibTechLibrary), (
-            f"{type(techlib).__name__} is not a LambalibTechLibrary")
-
-    cell = techlib.cell
-
-    ref_design = find_lambda_design(cell)
-    if ref_design is None:
-        raise LookupError(f"no lambdalib cell named '{cell}' found")
-
-    reference = extract_interface(verilog_files(ref_design, fileset), cell)
-    impl = extract_interface(verilog_files(techlib, fileset), cell)
-    return compare_interfaces(reference, impl,
-                              check_param_defaults=check_param_defaults)
+    techlib = _as_techlib_instance(techlib)
+    return compare_cell_to_files(
+        techlib.cell, verilog_files(techlib, fileset),
+        fileset=fileset, check_param_defaults=check_param_defaults)
 
 
 def format_problems(cell: str, problems: List[str]) -> str:
@@ -302,7 +305,7 @@ def format_problems(cell: str, problems: List[str]) -> str:
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def assert_techlib_interface():
+def assert_lambdalib_techlib_interface():
     """Fixture returning an assertion helper for ``LambalibTechLibrary`` interfaces.
 
     The returned callable asserts its argument is a ``LambalibTechLibrary``, then
@@ -312,15 +315,16 @@ def assert_techlib_interface():
 
     Example::
 
-        def test_my_ram(assert_techlib_interface):
-            assert_techlib_interface(MyRamTechLib)
+        def test_my_ram(assert_lambdalib_techlib_interface):
+            assert_lambdalib_techlib_interface(MyRamTechLib)
     """
     pytest.importorskip("pyslang")
 
     def _assert(techlib, *, fileset: str = "rtl", check_param_defaults: bool = True):
+        # Instantiate once and reuse the same object for the check and the report.
+        techlib = _as_techlib_instance(techlib)
         problems = check_techlib(techlib, fileset=fileset,
                                  check_param_defaults=check_param_defaults)
-        cell = techlib.cell if not isinstance(techlib, type) else techlib().cell
-        assert not problems, format_problems(cell, problems)
+        assert not problems, format_problems(techlib.cell, problems)
 
     return _assert
