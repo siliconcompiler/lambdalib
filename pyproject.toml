@@ -75,6 +75,14 @@ pythonpath = [
 testpaths = [
     "tests"
 ]
+# Only collect test_*.py.  The lambdalib/reusable_tests/**/*_test.py files are
+# reusable test *bodies* imported by tests/ (and downstream suites), not
+# standalone tests; excluding the *_test.py suffix keeps a whole-workspace
+# `pytest .` from double-importing them out of the installed package (which
+# fails with "import file mismatch" against a non-editable install).
+python_files = [
+    "test_*.py"
+]
 timeout = "60"
 
 [tool.codespell]
