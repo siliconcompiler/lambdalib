@@ -49,9 +49,10 @@ module la_dpram_impl #(
    // Generic RTL RAM
    reg     [DW-1:0] ram[(2**AW)-1:0];
 
-   // Byte mode delivers a DW/8-wide mask (one bit per byte); replicate each
-   // mask bit across its 8-bit lane to form a byte-uniform DW-wide mask for
-   // the reference model. Bit mode passes the per-bit mask through.
+`ifdef VERILATOR
+   // Fast equivalent ram write model (for ultra wide RAMs). The vectorized
+   // AND/OR needs a full DW-wide bit mask, so byte mode replicates each mask
+   // bit across its 8-bit lane; bit mode passes the per-bit mask through.
    wire [DW-1:0] wr_wmask_int;
    genvar gwm;
    generate
@@ -65,24 +66,21 @@ module la_dpram_impl #(
       end
    endgenerate
 
-`ifdef VERILATOR
-   // Fast equivalent ram write model (for ultra wide RAMs)
    always @(posedge wr_clk)
      if (wr_ce & wr_we)
        ram[wr_addr[AW-1:0]] <= (wr_din[DW-1:0]       &  wr_wmask_int[DW-1:0]) |
                                (ram[wr_addr[AW-1:0]] & ~wr_wmask_int[DW-1:0]);
 `else
    // FPGA synthesis friendly RAM pattern. BYTEMASK selects the write
-   // granularity: per-bit (hard macro) or per 8-bit lane (byte-wide BRAM).
-   // In byte mode wr_wmask_int is byte-uniform (replicated above) and DW
-   // must be a multiple of 8.
+   // granularity: per 8-bit lane (byte-wide BRAM) or per-bit (hard macro).
+   // In byte mode wr_wmask is DW/8-wide and DW must be a multiple of 8.
    generate
       if (BYTEMASK) begin : g_bytemask
          integer i;
          always @(posedge wr_clk)
            if (wr_ce & wr_we)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wr_wmask_int[i*8])
+               if (wr_wmask[i])
                  ram[wr_addr[AW-1:0]][i*8+:8] <= wr_din[i*8+:8];
       end
       else begin : g_bitmask
@@ -90,7 +88,7 @@ module la_dpram_impl #(
          always @(posedge wr_clk)
            if (wr_ce & wr_we)
              for (i = 0; i < DW; i = i + 1)
-               if (wr_wmask_int[i])
+               if (wr_wmask[i])
                  ram[wr_addr[AW-1:0]][i] <= wr_din[i];
       end
    endgenerate

@@ -54,9 +54,10 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
    reg [DW-1:0]       ram[(2**AW)-1:0];
    /* verilator lint_on MULTIDRIVEN */
 
-   // Byte mode delivers a DW/8-wide mask (one bit per byte); replicate each
-   // mask bit across its 8-bit lane to form byte-uniform DW-wide masks for
-   // the reference model. Bit mode passes the per-bit masks through.
+`ifdef VERILATOR
+   // Fast equivalent ram write model (for ultra wide RAMs). The vectorized
+   // AND/OR needs full DW-wide bit masks, so byte mode replicates each mask
+   // bit across its 8-bit lane; bit mode passes the per-bit masks through.
    wire [DW-1:0] wmask_a_int;
    wire [DW-1:0] wmask_b_int;
    genvar gwm;
@@ -73,8 +74,6 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
       end
    endgenerate
 
-`ifdef VERILATOR
-   // Fast equivalent ram write model (for ultra wide RAMs)
    always @(posedge clk_a)
      if (ce_a & we_a)
        ram[addr_a] <= (din_a & wmask_a_int) | (ram[addr_a] & ~wmask_a_int);
@@ -83,9 +82,8 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
        ram[addr_b] <= (din_b & wmask_b_int) | (ram[addr_b] & ~wmask_b_int);
 `else
    // FPGA synthesis friendly RAM pattern. BYTEMASK selects the write
-   // granularity: per-bit (hard macro) or per 8-bit lane (byte-wide BRAM).
-   // In byte mode the masks are byte-uniform (replicated above) and DW
-   // must be a multiple of 8.
+   // granularity: per 8-bit lane (byte-wide BRAM) or per-bit (hard macro).
+   // In byte mode the masks are DW/8-wide and DW must be a multiple of 8.
 
    // Port A write
    generate
@@ -94,7 +92,7 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
          always @(posedge clk_a)
            if (ce_a & we_a)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wmask_a_int[i*8])
+               if (wmask_a[i])
                  ram[addr_a][i*8+:8] <= din_a[i*8+:8];
       end
       else begin : g_bitmask_a
@@ -102,7 +100,7 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
          always @(posedge clk_a)
            if (ce_a & we_a)
              for (i = 0; i < DW; i = i + 1)
-               if (wmask_a_int[i])
+               if (wmask_a[i])
                  ram[addr_a][i] <= din_a[i];
       end
    endgenerate
@@ -114,7 +112,7 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
          always @(posedge clk_b)
            if (ce_b & we_b)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wmask_b_int[i*8])
+               if (wmask_b[i])
                  ram[addr_b][i*8+:8] <= din_b[i*8+:8];
       end
       else begin : g_bitmask_b
@@ -122,7 +120,7 @@ module la_tdpram_impl #(parameter DW = 32,          // memory width
          always @(posedge clk_b)
            if (ce_b & we_b)
              for (i = 0; i < DW; i = i + 1)
-               if (wmask_b_int[i])
+               if (wmask_b[i])
                  ram[addr_b][i] <= din_b[i];
       end
    endgenerate
