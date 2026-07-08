@@ -21,48 +21,61 @@
  ****************************************************************************/
 
 module la_spram_impl #(parameter DW = 32,          // memory width
-                       parameter AW = 10,          // address width (derived)
-                       parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask
+                       parameter AW = 10,          // address width
+                       parameter BYTEMASK = 0,     // 1=byte mask, 0=bit mask
                        parameter PROP = "DEFAULT", // variable for hard macro
                        parameter CTRLW = 32,       // width of ctrl interface
                        parameter STATUSW = 32      // width of status interface
                        )
    (// Memory interface
-    input               clk,     // write clock
-    input               ce,      // chip enable
-    input               we,      // write enable
-    input [DW-1:0]      wmask,   //per bit write mask
-    input [AW-1:0]      addr,    //write address
-    input [DW-1:0]      din,     //write data
-    output reg [DW-1:0] dout,    //read output data
+    input                          clk,     // write clock
+    input                          ce,      // chip enable
+    input                          we,      // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0] wmask,   // bit or byte write mask
+    input [AW-1:0]                 addr,    //write address
+    input [DW-1:0]                 din,     //write data
+    output reg [DW-1:0]            dout,    //read output data
     // Technology interfaces
-    input               selctrl, // selects control interface
-    input [CTRLW-1:0]   ctrl,    // pass through control interface
-    output [STATUSW-1:0] status   // pass through status interface
+    input                          selctrl, // selects control interface
+    input [CTRLW-1:0]              ctrl,    // pass through control interface
+    output [STATUSW-1:0]           status   // pass through status interface
     );
 
-    // Generic RTL RAM
-   reg     [DW-1:0] ram[(2**AW)-1:0];
-
+   // Generic RTL RAM
+   reg [DW-1:0]  ram[(2**AW)-1:0];
 
 `ifdef VERILATOR
-    // Fast requivalent ram write model (for ultra wide RAMs)
+    // Fast equivalent ram write model (for ultra wide RAMs). The vectorized
+    // AND/OR needs a full DW-wide bit mask, so byte mode replicates each mask
+    // bit across its 8-bit lane; bit mode passes the per-bit mask through.
+    wire [DW-1:0] wmask_int;
+    genvar gwm;
+    generate
+      if (BYTEMASK) begin : g_wm_byte
+         for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+            assign wmask_int[gwm*8+:8] = {8{wmask[gwm]}};
+         end
+      end
+      else begin : g_wm_bit
+         assign wmask_int = wmask;
+      end
+    endgenerate
+
     always @(posedge clk)
       if (ce & we)
-        ram[addr[AW-1:0]] <= (din[DW-1:0] & wmask[DW-1:0]) |
-                             (ram[addr[AW-1:0]] & ~wmask[DW-1:0]);
+        ram[addr[AW-1:0]] <= (din[DW-1:0]       &  wmask_int[DW-1:0]) |
+                             (ram[addr[AW-1:0]] & ~wmask_int[DW-1:0]);
 `else
-    // FPGA synthesis friendly RAM pattern. BYTEMODE selects the write
-    // granularity: per-bit (hard macro / per-bit BRAM such as ice40) or per
-    // 8-bit lane (byte-wide BRAM). In byte mode wmask is byte-uniform (the
-    // la_spram wrapper replicates wmask[i*8]) and DW must be a multiple of 8.
+    // FPGA synthesis friendly RAM pattern. BYTEMASK selects the write
+    // granularity: per 8-bit lane (byte-wide BRAM) or per-bit (hard macro).
+    // In byte mode wmask is DW/8-wide and DW must be a multiple of 8.
     generate
-      if (BYTEMODE) begin : g_bytemask
+      if (BYTEMASK) begin : g_bytemask
          integer i;
          always @(posedge clk)
            if (ce & we)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wmask[i*8])
+               if (wmask[i])
                  ram[addr[AW-1:0]][i*8+:8] <= din[i*8+:8];
       end
       else begin : g_bitmask

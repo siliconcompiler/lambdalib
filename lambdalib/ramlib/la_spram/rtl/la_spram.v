@@ -24,61 +24,44 @@
  *
  ****************************************************************************/
 
-module la_spram #(parameter DW = 32,          // Memory width
-                  parameter AW = 10,          // Address width (derived)
-                  parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask(def)
-                  parameter PROP = "DEFAULT", // Variable for hard macro
+module la_spram #(parameter DW = 32,          // memory width
+                  parameter AW = 10,          // address width
+                  parameter BYTEMASK = 0,     // 1=byte mask, 0=bit mask
+                  parameter PROP = "DEFAULT", // variable for hard macro
                   parameter CTRLW = 32,       // width of ctrl interface
                   parameter STATUSW = 32      // width of status interface
                   )
    (// Memory interface
-    input               clk,     // write clock
-    input               ce,      // chip enable
-    input               we,      // write enable
-    input [DW-1:0]      wmask,   //per bit write mask
-    input [AW-1:0]      addr,    //write address
-    input [DW-1:0]      din,     //write data
-    output [DW-1:0]     dout,    //read output data
+    input                          clk,     // write clock
+    input                          ce,      // chip enable
+    input                          we,      // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0] wmask,   // bit or byte write mask
+    input [AW-1:0]                 addr,    //write address
+    input [DW-1:0]                 din,     //write data
+    output [DW-1:0]                dout,    //read output data
     // Technology interfaces
-    input               selctrl, // selects control interface
-    input [CTRLW-1:0]   ctrl,    // pass through control interface
-    output [STATUSW-1:0] status   // pass through status interface
+    input                          selctrl, // selects control interface
+    input [CTRLW-1:0]              ctrl,    // pass through control interface
+    output [STATUSW-1:0]           status   // pass through status interface
     );
-
-   // In byte mode replicate byte-aligned mask bit wmask[i*8] across its
-   // 8-bit lane so the lane is byte-uniform. This keeps the synthesis byte
-   // for-loop and the verilator mux consistent, and gives any hard macro a
-   // clean byte mask. Bit mode passes the per-bit mask through.
-   wire [DW-1:0] wmask_int;
-   genvar gi;
-   generate
-      if (BYTEMODE) begin : g_bytemask
-         for (gi = 0; gi < DW/8; gi = gi + 1) begin : g_lane
-            assign wmask_int[gi*8+:8] = {8{wmask[gi*8]}};
-         end
-      end
-      else begin : g_passthru
-         assign wmask_int = wmask;
-      end
-   endgenerate
 
    la_spram_impl #(.DW      (DW),
                    .AW      (AW),
-                   .BYTEMODE(BYTEMODE),
+                   .BYTEMASK(BYTEMASK),
                    .PROP    (PROP),
                    .CTRLW   (CTRLW),
                    .STATUSW (STATUSW))
-   memory (// port
-           .clk    (clk),
-           .ce     (ce),
-           .we     (we),
-           .wmask  (wmask_int),
-           .addr   (addr),
-           .din    (din),
-           .dout   (dout),
-           // macro interface
-           .selctrl    (selctrl),
-           .ctrl       (ctrl),
-           .status     (status));
+   memory (// Memory interface
+           .clk      (clk),
+           .ce       (ce),
+           .we       (we),
+           .wmask    (wmask),
+           .addr     (addr),
+           .din      (din),
+           .dout     (dout),
+           // Technology interfaces
+           .selctrl  (selctrl),
+           .ctrl     (ctrl),
+           .status   (status));
 
 endmodule
