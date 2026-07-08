@@ -22,11 +22,12 @@
 
 (* keep_hierarchy *)
 module {{ type }}
-  #(parameter DW      = 32,         // Memory width
-    parameter AW      = 10,         // Address width (derived)
-    parameter PROP    = "DEFAULT",  // Pass through variable for hard macro
-    parameter CTRLW   = 32,         // Width of ctrl interface
-    parameter STATUSW = 32          // Width of status interface
+  #(parameter DW       = 32,         // Memory width
+    parameter AW       = 10,         // Address width (derived)
+    parameter BYTEMASK = 0,          // 1=byte mask, 0=bit mask
+    parameter PROP     = "DEFAULT",  // Pass through variable for hard macro
+    parameter CTRLW    = 32,         // Width of ctrl interface
+    parameter STATUSW  = 32          // Width of status interface
     )
    (// Memory interface
     input clk, // write clock
@@ -64,6 +65,7 @@ module {{ type }}
         la_spram_impl #(
             .DW(DW),
             .AW(AW),
+            .BYTEMASK(BYTEMASK),
             .PROP(PROP),
             .CTRLW(CTRLW),
             .STATUSW(STATUSW)
@@ -84,6 +86,20 @@ module {{ type }}
         // Create memories
         // When AW < MEM_DEPTH, force single-macro case (MEM_ADDRS = 1)
         localparam MEM_ADDRS = (AW >= MEM_DEPTH) ? 2**(AW - MEM_DEPTH) : 1;
+
+        // Generate a single bitmask
+        wire [DW-1:0] wmask_int;
+        genvar gwm;
+        generate
+          if (BYTEMASK) begin : g_wm_byte
+            for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+                assign wmask_int[gwm*8+:8] = {8{wmask[gwm]}};
+            end
+          end
+          else begin : g_wm_bit
+            assign wmask_int = wmask;
+          end
+        endgenerate
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
@@ -132,7 +148,7 @@ module {{ type }}
             for (i = 0; i < MEM_WIDTH; i = i + 1) begin: WORD_SELECT
               if (n + i < DW) begin: ACTIVE
                 assign mem_din[i] = din[n + i];
-                assign mem_wmask[i] = wmask[n + i];
+                assign mem_wmask[i] = wmask_int[n + i];
                 assign OUTPUTS[n + i].mem_outputs[a] = selected_reg ? mem_dout[i] : 1'b0;
               end
               else begin: INACTIVE

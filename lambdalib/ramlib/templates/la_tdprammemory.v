@@ -22,12 +22,12 @@
 
 (* keep_hierarchy *)
 module {{ type }}
-  #(
-    parameter DW      = 32,         // Memory width
-    parameter AW      = 10,         // Address width (derived)
-    parameter PROP    = "DEFAULT",  // Pass through variable for hard macro
-    parameter CTRLW   = 32,         // Width of ctrl interface
-    parameter STATUSW = 32          // Width of status interface
+  #(parameter DW       = 32,         // Memory width
+    parameter AW       = 10,         // Address width (derived)
+    parameter BYTEMASK = 0,          // 1=byte mask, 0=bit mask
+    parameter PROP     = "DEFAULT",  // Pass through variable for hard macro
+    parameter CTRLW    = 32,         // Width of ctrl interface
+    parameter STATUSW  = 32          // Width of status interface
   ) (  // Memory interface
       input               clk_a,    // write clock
       input               ce_a,     // write chip-enable
@@ -72,6 +72,7 @@ module {{ type }}
         la_tdpram_impl #(
             .DW(DW),
             .AW(AW),
+            .BYTEMASK(BYTEMASK),
             .PROP(PROP),
             .CTRLW(CTRLW),
             .STATUSW(STATUSW)
@@ -99,6 +100,23 @@ module {{ type }}
         // Create memories
         // When AW < MEM_DEPTH, force single-macro case (MEM_ADDRS = 1)
         localparam MEM_ADDRS = (AW >= MEM_DEPTH) ? 2 ** (AW - MEM_DEPTH) : 1;
+
+        // Generate a single bitmask
+        wire [DW-1:0] wmask_a_int;
+        wire [DW-1:0] wmask_b_int;
+        genvar gwm;
+        generate
+            if (BYTEMASK) begin : g_wm_byte
+              for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+                  assign wmask_a_int[gwm*8+:8] = {8{wmask_a[gwm]}};
+                  assign wmask_b_int[gwm*8+:8] = {8{wmask_b[gwm]}};
+              end
+            end
+            else begin : g_wm_bit
+              assign wmask_a_int = wmask_a;
+              assign wmask_b_int = wmask_b;
+            end
+        endgenerate
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin : OUTPUTS
@@ -170,10 +188,10 @@ module {{ type }}
             for (i = 0; i < MEM_WIDTH; i = i + 1) begin : WORD_SELECT
               if (n + i < DW) begin : ACTIVE
                 assign mem_dinA[i] = din_a[n+i];
-                assign mem_wmaskA[i] = wmask_a[n+i];
+                assign mem_wmaskA[i] = wmask_a_int[n+i];
                 assign OUTPUTS[n+i].mem_outputsA[a] = selectedA_reg ? mem_doutA[i] : 1'b0;
                 assign mem_dinB[i] = din_b[n+i];
-                assign mem_wmaskB[i] = wmask_b[n+i];
+                assign mem_wmaskB[i] = wmask_b_int[n+i];
                 assign OUTPUTS[n+i].mem_outputsB[a] = selectedB_reg ? mem_doutB[i] : 1'b0;
               end else begin : INACTIVE
                 assign mem_dinA[i]   = 1'b0;
