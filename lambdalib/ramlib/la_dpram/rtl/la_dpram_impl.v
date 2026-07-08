@@ -29,21 +29,21 @@ module la_dpram_impl #(
                        parameter STATUSW = 32      // width of status interface
                        )
    (// Write port
-    input               wr_clk,   // write clock
-    input               wr_ce,    // write chip-enable
-    input               wr_we,    // write enable
-    input [(BYTEMASK ? DW/8 : DW)-1:0] wr_wmask, // bit or byte write mask
-    input [AW-1:0]      wr_addr,  // write address
-    input [DW-1:0]      wr_din,   //write data in
+    input                          wr_clk,   // write clock
+    input                          wr_ce,    // write chip-enable
+    input                          wr_we,    // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0] wr_wmask, // bit or byte write mask
+    input [AW-1:0]                 wr_addr,  // write address
+    input [DW-1:0]                 wr_din,   //write data in
     // Read port
-    input               rd_clk,   // read clock
-    input               rd_ce,    // read chip-enable
-    input [AW-1:0]      rd_addr,  // read address
-    output reg [DW-1:0] rd_dout,  //read data out
+    input                          rd_clk,   // read clock
+    input                          rd_ce,    // read chip-enable
+    input [AW-1:0]                 rd_addr,  // read address
+    output reg [DW-1:0]            rd_dout,  //read data out
     // Technology interfaces
-    input               selctrl,  // selects control interface
-    input [CTRLW-1:0]   ctrl,     // pass through control interface
-    output [STATUSW-1:0] status    // pass through status interface
+    input                          selctrl,  // selects control interface
+    input [CTRLW-1:0]              ctrl,     // control interface
+    output [STATUSW-1:0]           status    // status interface
     );
 
    // Generic RTL RAM
@@ -97,7 +97,9 @@ module la_dpram_impl #(
 `endif
 
    // Read Port
-   always @(posedge rd_clk) if (rd_ce) rd_dout[DW-1:0] <= ram[rd_addr[AW-1:0]];
+   always @(posedge rd_clk)
+     if (rd_ce)
+       rd_dout[DW-1:0] <= ram[rd_addr[AW-1:0]];
 
    // Status (active in hard macro, tied off in soft model)
    assign status = {STATUSW{1'b0}};
