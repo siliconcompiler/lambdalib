@@ -16,6 +16,8 @@ import textwrap
 
 import pytest
 
+from siliconcompiler import Design
+from lambdalib import LambalibTechLibrary
 from lambdalib.reusable_tests.techlib_interface import (
     extract_interface,
     compare_interfaces,
@@ -159,8 +161,6 @@ def test_reference_extraction_on_real_cell():
 
 def _make_techlib(name, verilog):
     """Build a LambalibTechLibrary whose own rtl fileset holds `verilog`."""
-    from lambdalib import LambalibTechLibrary
-
     Path(f"{name}.v").write_text(verilog)
 
     class _TechLib(LambalibTechLibrary):
@@ -202,7 +202,5 @@ def test_fixture_fails_mismatched_implementation(assert_lambdalib_techlib_interf
 
 def test_fixture_rejects_non_techlib(assert_lambdalib_techlib_interface):
     """A non-LambalibTechLibrary argument fails the assertion up front."""
-    from siliconcompiler import Design
-
     with pytest.raises(AssertionError, match="not a LambalibTechLibrary"):
         assert_lambdalib_techlib_interface(Design)

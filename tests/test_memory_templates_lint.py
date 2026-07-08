@@ -449,13 +449,10 @@ def test_generated_wrapper_matches_lambda_interface(cell):
     parameters as the canonical lambda cell it substitutes.
 
     The wrapper's top-level interface is fixed by the template, independent of
-    the macro port map, so a single trivial memory suffices to render it.  Cells
-    whose template currently lags the lambda cell (write-mask width in byte-mask
-    mode) are marked strict xfail -- once a template is fixed the xfail turns
-    into a failure, prompting removal of the marker.
+    the macro port map, so a single trivial memory suffices to render it.  This
+    includes parameter-dependent widths such as the write-mask in byte-mask mode,
+    which compare_cell_to_files checks across the flag space.
     """
-    pytest.importorskip("pyslang")
-
     memories = [create_mock_ram_class("mem", width=8, depth=7, ports=[("clk", "clk")])]
     wrapper_file = Path(f"{cell}.v")
     RAMLib(cell, ".").write_lambdalib(wrapper_file, memories)

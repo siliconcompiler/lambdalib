@@ -147,7 +147,9 @@ def _elaborate_interface(files: List[str], top: str,
     if param_overrides:
         options.paramOverrides = [f"{name}={value}"
                                   for name, value in param_overrides.items()]
-    compilation = ast.Compilation(pyslang.Bag([options]))
+    bag = pyslang.Bag()
+    bag.compilationOptions = options
+    compilation = ast.Compilation(bag)
     for path in files:
         compilation.addSyntaxTree(SyntaxTree.fromFile(str(path)))
 
@@ -263,7 +265,7 @@ def compare_interfaces(ref: Interface, impl: Interface,
         # share.  Divergent parameter sets are reported by the parameter checks.
         rprof = {"": rp.width, **dict(rp.width_by_params)}
         iprof = {"": ip.width, **dict(ip.width_by_params)}
-        for label in [""] + sorted((set(rprof) & set(iprof)) - {""}):
+        for label in ["", *sorted((set(rprof) & set(iprof)) - {""})]:
             if rprof[label] != iprof[label]:
                 where = f" (at {label})" if label else ""
                 errors.append(f"port '{name}' width mismatch{where}: "
