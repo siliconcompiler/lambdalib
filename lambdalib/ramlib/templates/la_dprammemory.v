@@ -107,7 +107,7 @@ module {{ type }}
           end
         end
         else begin : g_wm_bit
-          assign wr_wmask_int = wmask;
+          assign wr_wmask_int = wr_wmask;
         end
 
         genvar o;
