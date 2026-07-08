@@ -20,62 +20,79 @@
  *
  ****************************************************************************/
 
-module la_tdpram_impl #(parameter DW = 32,          // Memory width
-                        parameter AW = 10,          // Address width (derived)
-                        parameter BYTEMODE = 0,     // 1=byte mask, 0=bit mask
+module la_tdpram_impl #(parameter DW = 32,          // memory width
+                        parameter AW = 10,          // address width
+                        parameter BYTEMASK = 0,     // 1=byte mask, 0=bit mask
                         parameter PROP = "DEFAULT", // variable for hard macro
                         parameter CTRLW = 32,       // width of ctrl interface
                         parameter STATUSW = 32      // width of status interface
                         )
    (// A port
-    input               clk_a,   // write clock
-    input               ce_a,    // write chip-enable
-    input               we_a,    // write enable
-    input [DW-1:0]      wmask_a, // write mask
-    input [AW-1:0]      addr_a,  // write address
-    input [DW-1:0]      din_a,   // write data in
-    output reg [DW-1:0] dout_a,  // read data out
+    input                              clk_a,   // write clock
+    input                              ce_a,    // write chip-enable
+    input                              we_a,    // write enable
+    input [(BYTEMASK?DW/8:DW)-1:0]     wmask_a, // bit or byte write mask
+    input [AW-1:0]                     addr_a,  // write address
+    input [DW-1:0]                     din_a,   // write data in
+    output reg [DW-1:0]                dout_a,  // read data out
     // B port
-    input               clk_b,   // write clock
-    input               ce_b,    // write chip-enable
-    input               we_b,    // write enable
-    input [DW-1:0]      wmask_b, // write mask
-    input [AW-1:0]      addr_b,  // write address
-    input [DW-1:0]      din_b,   // write data in
-    output reg [DW-1:0] dout_b,  // read data out
+    input                              clk_b,   // write clock
+    input                              ce_b,    // write chip-enable
+    input                              we_b,    // write enable
+    input [(BYTEMASK ? DW/8 : DW)-1:0] wmask_b, // bit or byte write mask
+    input [AW-1:0]                     addr_b,  // write address
+    input [DW-1:0]                     din_b,   // write data in
+    output reg [DW-1:0]                dout_b,  // read data out
     // Technology interfaces
-    input               selctrl, // selects control interface
-    input [CTRLW-1:0]   ctrl,    // pass through control interface
-    output [STATUSW-1:0] status   // pass through status interface
+    input                              selctrl, // selects control interface
+    input [CTRLW-1:0]                  ctrl,    // control interface
+    output [STATUSW-1:0]               status   // status interface
     );
 
-    // Generic RTL RAM
+   // Generic RTL RAM
    /* verilator lint_off MULTIDRIVEN */
    reg [DW-1:0]       ram[(2**AW)-1:0];
    /* verilator lint_on MULTIDRIVEN */
 
 `ifdef VERILATOR
-   // Fast equivalent ram write model (for ultra wide RAMs)
+   // Fast equivalent ram write model (for ultra wide RAMs). The vectorized
+   // AND/OR needs full DW-wide bit masks, so byte mode replicates each mask
+   // bit across its 8-bit lane; bit mode passes the per-bit masks through.
+   wire [DW-1:0] wmask_a_int;
+   wire [DW-1:0] wmask_b_int;
+   genvar gwm;
+   generate
+      if (BYTEMASK) begin : g_wm_byte
+         for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+            assign wmask_a_int[gwm*8+:8] = {8{wmask_a[gwm]}};
+            assign wmask_b_int[gwm*8+:8] = {8{wmask_b[gwm]}};
+         end
+      end
+      else begin : g_wm_bit
+         assign wmask_a_int = wmask_a;
+         assign wmask_b_int = wmask_b;
+      end
+   endgenerate
+
    always @(posedge clk_a)
      if (ce_a & we_a)
-       ram[addr_a] <= (din_a & wmask_a) | (ram[addr_a] & ~wmask_a);
+       ram[addr_a] <= (din_a & wmask_a_int) | (ram[addr_a] & ~wmask_a_int);
    always @(posedge clk_b)
      if (ce_b & we_b)
-       ram[addr_b] <= (din_b & wmask_b) | (ram[addr_b] & ~wmask_b);
+       ram[addr_b] <= (din_b & wmask_b_int) | (ram[addr_b] & ~wmask_b_int);
 `else
-   // FPGA synthesis friendly RAM pattern. BYTEMODE selects the write
-   // granularity: per-bit (hard macro / per-bit BRAM such as ice40) or per
-   // 8-bit lane (byte-wide BRAM). In byte mode the masks are byte-uniform (the
-   // la_tdpram wrapper replicates wmask_x[i*8]) and DW must be a multiple of 8.
+   // FPGA synthesis friendly RAM pattern. BYTEMASK selects the write
+   // granularity: per 8-bit lane (byte-wide BRAM) or per-bit (hard macro).
+   // In byte mode the masks are DW/8-wide and DW must be a multiple of 8.
 
    // Port A write
    generate
-      if (BYTEMODE) begin : g_bytemask_a
+      if (BYTEMASK) begin : g_bytemask_a
          integer i;
          always @(posedge clk_a)
            if (ce_a & we_a)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wmask_a[i*8])
+               if (wmask_a[i])
                  ram[addr_a][i*8+:8] <= din_a[i*8+:8];
       end
       else begin : g_bitmask_a
@@ -90,12 +107,12 @@ module la_tdpram_impl #(parameter DW = 32,          // Memory width
 
    // Port B write
    generate
-      if (BYTEMODE) begin : g_bytemask_b
+      if (BYTEMASK) begin : g_bytemask_b
          integer i;
          always @(posedge clk_b)
            if (ce_b & we_b)
              for (i = 0; i < DW/8; i = i + 1)
-               if (wmask_b[i*8])
+               if (wmask_b[i])
                  ram[addr_b][i*8+:8] <= din_b[i*8+:8];
       end
       else begin : g_bitmask_b
