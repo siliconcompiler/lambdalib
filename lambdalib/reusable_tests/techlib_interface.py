@@ -29,7 +29,7 @@ never fails.  Install it with ``pip install lambdalib[slang]``.
 import functools
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import pytest
 
@@ -45,6 +45,10 @@ class Port:
     name: str
     direction: str  # "in" | "out" | "inout"
     width: str      # canonical, elaborated type string e.g. "logic[31:0]"
+    # Width re-resolved with each boolean-like parameter flipped, as
+    # ((param-assignment, width), ...).  Captures parameter-dependent widths
+    # (e.g. a byte-mask flag narrowing a mask port) that match at the defaults.
+    width_by_params: Tuple[Tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -121,22 +125,29 @@ def verilog_files(design, fileset: Optional[str] = None) -> List[str]:
 # pyslang extraction
 # ---------------------------------------------------------------------------
 
-def extract_interface(files: List[str], top: str) -> Interface:
-    """Parse ``files`` with pyslang and return the interface of module ``top``.
+def _elaborate_interface(files: List[str], top: str,
+                         param_overrides: Optional[Dict[str, object]] = None) -> Interface:
+    """Elaborate ``top`` once and return its single-point interface.
 
     All files are added to a single compilation so that submodules resolve and
-    port widths / parameter defaults are elaborated.  ``top`` is located among
-    the compilation's top-level instances, so it must not be instantiated by
-    another file in the same set (true for lambda cells and standalone tech
-    macros).
+    port widths / parameter defaults are elaborated.  ``param_overrides`` maps
+    parameter names to values applied to ``top`` before elaboration.  ``top`` is
+    located among the compilation's top-level instances, so it must not be
+    instantiated by another file in the same set.
     """
+    import pyslang
     from pyslang import ast
     from pyslang.syntax import SyntaxTree
 
     if not files:
         raise ValueError(f"no Verilog sources found for module '{top}'")
 
-    compilation = ast.Compilation()
+    options = ast.CompilationOptions()
+    options.topModules = {top}
+    if param_overrides:
+        options.paramOverrides = [f"{name}={value}"
+                                  for name, value in param_overrides.items()]
+    compilation = ast.Compilation(pyslang.Bag([options]))
     for path in files:
         compilation.addSyntaxTree(SyntaxTree.fromFile(str(path)))
 
@@ -174,6 +185,56 @@ def extract_interface(files: List[str], top: str) -> Interface:
     return Interface(top=top, ports=ports, params=params)
 
 
+def _flag_sweep(params: Dict[str, Param]) -> List[Tuple[str, Dict[str, int]]]:
+    """Return ``(label, overrides)`` sample points flipping each 0/1 parameter.
+
+    A port width gated behind a boolean-like parameter (e.g. a byte-mask mode
+    that narrows the write-mask port) matches while both sides sit at the default
+    value and only diverges once the flag is toggled, so each flip is a sample
+    point at which such widths are re-resolved.
+    """
+    sweeps: List[Tuple[str, Dict[str, int]]] = []
+    for name in sorted(params):
+        try:
+            value = int(params[name].value)
+        except (TypeError, ValueError):
+            continue  # non-integer (e.g. string) parameter
+        if value in (0, 1):
+            flipped = 1 - value
+            sweeps.append((f"{name}={flipped}", {name: flipped}))
+    return sweeps
+
+
+def extract_interface(files: List[str], top: str) -> Interface:
+    """Parse ``files`` with pyslang and return the interface of module ``top``.
+
+    Port widths are resolved at the default parameters *and* re-resolved with each
+    boolean-like parameter flipped, recording the latter in ``Port.width_by_params``.
+    This means a width that depends on a parameter (e.g. a byte-mask flag narrowing
+    a write-mask port) is captured in the interface rather than hiding behind its
+    default value -- and :func:`compare_interfaces` diffs the full profile, so the
+    protection applies to every comparison automatically.
+    """
+    base = _elaborate_interface(files, top)
+
+    sweeps = _flag_sweep(base.params)
+    if not sweeps:
+        return base
+
+    profiles: Dict[str, List[Tuple[str, str]]] = {name: [] for name in base.ports}
+    for label, overrides in sweeps:
+        alt = _elaborate_interface(files, top, overrides)
+        for name in base.ports:
+            if name in alt.ports:
+                profiles[name].append((label, alt.ports[name].width))
+
+    ports = {
+        name: Port(port.name, port.direction, port.width, tuple(profiles[name]))
+        for name, port in base.ports.items()
+    }
+    return Interface(top=base.top, ports=ports, params=base.params)
+
+
 # ---------------------------------------------------------------------------
 # Comparison
 # ---------------------------------------------------------------------------
@@ -198,9 +259,16 @@ def compare_interfaces(ref: Interface, impl: Interface,
         if rp.direction != ip.direction:
             errors.append(f"port '{name}' direction mismatch: "
                           f"lambda={rp.direction} tech={ip.direction}")
-        if rp.width != ip.width:
-            errors.append(f"port '{name}' width mismatch: "
-                          f"lambda={rp.width} tech={ip.width}")
+        # Width at the defaults ("") plus every parameter sample both sides
+        # share.  Divergent parameter sets are reported by the parameter checks.
+        rprof = {"": rp.width, **dict(rp.width_by_params)}
+        iprof = {"": ip.width, **dict(ip.width_by_params)}
+        for label in [""] + sorted((set(rprof) & set(iprof)) - {""}):
+            if rprof[label] != iprof[label]:
+                where = f" (at {label})" if label else ""
+                errors.append(f"port '{name}' width mismatch{where}: "
+                              f"lambda={rprof[label]} tech={iprof[label]}")
+                break
 
     ref_params, impl_params = set(ref.params), set(impl.params)
     for name in sorted(ref_params - impl_params):
@@ -228,7 +296,9 @@ def compare_cell_to_files(cell: str, impl_files: List[str],
     """Compare a lambda cell's interface against an implementation given as files.
 
     Useful when the implementation isn't a full library -- e.g. a wrapper the
-    memory templates generate via ``write_lambdalib``.
+    memory templates generate via ``write_lambdalib``.  Parameter-dependent port
+    widths are handled by :func:`extract_interface`, which samples them across the
+    flag space, so this is a plain interface diff.
 
     Args:
         cell: the lambda cell name (also the top module name in ``impl_files``).

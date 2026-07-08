@@ -112,6 +112,27 @@ def test_detects_param_default_mismatch():
     assert compare_interfaces(ref, impl, check_param_defaults=False) == []
 
 
+def test_detects_param_dependent_width_hidden_at_defaults():
+    """A width gated behind a flag matches at the default but must be caught.
+
+    This exercises the low-level extract_interface + compare_interfaces path (as a
+    downstream user might) to prove the parameter sweep is embedded in the
+    Interface, not just in the higher-level helpers.
+    """
+    ref_v = ("module la_widget #(parameter BYTEMASK = 0) "
+             "(input [(BYTEMASK?8/8:8)-1:0] wmask); endmodule\n")
+    impl_v = ("module la_widget #(parameter BYTEMASK = 0) "
+              "(input [8-1:0] wmask); endmodule\n")
+    ref = extract_interface([_write("ref.v", ref_v)], "la_widget")
+    impl = extract_interface([_write("impl.v", impl_v)], "la_widget")
+
+    # Identical at the default (BYTEMASK=0): wmask is [7:0] on both sides.
+    assert ref.ports["wmask"].width == impl.ports["wmask"].width == "logic[7:0]"
+    # ...but the reference narrows it at BYTEMASK=1, which the profile captures.
+    errors = compare_interfaces(ref, impl)
+    assert any("wmask" in e and "width" in e and "BYTEMASK=1" in e for e in errors)
+
+
 # ---------------------------------------------------------------------------
 # Sanity check against a real lambda cell so the resolver + extraction are
 # exercised on shipped RTL (not just synthetic modules).

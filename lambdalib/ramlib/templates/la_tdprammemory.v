@@ -32,7 +32,7 @@ module {{ type }}
       input               clk_a,    // write clock
       input               ce_a,     // write chip-enable
       input               we_a,     // write enable
-      input [DW-1:0]      wmask_a,  // write mask
+      input [(BYTEMASK?DW/8:DW)-1:0] wmask_a, // bit or byte write mask
       input [AW-1:0]      addr_a,   // write address
       input [DW-1:0]      din_a,    // write data in
       output [DW-1:0]     dout_a,   // read data out
@@ -40,7 +40,7 @@ module {{ type }}
       input               clk_b,    // write clock
       input               ce_b,     // write chip-enable
       input               we_b,     // write enable
-      input [DW-1:0]      wmask_b,  // write mask
+      input [(BYTEMASK?DW/8:DW)-1:0] wmask_b, // bit or byte write mask
       input [AW-1:0]      addr_b,   // write address
       input [DW-1:0]      din_b,    // write data in
       output [DW-1:0]     dout_b,   // read data out

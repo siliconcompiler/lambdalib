@@ -33,7 +33,7 @@ module {{ type }}
     input clk, // write clock
     input ce, // chip enable
     input we, // write enable
-    input [DW-1:0] wmask, //per bit write mask
+    input [(BYTEMASK?DW/8:DW)-1:0] wmask, // bit or byte write mask
     input [AW-1:0] addr, //write address
     input [DW-1:0] din, //write data
     output [DW-1:0] dout, //read output data

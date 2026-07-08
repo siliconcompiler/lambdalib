@@ -438,12 +438,6 @@ def test_tdpram_lint_verilator(macroaw, macrodw, aw, dw, tdpram_macro):
     assert project.run()
 
 
-_BYTEMODE_DRIFT = pytest.mark.xfail(
-    reason="memory template lags the lambda cell: missing BYTEMODE parameter",
-    strict=True,
-)
-
-
 @pytest.mark.parametrize("cell", [
     "la_spregfile",
     "la_spram",
@@ -456,9 +450,9 @@ def test_generated_wrapper_matches_lambda_interface(cell):
 
     The wrapper's top-level interface is fixed by the template, independent of
     the macro port map, so a single trivial memory suffices to render it.  Cells
-    whose template currently lags the lambda cell (missing BYTEMODE) are marked
-    strict xfail -- once a template is fixed the xfail turns into a failure,
-    prompting removal of the marker.
+    whose template currently lags the lambda cell (write-mask width in byte-mask
+    mode) are marked strict xfail -- once a template is fixed the xfail turns
+    into a failure, prompting removal of the marker.
     """
     pytest.importorskip("pyslang")
 

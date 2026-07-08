@@ -34,7 +34,7 @@ module {{ type }}
     input wr_clk, // write clock
     input wr_ce, // write chip-enable
     input wr_we, // write enable
-    input [DW-1:0] wr_wmask, // write mask
+    input [(BYTEMASK?DW/8:DW)-1:0] wr_wmask, // bit or byte write mask
     input [AW-1:0] wr_addr, // write address
     input [DW-1:0] wr_din, //write data in
     // Read port
@@ -99,15 +99,15 @@ module {{ type }}
         localparam MEM_ADDRS = (AW >= MEM_DEPTH) ? 2**(AW - MEM_DEPTH) : 1;
 
         // Generate a single bitmask
-        wire [DW-1:0] wmask_int;
+        wire [DW-1:0] wr_wmask_int;
         genvar gwm;
         if (BYTEMASK) begin : g_wm_byte
           for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
-              assign wmask_int[gwm*8+:8] = {8{wmask[gwm]}};
+              assign wr_wmask_int[gwm*8+:8] = {8{wr_wmask[gwm]}};
           end
         end
         else begin : g_wm_bit
-          assign wmask_int = wmask;
+          assign wr_wmask_int = wmask;
         end
 
         genvar o;
