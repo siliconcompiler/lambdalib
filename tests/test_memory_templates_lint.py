@@ -12,6 +12,7 @@ from siliconcompiler import Design, Project
 from siliconcompiler.flows import lintflow
 from lambdalib.ramlib._common import RAMLib
 from lambdalib.ramlib import Spram, Spregfile, Dpram, Tdpram
+from lambdalib.reusable_tests.techlib_interface import compare_cell_to_files
 
 
 def create_mock_ram_class(name, width, depth, ports):
@@ -64,6 +65,27 @@ def create_mock_ram_class(name, width, depth, ports):
     return _MockRAM
 
 
+class _MemoryLintDesign(Design):
+    """Lint testbench design for a generated memory wrapper.
+
+    Defined at module scope (not inside a test function) so it is picklable:
+    the SiliconCompiler scheduler runs nodes in worker processes via
+    multiprocessing, which pickles the design.  Python 3.14 switched the
+    default start method to ``forkserver``, so a function-local Design class
+    can no longer be sent to the worker.
+    """
+
+    def __init__(self, name, topmodule, aw, dw, impl, wrapper_file, macro_file):
+        super().__init__(name)
+        with self.active_fileset("rtl"):
+            self.set_topmodule(topmodule)
+            self.set_param("AW", str(aw))
+            self.set_param("DW", str(dw))
+            self.add_file(str(wrapper_file), filetype="verilog")
+            self.add_file(str(macro_file), filetype="verilog")
+            self.add_depfileset(impl(), "rtl.impl")
+
+
 @pytest.mark.timeout(120)
 @pytest.mark.parametrize("macroaw, macrodw, aw, dw", [
     # Exact match tests
@@ -80,17 +102,6 @@ def create_mock_ram_class(name, width, depth, ports):
 ])
 def test_spram_lint_slang(macroaw, macrodw, aw, dw, spram_macro):
     """Test SPRAM template linting with slang linter."""
-    class SpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("spram_lint_slang")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_spram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Spram(), "rtl.impl")
-
     spram_lib = RAMLib("la_spram", ".")
     port_map = [
         ("clk", "clk"),
@@ -108,7 +119,8 @@ def test_spram_lint_slang(macroaw, macrodw, aw, dw, spram_macro):
     macro_file = Path("spram_macro.v")
     macro_file.write_text(spram_macro(macroaw, macrodw))
 
-    design = SpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("spram_lint_slang", "la_spram", aw, dw, Spram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="slang"))
@@ -131,17 +143,6 @@ def test_spram_lint_slang(macroaw, macrodw, aw, dw, spram_macro):
 ])
 def test_dpram_lint_slang(macroaw, macrodw, aw, dw, dpram_macro):
     """Test DPRAM template linting with slang linter."""
-    class DpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("dpram_lint_slang")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_dpram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Dpram(), "rtl.impl")
-
     dpram_lib = RAMLib("la_dpram", ".")
     port_map = [
         ("wr_clk", "wr_clk"),
@@ -162,7 +163,8 @@ def test_dpram_lint_slang(macroaw, macrodw, aw, dw, dpram_macro):
     macro_file = Path("dpram_macro.v")
     macro_file.write_text(dpram_macro(macroaw, macrodw))
 
-    design = DpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("dpram_lint_slang", "la_dpram", aw, dw, Dpram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="slang"))
@@ -185,17 +187,6 @@ def test_dpram_lint_slang(macroaw, macrodw, aw, dw, dpram_macro):
 ])
 def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
     """Test SPREGFILE template linting with slang linter."""
-    class SpregfileLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("spregfile_lint_slang")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_spregfile")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Spregfile(), "rtl.impl")
-
     spregfile_lib = RAMLib("la_spregfile", ".")
     port_map = [
         ("clk", "clk"),
@@ -213,8 +204,8 @@ def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
     macro_file = Path("spregfile_macro.v")
     macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
-    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(),
-                                 macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("spregfile_lint_slang", "la_spregfile", aw, dw, Spregfile,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="slang"))
@@ -237,17 +228,6 @@ def test_spregfile_lint_slang(macroaw, macrodw, aw, dw, spregfile_macro):
 ])
 def test_tdpram_lint_slang(macroaw, macrodw, aw, dw, tdpram_macro):
     """Test TDPRAM template linting with slang linter."""
-    class TdpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("tdpram_lint_slang")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_tdpram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Tdpram(), "rtl.impl")
-
     tdpram_lib = RAMLib("la_tdpram", ".")
     port_map = [
         ("clk_a", "clk_a"),
@@ -272,7 +252,8 @@ def test_tdpram_lint_slang(macroaw, macrodw, aw, dw, tdpram_macro):
     macro_file = Path("tdpram_macro.v")
     macro_file.write_text(tdpram_macro(macroaw, macrodw))
 
-    design = TdpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("tdpram_lint_slang", "la_tdpram", aw, dw, Tdpram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="slang"))
@@ -296,17 +277,6 @@ def test_tdpram_lint_slang(macroaw, macrodw, aw, dw, tdpram_macro):
 ])
 def test_spram_lint_verilator(macroaw, macrodw, aw, dw, spram_macro):
     """Test SPRAM template linting with verilator."""
-    class SpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("spram_lint_verilator")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_spram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Spram(), "rtl.impl")
-
     spram_lib = RAMLib("la_spram", ".")
     port_map = [
         ("clk", "clk"),
@@ -324,7 +294,8 @@ def test_spram_lint_verilator(macroaw, macrodw, aw, dw, spram_macro):
     macro_file = Path("spram_macro.v")
     macro_file.write_text(spram_macro(macroaw, macrodw))
 
-    design = SpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("spram_lint_verilator", "la_spram", aw, dw, Spram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="verilator"))
@@ -348,17 +319,6 @@ def test_spram_lint_verilator(macroaw, macrodw, aw, dw, spram_macro):
 ])
 def test_dpram_lint_verilator(macroaw, macrodw, aw, dw, dpram_macro):
     """Test DPRAM template linting with verilator."""
-    class DpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("dpram_lint_verilator")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_dpram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Dpram(), "rtl.impl")
-
     dpram_lib = RAMLib("la_dpram", ".")
     port_map = [
         ("wr_clk", "wr_clk"),
@@ -379,7 +339,8 @@ def test_dpram_lint_verilator(macroaw, macrodw, aw, dw, dpram_macro):
     macro_file = Path("dpram_macro.v")
     macro_file.write_text(dpram_macro(macroaw, macrodw))
 
-    design = DpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("dpram_lint_verilator", "la_dpram", aw, dw, Dpram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="verilator"))
@@ -403,17 +364,6 @@ def test_dpram_lint_verilator(macroaw, macrodw, aw, dw, dpram_macro):
 ])
 def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
     """Test SPREGFILE template linting with verilator."""
-    class SpregfileLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("spregfile_lint_verilator")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_spregfile")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Spregfile(), "rtl.impl")
-
     spregfile_lib = RAMLib("la_spregfile", ".")
     port_map = [
         ("clk", "clk"),
@@ -431,8 +381,8 @@ def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
     macro_file = Path("spregfile_macro.v")
     macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
-    design = SpregfileLintDesign(wrapper_file=wrapper_file.resolve(),
-                                 macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("spregfile_lint_verilator", "la_spregfile", aw, dw, Spregfile,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="verilator"))
@@ -456,17 +406,6 @@ def test_spregfile_lint_verilator(macroaw, macrodw, aw, dw, spregfile_macro):
 ])
 def test_tdpram_lint_verilator(macroaw, macrodw, aw, dw, tdpram_macro):
     """Test TDPRAM template linting with verilator."""
-    class TdpramLintDesign(Design):
-        def __init__(self, wrapper_file=None, macro_file=None):
-            super().__init__("tdpram_lint_verilator")
-            with self.active_fileset("rtl"):
-                self.set_topmodule("la_tdpram")
-                self.set_param("AW", str(aw))
-                self.set_param("DW", str(dw))
-                self.add_file(str(wrapper_file), filetype="verilog")
-                self.add_file(str(macro_file), filetype="verilog")
-                self.add_depfileset(Tdpram(), "rtl.impl")
-
     tdpram_lib = RAMLib("la_tdpram", ".")
     port_map = [
         ("clk_a", "clk_a"),
@@ -491,8 +430,32 @@ def test_tdpram_lint_verilator(macroaw, macrodw, aw, dw, tdpram_macro):
     macro_file = Path("tdpram_macro.v")
     macro_file.write_text(tdpram_macro(macroaw, macrodw))
 
-    design = TdpramLintDesign(wrapper_file=wrapper_file.resolve(), macro_file=macro_file.resolve())
+    design = _MemoryLintDesign("tdpram_lint_verilator", "la_tdpram", aw, dw, Tdpram,
+                               wrapper_file.resolve(), macro_file.resolve())
     project = Project(design)
     project.add_fileset("rtl")
     project.set_flow(lintflow.LintFlow(tool="verilator"))
     assert project.run()
+
+
+@pytest.mark.parametrize("cell", [
+    "la_spregfile",
+    "la_spram",
+    "la_dpram",
+    "la_tdpram"
+])
+def test_generated_wrapper_matches_lambda_interface(cell):
+    """The wrapper generated by write_lambdalib must present the same ports and
+    parameters as the canonical lambda cell it substitutes.
+
+    The wrapper's top-level interface is fixed by the template, independent of
+    the macro port map, so a single trivial memory suffices to render it.  This
+    includes parameter-dependent widths such as the write-mask in byte-mask mode,
+    which compare_cell_to_files checks across the flag space.
+    """
+    memories = [create_mock_ram_class("mem", width=8, depth=7, ports=[("clk", "clk")])]
+    wrapper_file = Path(f"{cell}.v")
+    RAMLib(cell, ".").write_lambdalib(wrapper_file, memories)
+
+    problems = compare_cell_to_files(cell, [str(wrapper_file.resolve())])
+    assert not problems, f"{cell} wrapper interface drift:\n  " + "\n  ".join(problems)

@@ -35,6 +35,12 @@ dependencies = [
 ]
 dynamic = ['version']
 
+# Ship the reusable techlib-interface fixtures as a pytest plugin so any project
+# with lambdalib installed can use `assert_techlib_interface` without editing its
+# conftest.  pyslang is only imported when the check actually runs.
+[project.entry-points.pytest11]
+lambdalib_techlib_interface = "lambdalib.reusable_tests.techlib_interface"
+
 [project.optional-dependencies]
 # Dev dependencies.
 test = [
@@ -42,7 +48,12 @@ test = [
     "pytest-xdist==3.8.0",
     "pytest-timeout == 2.4.0",
     "cocotb == 2.0.1",
-    "cocotb-bus == 0.3.0"
+    "cocotb-bus == 0.3.0",
+    "pyslang >= 11.0"
+]
+# SystemVerilog parsing for tech-library interface checks.
+slang = [
+    "pyslang >= 11.0"
 ]
 cocotb = [
     "cocotb == 2.0.1",
@@ -63,6 +74,14 @@ pythonpath = [
 ]
 testpaths = [
     "tests"
+]
+# Only collect test_*.py.  The lambdalib/reusable_tests/**/*_test.py files are
+# reusable test *bodies* imported by tests/ (and downstream suites), not
+# standalone tests; excluding the *_test.py suffix keeps a whole-workspace
+# `pytest .` from double-importing them out of the installed package (which
+# fails with "import file mismatch" against a non-editable install).
+python_files = [
+    "test_*.py"
 ]
 timeout = "60"
 

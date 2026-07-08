@@ -69,6 +69,36 @@ def create_mock_ram_class(name, width, depth, ports):
     return _MockRAM
 
 
+class _MemoryCocotbTbDesign(Design):
+    """Cocotb testbench design for a generated memory wrapper.
+
+    Defined at module scope (not inside a test function) so it is picklable:
+    the SiliconCompiler scheduler runs nodes in worker processes via
+    multiprocessing, which pickles the design.  Python 3.14 switched the
+    default start method to ``forkserver``, so a function-local Design class
+    can no longer be sent to the worker.
+    """
+
+    def __init__(self, topmodule, aw, dw, impl, cocotb_test,
+                 simulator="icarus", wrapper_file=None, macro_file=None):
+        super().__init__("testbench")
+        self.set_dataroot("testdata", __file__)
+
+        with self.active_dataroot("testdata"):
+            with self.active_fileset("testbench.cocotb"):
+                self.set_topmodule(topmodule)
+                self.set_param("AW", str(aw))
+                self.set_param("DW", str(dw))
+                self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
+                # Add cocotb test procedures
+                self.add_file(Path(__file__).parent / "cocotb_tests" / cocotb_test,
+                              filetype="python")
+                # Add generated wrapper and testbench
+                self.add_file(str(wrapper_file), filetype="verilog")
+                self.add_file(str(macro_file), filetype="verilog")
+                self.add_depfileset(impl(), "rtl.impl")
+
+
 @pytest.mark.eda
 @pytest.mark.timeout(300)
 @pytest.mark.parametrize("macroaw, macrodw", [
@@ -91,27 +121,6 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw, spram_macro):
     write masking.
     """
     pytest.importorskip("cocotb")
-
-    class SpramTbDesign(Design):
-        """Testbench design for SPRAM cocotb functional tests"""
-
-        def __init__(self, simulator: str = "icarus", wrapper_file=None, macro_file=None):
-            super().__init__("testbench")
-            self.set_dataroot("testdata", __file__)
-
-            with self.active_dataroot("testdata"):
-                with self.active_fileset("testbench.cocotb"):
-                    self.set_topmodule("la_spram")
-                    self.set_param("AW", str(aw))
-                    self.set_param("DW", str(dw))
-                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
-                    # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_spram.py",
-                                  filetype="python")
-                    # Add generated wrapper and testbench
-                    self.add_file(str(wrapper_file), filetype="verilog")
-                    self.add_file(str(macro_file), filetype="verilog")
-                    self.add_depfileset(Spram(), "rtl.impl")
 
     # Generate SPRAM template and testbench, keeping files alive
     spram_lib = RAMLib("la_spram", ".")
@@ -139,9 +148,10 @@ def test_spram_cocotb_functional(macroaw, macrodw, aw, dw, spram_macro):
     macro_file.write_text(spram_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(SpramTbDesign("icarus",
-                                wrapper_file=wrapper_file.resolve(),
-                                macro_file=macro_file.resolve()))
+    project = Sim(_MemoryCocotbTbDesign("la_spram", aw, dw, Spram, "test_spram.py",
+                                        "icarus",
+                                        wrapper_file=wrapper_file.resolve(),
+                                        macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -172,27 +182,6 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw, spregfile_macro):
     """
     pytest.importorskip("cocotb")
 
-    class SpregfileTbDesign(Design):
-        """Testbench design for SPREGFILE cocotb functional tests"""
-
-        def __init__(self, simulator: str = "icarus", wrapper_file=None, macro_file=None):
-            super().__init__("testbench")
-            self.set_dataroot("testdata", __file__)
-
-            with self.active_dataroot("testdata"):
-                with self.active_fileset("testbench.cocotb"):
-                    self.set_topmodule("la_spregfile")
-                    self.set_param("AW", str(aw))
-                    self.set_param("DW", str(dw))
-                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
-                    # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_spregfile.py",
-                                  filetype="python")
-                    # Add generated wrapper and macro
-                    self.add_file(str(wrapper_file), filetype="verilog")
-                    self.add_file(str(macro_file), filetype="verilog")
-                    self.add_depfileset(Spregfile(), "rtl.impl")
-
     # Generate SPREGFILE template via write_lambdalib
     spregfile_lib = RAMLib("la_spregfile", ".")
 
@@ -219,9 +208,10 @@ def test_spregfile_cocotb_functional(macroaw, macrodw, aw, dw, spregfile_macro):
     macro_file.write_text(spregfile_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(SpregfileTbDesign("icarus",
-                                    wrapper_file=wrapper_file.resolve(),
-                                    macro_file=macro_file.resolve()))
+    project = Sim(_MemoryCocotbTbDesign("la_spregfile", aw, dw, Spregfile, "test_spregfile.py",
+                                        "icarus",
+                                        wrapper_file=wrapper_file.resolve(),
+                                        macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -251,27 +241,6 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw, dpram_macro):
     write masking with separate read and write clocks.
     """
     pytest.importorskip("cocotb")
-
-    class DpramTbDesign(Design):
-        """Testbench design for DPRAM cocotb functional tests"""
-
-        def __init__(self, simulator: str = "icarus", wrapper_file=None, macro_file=None):
-            super().__init__("testbench")
-            self.set_dataroot("testdata", __file__)
-
-            with self.active_dataroot("testdata"):
-                with self.active_fileset("testbench.cocotb"):
-                    self.set_topmodule("la_dpram")
-                    self.set_param("AW", str(aw))
-                    self.set_param("DW", str(dw))
-                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
-                    # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_dpram.py",
-                                  filetype="python")
-                    # Add generated wrapper and macro
-                    self.add_file(str(wrapper_file), filetype="verilog")
-                    self.add_file(str(macro_file), filetype="verilog")
-                    self.add_depfileset(Dpram(), "rtl.impl")
 
     # Generate DPRAM template via write_lambdalib
     dpram_lib = RAMLib("la_dpram", ".")
@@ -303,9 +272,10 @@ def test_dpram_cocotb_functional(macroaw, macrodw, aw, dw, dpram_macro):
     macro_file.write_text(dpram_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(DpramTbDesign("icarus",
-                                wrapper_file=wrapper_file.resolve(),
-                                macro_file=macro_file.resolve()))
+    project = Sim(_MemoryCocotbTbDesign("la_dpram", aw, dw, Dpram, "test_dpram.py",
+                                        "icarus",
+                                        wrapper_file=wrapper_file.resolve(),
+                                        macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
@@ -335,27 +305,6 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw, tdpram_macro):
     write masking with two independent ports.
     """
     pytest.importorskip("cocotb")
-
-    class TdpramTbDesign(Design):
-        """Testbench design for TDPRAM cocotb functional tests"""
-
-        def __init__(self, simulator: str = "icarus", wrapper_file=None, macro_file=None):
-            super().__init__("testbench")
-            self.set_dataroot("testdata", __file__)
-
-            with self.active_dataroot("testdata"):
-                with self.active_fileset("testbench.cocotb"):
-                    self.set_topmodule("la_tdpram")
-                    self.set_param("AW", str(aw))
-                    self.set_param("DW", str(dw))
-                    self.add_depfileset(SimCmdFiles(), f"{simulator}_sim")
-                    # Add cocotb test procedures
-                    self.add_file(Path(__file__).parent / "cocotb_tests" / "test_tdpram.py",
-                                  filetype="python")
-                    # Add generated wrapper and macro
-                    self.add_file(str(wrapper_file), filetype="verilog")
-                    self.add_file(str(macro_file), filetype="verilog")
-                    self.add_depfileset(Tdpram(), "rtl.impl")
 
     # Generate TDPRAM template via write_lambdalib
     tdpram_lib = RAMLib("la_tdpram", ".")
@@ -391,9 +340,10 @@ def test_tdpram_cocotb_functional(macroaw, macrodw, aw, dw, tdpram_macro):
     macro_file.write_text(tdpram_macro(macroaw, macrodw))
 
     # Run cocotb simulation via SiliconCompiler
-    project = Sim(TdpramTbDesign("icarus",
-                                 wrapper_file=wrapper_file.resolve(),
-                                 macro_file=macro_file.resolve()))
+    project = Sim(_MemoryCocotbTbDesign("la_tdpram", aw, dw, Tdpram, "test_tdpram.py",
+                                        "icarus",
+                                        wrapper_file=wrapper_file.resolve(),
+                                        macro_file=macro_file.resolve()))
     project.add_fileset("testbench.cocotb")
     use_cocotb(project=project, trace=False)
     project.set_flow("dvflow-icarus-cocotb")
