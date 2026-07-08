@@ -105,18 +105,16 @@ module {{ type }}
         wire [DW-1:0] wmask_a_int;
         wire [DW-1:0] wmask_b_int;
         genvar gwm;
-        generate
-            if (BYTEMASK) begin : g_wm_byte
-              for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
-                  assign wmask_a_int[gwm*8+:8] = {8{wmask_a[gwm]}};
-                  assign wmask_b_int[gwm*8+:8] = {8{wmask_b[gwm]}};
-              end
-            end
-            else begin : g_wm_bit
-              assign wmask_a_int = wmask_a;
-              assign wmask_b_int = wmask_b;
-            end
-        endgenerate
+        if (BYTEMASK) begin : g_wm_byte
+          for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+              assign wmask_a_int[gwm*8+:8] = {8{wmask_a[gwm]}};
+              assign wmask_b_int[gwm*8+:8] = {8{wmask_b[gwm]}};
+          end
+        end
+        else begin : g_wm_bit
+          assign wmask_a_int = wmask_a;
+          assign wmask_b_int = wmask_b;
+        end
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin : OUTPUTS

@@ -90,16 +90,14 @@ module {{ type }}
         // Generate a single bitmask
         wire [DW-1:0] wmask_int;
         genvar gwm;
-        generate
-          if (BYTEMASK) begin : g_wm_byte
-            for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
-                assign wmask_int[gwm*8+:8] = {8{wmask[gwm]}};
-            end
+        if (BYTEMASK) begin : g_wm_byte
+          for (gwm = 0; gwm < DW/8; gwm = gwm + 1) begin : g_wm_lane
+              assign wmask_int[gwm*8+:8] = {8{wmask[gwm]}};
           end
-          else begin : g_wm_bit
-            assign wmask_int = wmask;
-          end
-        endgenerate
+        end
+        else begin : g_wm_bit
+          assign wmask_int = wmask;
+        end
 
         genvar o;
         for (o = 0; o < DW; o = o + 1) begin: OUTPUTS
