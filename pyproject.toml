@@ -47,7 +47,7 @@ test = [
     "pytest == 9.1.1",
     "pytest-xdist==3.8.0",
     "pytest-timeout == 2.4.0",
-    "cocotb == 2.0.1",
+    "cocotb == 2.1.0",
     "cocotb-bus == 0.3.0",
     "pyslang >= 11.0"
 ]
@@ -56,7 +56,7 @@ slang = [
     "pyslang >= 11.0"
 ]
 cocotb = [
-    "cocotb == 2.0.1",
+    "cocotb == 2.1.0",
     "cocotb-bus == 0.3.0"
 ]
 
