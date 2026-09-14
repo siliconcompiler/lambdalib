@@ -30,7 +30,7 @@ requires-python = ">= 3.9"
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-    "siliconcompiler >= 0.37.0",
+    "siliconcompiler >= 0.38.8",
     "Jinja2 >= 3.1.3"
 ]
 dynamic = ['version']
