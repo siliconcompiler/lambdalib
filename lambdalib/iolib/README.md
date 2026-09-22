@@ -20,6 +20,7 @@
 [la_iocorner](./rtl/la_iocorner.v) | Supply  | Corner connector
 [la_ioclamp](./rtl/la_ioclamp.v)   | Supply  | ESD clamp
 [la_iocut](./rtl/la_iocut.v)       | Supply  | Power ring cutter
+[la_iocutana](./rtl/la_iocutana.v) | Supply  | Analog supply ring cutter
 
 ## PARAMETERS
 
@@ -78,3 +79,5 @@ The `PROP` parameter can be used by the technology specific `iolib` implementati
 ## la_ioclamp
 
 ## la_iocut
+
+## la_iocutana
