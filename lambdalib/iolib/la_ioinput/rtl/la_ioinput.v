@@ -36,8 +36,8 @@ module la_ioinput
 
 `ifndef VERILATOR
    if(PROP!="FIXED") begin
-      rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown
-      rnmos #1 (pad, vddio, pe & ps); // weak pullup
+      rnmos (pad, vssio, pe & ~ps); // weak pulldown
+      rnmos (pad, vddio, pe & ps); // weak pullup
    end
 `endif
 

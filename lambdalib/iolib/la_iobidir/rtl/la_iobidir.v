@@ -39,8 +39,8 @@ module la_iobidir
    assign z   = ie ? pad : 1'b0;
 
 `ifndef VERILATOR
-   rnmos #1 (pad, vssio, pe & ~ps); // weak pulldown
-   rnmos #1 (pad, vddio, pe & ps); // weak pullup
+   rnmos (pad, vssio, pe & ~ps); // weak pulldown
+   rnmos (pad, vddio, pe & ps); // weak pullup
 `endif
 
 endmodule
