@@ -268,6 +268,58 @@ module la_padside
                     .ioring1());
               end
           end
+        // LA_CUTANA
+        if (CELLMAP[(i*CMW+INDEX_CELL)+:FW] == LA_CUTANA)
+          begin : icutana
+             if (i - 1 < 0 && i + 1 == NCELLS)
+              begin: icutana_invalid
+              end
+             if (i - 1 < 0 && i + 1 <= NCELLS - 1)
+              begin: icutana_start
+                la_iocutana #(.SIDE(SIDE),
+                              .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                              .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd0(),
+                    .vdd1(vdd[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio0(),
+                    .vddio1(vddio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio0(),
+                    .vssio1(vssio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .ioring0(),
+                    .ioring1(ioring[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]));
+              end
+             if (i - 1 >= 0 && i + 1 <= NCELLS - 1)
+              begin: icutana_middle
+                la_iocutana #(.SIDE(SIDE),
+                              .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                              .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd0(vdd[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vdd1(vdd[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio0(vddio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio1(vddio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio0(vssio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio1(vssio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .ioring0(ioring[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]),
+                    .ioring1(ioring[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]));
+              end
+             if (i - 1 >= 0 && i + 1 == NCELLS)
+              begin: icutana_end
+                la_iocutana #(.SIDE(SIDE),
+                              .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                              .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd0(vdd[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vdd1(),
+                    .vddio0(vddio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio1(),
+                    .vssio0(vssio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio1(),
+                    .ioring0(ioring[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]),
+                    .ioring1());
+              end
+          end
         // LA_VDDIO
         if (CELLMAP[(i*CMW+INDEX_CELL)+:FW] == LA_VDDIO)
           begin : gvddio
