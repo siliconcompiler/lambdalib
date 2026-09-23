@@ -16,14 +16,16 @@ module la_iocutana
     )
    (
     // shorted signals
-    inout             vss,    // core ground
-    inout             vdd,    // core supply
-    inout [RINGW-1:0] ioring, // generic ioring
+    inout             vss,     // core ground
+    inout             vdd0,    // previous section vdd (shorted to vdd1)
+    inout             vdd1,    // next section vdd (shorted to vdd0)
+    inout [RINGW-1:0] ioring0, // previous section irong (shorted to ioring1)
+    inout [RINGW-1:0] ioring1, // next section ioring (shorted to ioring0)
     // cut signals
-    inout             vddio,  // digital power
-    inout             vssio,  // digital ground
-    inout             vdda,   // analog power
-    inout             vssa    // analog ground
+    inout             vddio0,  // io/analog supply from section before
+    inout             vddio1,  // io/analog supply from next section
+    inout             vssio0,  // io/analog ground from section before
+    inout             vssio1   // io/analog ground from next section
     );
 
 endmodule
