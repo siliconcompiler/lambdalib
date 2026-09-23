@@ -2,25 +2,25 @@
 
 ## Cell Listing
 
-| Cell                             | Type    | Description                 |
-| ---------------------------------|---------|-----------------------------|
-[la_iobidir](./rtl/la_iobidir.v)   | Digital | Bidirectional
-[la_ioinput](./rtl/la_ioinput.v)   | Digital | Input
-[la_ioxtal](./rtl/la_ioxtal.v)     | Digital | Xtal transceiver
-[la_iorxdiff](./rtl/la_iorxdiff.v) | Digital | Differential input
-[la_iotxdiff](./rtl/la_iotxdiff.v) | Digital | Differential output
-[la_ioanalog](./rtl/la_ioanalog.v) | Analog  | Pass through ESD protection
-[la_iovdd](./rtl/la_iovdd.v)       | Supply  | Core power
-[la_iovss](./rtl/la_iovss.v)       | Supply  | Core ground
-[la_iovddio](./rtl/la_iovddio.v)   | Supply  | IO  power
-[la_iovssio](./rtl/la_iovssio.v)   | Supply  | IO ground
-[la_iovdda](./rtl/la_iovdda.v)     | Supply  | Analog power
-[la_iovssa](./rtl/la_iovssa.v)     | Supply  | Analog ground
-[la_iopoc](./rtl/la_iopoc.v)       | Supply  | Power on control
-[la_iocorner](./rtl/la_iocorner.v) | Supply  | Corner connector
-[la_ioclamp](./rtl/la_ioclamp.v)   | Supply  | ESD clamp
-[la_iocut](./rtl/la_iocut.v)       | Supply  | Power ring cutter
-[la_iocutana](./rtl/la_iocutana.v) | Supply  | Analog supply ring cutter
+| Cell                                         | Type    | Description                 |
+| ---------------------------------------------|---------|-----------------------------|
+[la_iobidir](./la_iobidir/rtl/la_iobidir.v)    | Digital | Bidirectional
+[la_ioinput](./la_ioinput/rtl/la_ioinput.v)    | Digital | Input
+[la_ioxtal](./la_ioxtal/rtl/la_ioxtal.v)       | Digital | Xtal transceiver
+[la_iorxdiff](./la_iorxdiff/rtl/la_iorxdiff.v) | Digital | Differential input
+[la_iotxdiff](./la_iotxdiff/rtl/la_iotxdiff.v) | Digital | Differential output
+[la_ioanalog](./la_ioanalog/rtl/la_ioanalog.v) | Analog  | Pass through ESD protection
+[la_iovdd](./la_iovdd/rtl/la_iovdd.v)          | Supply  | Core power
+[la_iovss](./la_iovss/rtl/la_iovss.v)          | Supply  | Core ground
+[la_iovddio](./la_iovddio/rtl/la_iovddio.v)    | Supply  | IO  power
+[la_iovssio](./la_iovssio/rtl/la_iovssio.v)    | Supply  | IO ground
+[la_iovdda](./la_iovdda/rtl/la_iovdda.v)       | Supply  | Analog power
+[la_iovssa](./la_iovssa/rtl/la_iovssa.v)       | Supply  | Analog ground
+[la_iopoc](./la_iopoc/rtl/la_iopoc.v)          | Supply  | Power on control
+[la_iocorner](./la_iocorner/rtl/la_iocorner.v) | Supply  | Corner connector
+[la_ioclamp](./la_ioclamp/rtl/la_ioclamp.v)    | Supply  | ESD clamp
+[la_iocut](./la_iocut/rtl/la_iocut.v)          | Supply  | Power ring cutter
+[la_iocutana](./la_iocutana/rtl/la_iocutana.v) | Supply  | Analog supply ring cutter
 
 ## PARAMETERS
 
