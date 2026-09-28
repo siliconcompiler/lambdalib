@@ -61,7 +61,7 @@ cocotb = [
 ]
 
 lint = [
-    "flake8 == 7.3.0",
+    "flake8 == 7.4.1",
     "codespell == 2.4.3"
 ]
 
