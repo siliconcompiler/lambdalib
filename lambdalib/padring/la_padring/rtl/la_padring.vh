@@ -26,3 +26,4 @@ localparam [15:0] LA_VSSA   = 16'h15;
 localparam [15:0] LA_POC    = 16'h16;
 localparam [15:0] LA_CUT    = 16'h17;
 localparam [15:0] LA_CLAMP  = 16'h18;
+localparam [15:0] LA_CUTANA = 16'h19;
