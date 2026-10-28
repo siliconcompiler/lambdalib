@@ -268,6 +268,52 @@ module la_padside
                     .ioring1());
               end
           end
+        // LA_CUTVDDIO
+        if (CELLMAP[(i*CMW+INDEX_CELL)+:FW] == LA_CUTVDDIO)
+          begin : icutvddio
+             if (i - 1 < 0 && i + 1 == NCELLS)
+              begin: icutvddio_invalid
+              end
+             if (i - 1 < 0 && i + 1 <= NCELLS - 1)
+              begin: icutvddio_start
+                la_iocutvddio #(.SIDE(SIDE),
+                                .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                                .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd(vdd[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .ioring(ioring[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]),
+                    .vddio0(),
+                    .vddio1(vddio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio0(),
+                    .vssio1(vssio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]));
+              end
+             if (i - 1 >= 0 && i + 1 <= NCELLS - 1)
+              begin: icutvddio_middle
+                la_iocutvddio #(.SIDE(SIDE),
+                                .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                                .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd(vdd[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .ioring(ioring[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]),
+                    .vddio0(vddio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio1(vddio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio0(vssio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio1(vssio[CELLMAP[((i+1)*CMW+INDEX_SECTION)+:FW]]));
+              end
+             if (i - 1 >= 0 && i + 1 == NCELLS)
+              begin: icutvddio_end
+                la_iocutvddio #(.SIDE(SIDE),
+                                .PROP(CELLMAP[(i*CMW+INDEX_PROP)+:FW]),
+                                .RINGW(RINGW))
+                i0 (.vss(vss),
+                    .vdd(vdd[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .ioring(ioring[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]*RINGW+:RINGW]),
+                    .vddio0(vddio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vddio1(),
+                    .vssio0(vssio[CELLMAP[((i-1)*CMW+INDEX_SECTION)+:FW]]),
+                    .vssio1());
+              end
+          end
         // LA_VDDIO
         if (CELLMAP[(i*CMW+INDEX_CELL)+:FW] == LA_VDDIO)
           begin : gvddio
