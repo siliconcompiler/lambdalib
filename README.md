@@ -71,7 +71,7 @@ lambdalib/
 ├── stdlib/     # Standard digital cells (97 cells)
 ├── auxlib/     # Special-purpose cells (22 cells)
 ├── ramlib/     # Memory modules (6 modules)
-├── iolib/      # I/O pad cells (16 cells)
+├── iolib/      # I/O pad cells (17 cells)
 ├── padring/    # Padring generator (3 modules)
 ├── veclib/     # Vectorized datapath (15 cells)
 ├── fpgalib/    # FPGA primitives (3 cells)
@@ -389,7 +389,7 @@ Parameterizable memory generators with consistent interfaces across technologies
 
 ---
 
-### iolib - I/O Cells (16 cells)
+### iolib - I/O Cells (17 cells)
 
 Complete I/O pad library for chip periphery.
 
@@ -427,6 +427,7 @@ Complete I/O pad library for chip periphery.
 | [`Iocorner`](lambdalib/iolib/la_iocorner/rtl/la_iocorner.v) | Corner cell |
 | [`Ioclamp`](lambdalib/iolib/la_ioclamp/rtl/la_ioclamp.v) | ESD clamp |
 | [`Iocut`](lambdalib/iolib/la_iocut/rtl/la_iocut.v) | Power ring cut |
+| [`Iocutana`](lambdalib/iolib/la_iocutana/rtl/la_iocutana.v) | Analog supply ring cut |
 
 ---
 

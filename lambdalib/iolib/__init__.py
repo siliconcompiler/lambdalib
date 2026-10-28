@@ -5,6 +5,7 @@ from .la_iobidir.la_iobidir import Iobidir
 from .la_ioclamp.la_ioclamp import Ioclamp
 from .la_iocorner.la_iocorner import Iocorner
 from .la_iocut.la_iocut import Iocut
+from .la_iocutana.la_iocutana import Iocutana
 from .la_ioinput.la_ioinput import Ioinput
 from .la_iopoc.la_iopoc import Iopoc
 from .la_iorxdiff.la_iorxdiff import Iorxdiff
@@ -22,6 +23,7 @@ __all__ = ['Ioanalog',
            'Ioclamp',
            'Iocorner',
            'Iocut',
+           'Iocutana',
            'Ioinput',
            'Iopoc',
            'Iorxdiff',
@@ -48,6 +50,7 @@ class IOLib(Design):
             self.add_depfileset(Iotxdiff(), depfileset="rtl")
             self.add_depfileset(Iopoc(), depfileset="rtl")
             self.add_depfileset(Iocut(), depfileset="rtl")
+            self.add_depfileset(Iocutana(), depfileset="rtl")
             self.add_depfileset(Iovddio(), depfileset="rtl")
             self.add_depfileset(Iovssio(), depfileset="rtl")
             self.add_depfileset(Iovdd(), depfileset="rtl")
