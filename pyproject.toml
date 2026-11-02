@@ -44,7 +44,7 @@ lambdalib_techlib_interface = "lambdalib.reusable_tests.techlib_interface"
 [project.optional-dependencies]
 # Dev dependencies.
 test = [
-    "pytest == 9.1.1",
+    "pytest == 9.2.0",
     "pytest-xdist==3.8.0",
     "pytest-timeout == 2.4.0",
     "cocotb == 2.1.0",
